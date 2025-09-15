@@ -1,0 +1,7 @@
+# Arquivos de configuração do ambiente
+front/node_modules
+front/playwright.config.ts
+front/pnpm-lock.yaml
+front/pnpm-workspace.yaml
+front/tsconfig.json
+front/src/vite-env.d.ts
