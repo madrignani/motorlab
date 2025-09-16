@@ -26,7 +26,7 @@ Para executar o projeto é necessário ter previamente instalado e configurado n
 
 ## Dependências
 
-### Front-end (listadas no `package.json`)
+### Front-end (listadas no "package.json")
 
 No diretório `front`, o TypeScript utiliza as seguintes dependências:
 
@@ -35,7 +35,7 @@ No diretório `front`, o TypeScript utiliza as seguintes dependências:
 - `vitest`: 3.2.4
 - `playwright/test`: 1.55.0
 
-### Back-end (listadas no `composer.json`)
+### Back-end (listadas no "composer.json")
 
 No diretório `back`, a API PHP utiliza a seguinte dependência:
 
