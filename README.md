@@ -8,7 +8,7 @@ O software faz parte do meu **Projeto Final 2 (TCC)**, desenvolvido sob a orient
 
 ## Autor
 
-**Giovanni de Oliveira Madrignani** 
+### Giovanni de Oliveira Madrignani
 
 
 
