@@ -4,11 +4,7 @@ Este sistema web visa gerenciar os processos operacionais de oficinas mecânicas
 
 O software faz parte do meu **Projeto Final 2 (TCC)**, desenvolvido sob a orientação do professor **Rafael Elias de Lima Escalfoni**, no curso de **Bacharelado em Sistemas de Informação do CEFET/RJ**, Campus Nova Friburgo.
 
-
-
-## Autor
-
-### Giovanni de Oliveira Madrignani
+Desenvolvido por **Giovanni de Oliveira Madrignani**
 
 
 
