@@ -5,3 +5,13 @@ front/pnpm-lock.yaml
 front/pnpm-workspace.yaml
 front/tsconfig.json
 front/src/vite-env.d.ts
+back/vendor
+back/composer.lock
+
+
+# Arquivos de armazenamento e cache do ambiente
+back/bootstrap/cache
+back/storage
+
+# Arquivos com variáveis de ambiente
+back/.env

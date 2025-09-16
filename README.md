@@ -1,12 +1,14 @@
 # MotorLab
 
-Este sistema web visa gerenciar os processos operacionais de oficinas mecânicas automotivas, aplicando os princípios do **Sistema Toyota de Produção** para otimizar qualidade e eficiência. Ele controla o fluxo de trabalho desde o contato inicial com o cliente até o fechamento do serviço, incluindo cadastro de clientes e veículos, geração e acompanhamento de Ordens de Serviço, cálculo final e gestão de estoque. O software faz parte do meu **Projeto Final 2 (TCC)**, desenvolvido sob a orientação do professor **Rafael Elias de Lima Escalfoni**, no curso de **Bacharelado em Sistemas de Informação do CEFET/RJ**, Campus Nova Friburgo.
+Este sistema web visa gerenciar os processos operacionais de oficinas mecânicas automotivas, aplicando os princípios do **Sistema Toyota de Produção** para otimizar qualidade e eficiência. Ele controla o fluxo de trabalho desde o contato inicial com o cliente até o fechamento do serviço, incluindo cadastro de clientes e veículos, geração e acompanhamento de Ordens de Serviço, cálculo final e gestão de estoque. 
+
+O software faz parte do meu **Projeto Final 2 (TCC)**, desenvolvido sob a orientação do professor **Rafael Elias de Lima Escalfoni**, no curso de **Bacharelado em Sistemas de Informação do CEFET/RJ**, Campus Nova Friburgo.
 
 
 
 ## Autor
 
-- **Giovanni de Oliveira Madrignani** 
+**Giovanni de Oliveira Madrignani** 
 
 
 
@@ -14,24 +16,30 @@ Este sistema web visa gerenciar os processos operacionais de oficinas mecânicas
 
 Para executar o projeto é necessário ter previamente instalado e configurado no ambiente: 
 
-- [Node.js](https://nodejs.org/) (versão 18 ou superior)
-- [PNPM](https://pnpm.io/) (versão 10.11.0 ou superior)
-- [PHP](https://www.php.net/) (versão 8.4.3 ou superior)
-- [Composer](https://getcomposer.org/)
-- [MariaDB](https://mariadb.org/) ou MySQL 5.7+
+- [Node.js](https://nodejs.org/) (versão 18.0+)
+- [PNPM](https://pnpm.io/) (versão 10.11.0+)
+- [PHP](https://www.php.net/) (versão 8.4.3+)
+- [Composer](https://getcomposer.org/) (versão 2.8.9+)
+- [MariaDB](https://mariadb.org/) ou MySQL (versão 5.7+)
 
-### Front-end (devDependencies listadas no `package.json`)
+
+
+## Dependências
+
+### Front-end (listadas no `package.json`)
 
 No diretório `front`, o TypeScript utiliza as seguintes dependências:
 
-* `vite`
-* `typescript`
-* `vitest`
-* `playwright/test`
+- `vite`: 7.1.2
+- `typescript`: 5.8.3
+- `vitest`: 3.2.4
+- `playwright/test`: 1.55.0
 
-### Back-end (require e require-dev listadas no `composer.json`)
+### Back-end (listadas no `composer.json`)
 
-No diretório `back`, a API PHP utiliza as seguintes dependências:
+No diretório `back`, a API PHP utiliza a seguinte dependência:
+
+- `Laravel`: 12.0 (engloba todas as bibliotecas necessárias)
 
 
 
