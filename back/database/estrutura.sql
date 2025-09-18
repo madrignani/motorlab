@@ -1,5 +1,7 @@
 CREATE DATABASE IF NOT EXISTS motorlab CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
+USE motorlab;
+
 CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
     cpf CHAR(11) NOT NULL UNIQUE,
