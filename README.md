@@ -35,6 +35,9 @@ No diretório `front`, o TypeScript utiliza as seguintes dependências:
 
 No diretório `back`, a API PHP utiliza a seguinte dependência:
 
+- `phputil/router`: dev-main
+- `phputil/cors`: dev-main
+- `kahlan/kahlan`: 6.0
 
 
 
