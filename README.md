@@ -35,7 +35,6 @@ No diretório `front`, o TypeScript utiliza as seguintes dependências:
 
 No diretório `back`, a API PHP utiliza a seguinte dependência:
 
-- `Laravel`: 12.0 (engloba todas as bibliotecas necessárias)
 
 
 

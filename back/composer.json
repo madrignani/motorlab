@@ -1,0 +1,30 @@
+{   
+    
+    "name": "motorlab/back",
+    "description": "API do projeto MotorLab (TCC 2)",
+    "version": "0.1.0",
+    "type": "project",
+    "license": "MIT",
+    "author": "Giovanni de Oliveira Madrignani",
+    "minimum-stability": "dev", 
+
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+
+    "scripts": {
+        "test": "kahlan --spec=test",
+        "dump": "composer dump-autoload"
+    },
+
+    "require": {
+        "phputil/router": "dev-main",
+        "phputil/cors": "dev-main"
+    },
+    "require-dev": {
+        "kahlan/kahlan": "^6.0"
+    }
+
+}
