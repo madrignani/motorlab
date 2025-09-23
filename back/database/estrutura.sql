@@ -48,7 +48,7 @@ CREATE TABLE os (
     veiculo_id INT NOT NULL,
     usuario_criacao INT NOT NULL,
     usuario_responsavel INT NOT NULL,
-    status ENUM('PROVISORIA', 'ANDAMENTO', 'CANCELADA', 'FINALIZADA') NOT NULL,
+    status ENUM('PROVISORIA', 'ANDAMENTO', 'ALERTA', 'CONCLUIDA', 'FINALIZADA', 'CANCELADA') NOT NULL,
     data_hora_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     valor_estimado DECIMAL(10,2) DEFAULT 0.00,
     valor_final DECIMAL(10,2),
