@@ -6,7 +6,8 @@ CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
     cpf CHAR(11) NOT NULL UNIQUE,
     nome VARCHAR(70) NOT NULL,
-    senha VARCHAR(128) NOT NULL,
+    sal CHAR(32) NOT NULL,
+    senha CHAR(128) NOT NULL,
     cargo ENUM('ATENDENTE', 'MECANICO', 'GERENTE') NOT NULL,
     ativo BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
@@ -24,7 +25,7 @@ CREATE TABLE veiculo (
     cliente_id INT NOT NULL,
     placa CHAR(7) NOT NULL,
     chassi CHAR(17) NOT NULL,
-    marca VARCHAR(30) NOT NULL,
+    fabricante VARCHAR(30) NOT NULL,
     modelo VARCHAR(70) NOT NULL,
     ano INT NOT NULL,
     quilometragem INT NOT NULL,
@@ -34,7 +35,8 @@ CREATE TABLE veiculo (
 CREATE TABLE item (
     id INT PRIMARY KEY AUTO_INCREMENT,
     codigo VARCHAR(30) NOT NULL UNIQUE,
-    nome VARCHAR(30) NOT NULL, 
+    titulo VARCHAR(30) NOT NULL, 
+    fabricante VARCHAR(30) NOT NULL,
     descricao VARCHAR(70) NULL,
     preco_venda DECIMAL(10,2) NOT NULL,
     estoque INT NOT NULL,
