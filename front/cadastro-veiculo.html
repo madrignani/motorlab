@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="./src/visao/cadastro-veiculo.ts" type="module" defer></script>
+        <link rel="stylesheet" href="./estilo/estilo-cadastro-veiculo.css">
+        <title>MotorLab - Cadastrar Veículo</title>
+    </head>
+    <body>
+        <header>
+            <nav aria-label="Navegação principal">
+                <div class="dropdown">
+                    <button class="dropdown-botao" id="dropdownBotaoUsuario">Usuário</button>
+                    <div class="dropdown-conteudo" id="dropdownConteudoUsuario"></div>
+                </div>
+                <div class="dropdown">
+                    <button class="dropdown-botao" id="dropdownBotaoCadastro">Cadastro</button>
+                    <div class="dropdown-conteudo" id="dropdownConteudoCadastro">
+                        <a href="./cadastro-cliente.html">Cliente</a>
+                        <a href="./cadastro-veiculo.html">Veículo</a>
+                    </div>
+                </div>
+                <a href="./index.html">Ordens de Serviço</a>
+            </nav>
+            <button id="botaoLogout" type="button">LOGOUT</button>
+        </header>
+        <main>
+            <h1>CADASTRAR VEÍCULO</h1>
+            <form>
+                <label for="buscaCliente">Cliente: </label>
+                <input type="search" id="buscaCliente" placeholder="Digite o nome ou CPF">
+                <button type="button" id="botaoBuscaCliente">BUSCAR</button>
+                <div id="detalhesCliente"></div>
+                <label for="placa">Placa: </label>
+                <input type="text" id="placa" required>
+                <label for="chassi">Chassi: </label>
+                <input type="text" id="chassi" placeholder="sem pontuação" required>
+                <label for="fabricante">Fabricante: </label>
+                <input type="text" id="fabricante" required>
+                <label for="modelo">Modelo: </label>
+                <input type="text" id="modelo" required>
+                <label for="ano">Ano de fabricação: </label>
+                <input type="number" id="ano" required>
+                <label for="quilometragem">Quilometragem atual: </label>
+                <input type="number" id="quilometragem" required>
+                <button id="botaoEnviar" type="submit">CADASTRAR</button>
+            </form>
+        </main>
+    </body>
+</html>
