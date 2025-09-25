@@ -6,6 +6,7 @@ CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
     cpf CHAR(11) NOT NULL UNIQUE,
     nome VARCHAR(70) NOT NULL,
+    email VARCHAR(70) NOT NULL,
     sal CHAR(32) NOT NULL,
     senha CHAR(128) NOT NULL,
     cargo ENUM('ATENDENTE', 'MECANICO', 'GERENTE') NOT NULL,
@@ -37,11 +38,11 @@ CREATE TABLE item (
     codigo VARCHAR(30) NOT NULL UNIQUE,
     titulo VARCHAR(30) NOT NULL, 
     fabricante VARCHAR(30) NOT NULL,
-    descricao VARCHAR(70) NULL,
+    descricao VARCHAR(70) NOT NULL,
     preco_venda DECIMAL(10,2) NOT NULL,
     estoque INT NOT NULL,
     estoque_minimo INT NOT NULL,
-    localizacao VARCHAR(20)
+    localizacao VARCHAR(20) NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE os (
@@ -53,7 +54,7 @@ CREATE TABLE os (
     status ENUM('PROVISORIA', 'ANDAMENTO', 'ALERTA', 'CONCLUIDA', 'FINALIZADA', 'CANCELADA') NOT NULL,
     data_hora_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     valor_estimado DECIMAL(10,2) DEFAULT 0.00,
-    valor_final DECIMAL(10,2),
+    valor_final DECIMAL(10,2) DEFAULT 0.00,
     observacoes TEXT,
     FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE RESTRICT,
     FOREIGN KEY (veiculo_id) REFERENCES veiculo(id) ON DELETE RESTRICT,

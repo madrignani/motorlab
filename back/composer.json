@@ -5,6 +5,8 @@
     "version": "0.1.0",
     "type": "project",
     "license": "MIT",
+    "keywords": ["motorlab", "tcc", "api", "php"],
+    "homepage": "https://github.com/madrignani/motorlab/tree/main/back",
     "author": "Giovanni de Oliveira Madrignani",
     "minimum-stability": "dev", 
 
@@ -16,7 +18,8 @@
 
     "scripts": {
         "test": "kahlan --spec=test",
-        "dump": "composer dump-autoload"
+        "dump": "composer dump-autoload",
+        "serve": "php -S localhost:8080"
     },
 
     "require": {
