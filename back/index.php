@@ -12,7 +12,9 @@ use App\Excecao\DominioException;
 use App\Excecao\RepositorioException;
 use App\Transacao\TransacaoPDO;
 use App\Servico\ServicoAutenticacao;
+use App\Servico\ServicoCadastroCliente;
 use App\Repositorio\RepositorioUsuarioBDR;
+use App\Repositorio\RepositorioClienteBDR;
 use App\Dto\UsuarioDTO;
 
 
@@ -107,6 +109,34 @@ $app->get( '/dados-usuario', function($req, $res) {
         $res->status(200)->json( $usuarioDto->arrayDados() );
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->post( '/clientes', function($req, $res) {
+    try{
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $logado = $sessao->dadosUsuarioLogado();
+        $dados = ( (array)$req->body() );
+        if ( (empty($dados['cpf'])) || (empty($dados['nome'])) || (empty($dados['telefone'])) || (empty($dados['email'])) ) {
+            throw new Exception( ['Dados necessários para cadastrar o Cliente não foram recebidos.'] );
+        }
+        $pdo = Conexao::conectar();
+        $repositorio = new RepositorioClienteBDR($pdo);
+        $servico = new ServicoCadastroCliente($repositorio); 
+        $servico->cadastrarCliente(
+            $dados['cpf'], $dados['nome'], $dados['telefone'], $dados['email'], 
+            $logado['cargo_usuario'] 
+        );
+        $res->status(200)->end();
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    }  catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
     } catch (Exception $erro) {
         $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
     }

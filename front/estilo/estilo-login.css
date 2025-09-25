@@ -1,0 +1,24 @@
+/*////////////////////////////     APRESENTAÇÃO      /////////////////////////////////*/
+
+
+@font-face {
+    font-family: 'Open Sans Variable';
+    src: url('./fonte/OpenSans-VariableFont.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Open Sans Variable', sans-serif;
+}
+
+button {
+    font-family: 'Open Sans Variable', sans-serif;
+}

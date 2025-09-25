@@ -23,9 +23,13 @@ export class VisaoListagemOsHTML implements VisaoListagemOs {
     }
 
     exibirDadosUsuario( dados: any ): void {
-        const div = document.getElementById("identificacaoUsuario") as HTMLDivElement;
-        let texto = `Usuário: ${dados.nome} -- ${dados.cargo}`;
-        div.textContent = texto;
+        const div = document.getElementById("dropdownConteudoUsuario") as HTMLDivElement;
+        const nome = document.createElement("p");
+        nome.textContent = dados.nome;
+        const cargo = document.createElement("p");
+        cargo.textContent = dados.cargo;
+        div.appendChild(nome);
+        div.appendChild(cargo);
     }
 
     redirecionarParaLogin(): void {
@@ -34,6 +38,10 @@ export class VisaoListagemOsHTML implements VisaoListagemOs {
 
     exibirMensagem( mensagens: string[] ): void {
         alert( mensagens.join("\n") );
+    }
+
+    exibirPagina(): void {
+        document.body.style.visibility = "visible";
     }
 
 }

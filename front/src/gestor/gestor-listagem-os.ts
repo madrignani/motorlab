@@ -15,7 +15,7 @@ export class GestorListagemOs {
         await this.gestorSessao.verificarPermissao();
     }
 
-    async obterDadosUsuario(): Promise<void> {
+    async obterDadosUsuario(): Promise<any> {
         return await this.gestorSessao.obterDadosUsuario();
     }
 

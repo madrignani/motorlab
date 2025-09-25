@@ -33,11 +33,12 @@ export class ControladoraListagemOs {
             return;
         }
         await this.carregarDadosUsuario();
+        this.visao.exibirPagina();
     }
 
     private async carregarDadosUsuario(): Promise<void> {
         try {
-            const dadosUsuario = await this.gestor.obterDadosUsuario()
+            const dadosUsuario = await this.gestor.obterDadosUsuario();
             this.visao.exibirDadosUsuario(dadosUsuario);
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
