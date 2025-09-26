@@ -67,7 +67,7 @@ export class ControladoraCadastroVeiculo {
             return;
         }
         try {
-            const dadosCliente = await this.gestor.buscarCliente(busca.trim());
+            const dadosCliente = await this.gestor.obterCliente(busca.trim());
             if (!dadosCliente.id) {
                 this.visao.exibirMensagem( ["Cliente não encontrado."] );
                 this.idClienteSelecionado = null;

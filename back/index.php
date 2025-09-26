@@ -13,8 +13,10 @@ use App\Excecao\RepositorioException;
 use App\Transacao\TransacaoPDO;
 use App\Servico\ServicoAutenticacao;
 use App\Servico\ServicoCadastroCliente;
+use App\Servico\ServicoCadastroVeiculo;
 use App\Repositorio\RepositorioUsuarioBDR;
 use App\Repositorio\RepositorioClienteBDR;
+use App\Repositorio\RepositorioVeiculoBDR;
 use App\Dto\UsuarioDTO;
 
 
@@ -136,6 +138,30 @@ $app->post( '/clientes', function($req, $res) {
     } catch (DominioException $erro) {
         $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
     }  catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->get( '/clientes/:busca', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $logado = $sessao->dadosUsuarioLogado();
+        $busca = $req->param('busca');
+        $pdo = Conexao::conectar();
+        $repositorioCliente = new RepositorioClienteBDR($pdo);
+        $repositorioVeiculo = new RepositorioVeiculoBDR($pdo);
+        $servico = new ServicoCadastroVeiculo($repositorioCliente, $repositorioVeiculo);
+        $cliente = $servico->buscarCliente(
+            $busca,
+            $logado['cargo_usuario'] 
+        );
+        $res->status(200)->json($cliente);
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (RepositorioException $erro) {
         $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
     } catch (Exception $erro) {
         $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );

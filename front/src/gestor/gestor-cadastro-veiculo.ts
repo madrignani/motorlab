@@ -21,8 +21,8 @@ export class GestorCadastroVeiculo {
         return await this.gestorSessao.obterDadosUsuario();
     }
 
-    async buscarCliente(busca: string): Promise<any> {
-        const response = await fetch( `${API_URL}/cliente?busca=${busca}`, {
+    async obterCliente(busca: string): Promise<any> {
+        const response = await fetch( `${API_URL}/clientes/${busca}`, {
             method: 'GET',
             credentials: 'include'
         } );

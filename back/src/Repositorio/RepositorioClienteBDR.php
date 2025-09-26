@@ -33,6 +33,22 @@ class RepositorioClienteBDR implements RepositorioCliente {
         }
     }
 
+    public function buscarPorCpfOuNome(string $valor): ?array {
+        try {
+            $sql = <<<SQL
+                SELECT id, cpf, nome, telefone, email
+                FROM cliente
+                WHERE cpf = :valor OR nome = :valor
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['valor' => $valor] );
+            $dados = $stmt->fetchAll();
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
 }
 
 
