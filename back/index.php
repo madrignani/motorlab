@@ -123,15 +123,12 @@ $app->post( '/clientes', function($req, $res) {
         $logado = $sessao->dadosUsuarioLogado();
         $dados = ( (array)$req->body() );
         if ( (empty($dados['cpf'])) || (empty($dados['nome'])) || (empty($dados['telefone'])) || (empty($dados['email'])) ) {
-            throw new Exception( ['Dados necessários para cadastrar o Cliente não foram recebidos.'] );
+            throw DominioException::comProblemas( ['Dados necessários para cadastrar o Cliente não foram recebidos.'] );
         }
         $pdo = Conexao::conectar();
         $repositorio = new RepositorioClienteBDR($pdo);
         $servico = new ServicoCadastroCliente($repositorio); 
-        $servico->cadastrarCliente(
-            $dados['cpf'], $dados['nome'], $dados['telefone'], $dados['email'], 
-            $logado['cargo_usuario'] 
-        );
+        $servico->cadastrarCliente($dados, $logado['cargo_usuario']);
         $res->status(200)->end();
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
@@ -162,6 +159,33 @@ $app->get( '/clientes/:busca', function($req, $res) {
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
     } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->post( '/veiculos', function($req, $res) {
+    try{
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $logado = $sessao->dadosUsuarioLogado();
+        $dados = ( (array)$req->body() );
+        if ( (empty($dados['cliente_id'])) || (empty($dados['placa'])) || (empty($dados['chassi'])) || (empty($dados['fabricante']))
+            || (empty($dados['modelo'])) || (empty($dados['ano'])) || (empty($dados['quilometragem'])) ) {
+            throw DominioException::comProblemas( ['Dados necessários para cadastrar o Veículo não foram recebidos.'] );
+        }
+        $pdo = Conexao::conectar();
+        $repositorioCliente = new RepositorioClienteBDR($pdo);
+        $repositorioVeiculo = new RepositorioVeiculoBDR($pdo);
+        $servico = new ServicoCadastroVeiculo($repositorioCliente, $repositorioVeiculo);
+        $cliente = $servico->cadastrarVeiculo($dados, $logado['cargo_usuario'] );
+        $res->status(200)->end();
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    }  catch (RepositorioException $erro) {
         $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
     } catch (Exception $erro) {
         $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );

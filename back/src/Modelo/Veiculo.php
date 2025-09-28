@@ -27,7 +27,7 @@ class Veiculo {
         int $quilometragem
     ) {
         $this->id = $id;
-        $this->clienteId = $clienteId;
+        $this->cliente = $cliente;
         $this->placa = $placa;
         $this->chassi = $chassi;
         $this->fabricante = $fabricante;

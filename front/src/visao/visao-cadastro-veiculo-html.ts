@@ -61,10 +61,10 @@ export class VisaoCadastroVeiculoHTML implements VisaoCadastroVeiculo {
     exibirCliente(cliente: any): void {
         const divDetalhesCliente = document.getElementById("detalhesCliente") as HTMLDivElement;
         divDetalhesCliente.innerHTML = `
-            <p><strong>Nome: </strong> ${cliente.nome}</p>
-            <p><strong>CPF: </strong> ${cliente.cpf}</p>
-            <p><strong>Telefone: </strong> ${cliente.telefone}</p>
-            <p><strong>Email: </strong> ${cliente.email}</p>
+            <p>Nome: ${cliente.nome}</p>
+            <p>CPF: ${cliente.cpf}</p>
+            <p>Telefone: ${cliente.telefone}</p>
+            <p>Email: ${cliente.email}</p>
         `;
     }
 

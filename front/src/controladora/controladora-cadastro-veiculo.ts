@@ -71,6 +71,7 @@ export class ControladoraCadastroVeiculo {
             if (!dadosCliente.id) {
                 this.visao.exibirMensagem( ["Cliente não encontrado."] );
                 this.idClienteSelecionado = null;
+                this.visao.limparDivCliente();
                 return;
             }
             this.idClienteSelecionado = dadosCliente.id;
@@ -86,6 +87,9 @@ export class ControladoraCadastroVeiculo {
     }
 
     async enviarVeiculo(dados: any): Promise<void> {
+        if (!this.idClienteSelecionado) {
+            this.visao.exibirMensagem( ["Informe um cliente válido."] );
+        }
         if (!dados.placa || !dados.chassi || !dados.fabricante || !dados.modelo || !dados.ano || !dados.quilometragem) {
             this.visao.exibirMensagem( ["Todos os campos do fomulário devem ser preenchidos."] );
             return;
@@ -100,8 +104,8 @@ export class ControladoraCadastroVeiculo {
             chassi: dados.chassi,
             fabricante: dados.fabricante,
             modelo: dados.modelo,
-            ano: Number(dados.ano),
-            quilometragem: Number(dados.quilometragem)
+            ano: ( Number(dados.ano) ),
+            quilometragem: ( Number(dados.quilometragem) )
         };
         try {
             await this.gestor.cadastrarVeiculo(envio);

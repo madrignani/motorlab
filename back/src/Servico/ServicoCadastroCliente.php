@@ -16,14 +16,18 @@ class ServicoCadastroCliente {
         $this->repositorio = $repositorio;
     }
 
-    public function cadastrarCliente(string $cpf, string $nome, string $telefone, string $email, string $cargoUsuarioLogado): void {
+    public function cadastrarCliente(array $dados, string $cargoUsuarioLogado): void {
         if ($cargoUsuarioLogado !== 'ATENDENTE' && $cargoUsuarioLogado !== 'GERENTE') {
             throw new AutenticacaoException('Permissão negada.');
         }
+        $cpf = $dados['cpf'];
+        $nome = $dados['nome'];
+        $telefone = $dados['telefone'];
+        $email = $dados['email'];
         $cliente = $this->mapearCliente($cpf, $nome, $telefone, $email);
         $problemas = $cliente->validar();
-        if (!empty($problemas)) {
-            throw new DominioException($problemas);
+        if ( !empty($problemas) ) {
+            throw DominioException::comProblemas($problemas);
         }
         $this->repositorio->salvar($cpf, $nome, $telefone, $email);
     }

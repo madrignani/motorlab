@@ -1,10 +1,10 @@
 <?php
 
 
-namespace App\DTO;
+namespace App\Dto;
 
 
-class UsuarioDTO {
+class UsuarioDto {
 
     private int $id;
     private string $cpf;

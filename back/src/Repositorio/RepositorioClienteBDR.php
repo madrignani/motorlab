@@ -49,6 +49,25 @@ class RepositorioClienteBDR implements RepositorioCliente {
         }
     }
 
+    public function buscarPorId(int $id): ?array {
+        try {
+            $sql = <<<SQL
+                SELECT id, cpf, nome, telefone, email
+                FROM cliente
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['id' => $id] );
+            $dados = $stmt->fetch();
+            if ( empty($dados) ) {
+                return null;
+            }
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
 }
 
 
