@@ -50,15 +50,3 @@ nav {
 .dropdown:hover .dropdown-conteudo {
     display: block;
 }
-
-#camposEditaveis {
-    display: none;
-}
-
-#modalConfirmarEdicao {
-    display: none;
-}
-
-#modalCancelarEdicao {
-    display: none;
-}

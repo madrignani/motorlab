@@ -37,8 +37,14 @@ export class VisaoCadastroVeiculoHTML implements VisaoCadastroVeiculo {
         window.location.href = "./login.html";
     }
 
-    exibirMensagem(mensagens: string[]): void {
-        alert(mensagens.join("\n"));
+    exibirMensagem( mensagens: string[] ): void {
+        const texto = mensagens.join("\n");
+        const dialog = document.getElementById("modalMensagem") as HTMLDialogElement;
+        const p = document.getElementById("modalMensagemTexto") as HTMLParagraphElement;
+        const botaoOk = document.getElementById("modalMensagemOk") as HTMLButtonElement;
+        p.textContent = texto;
+        botaoOk.addEventListener( "click", () => dialog.close() );
+        dialog.showModal();
     }
 
     redirecionarParaIndex(): void {

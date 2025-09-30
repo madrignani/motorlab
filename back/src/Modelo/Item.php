@@ -71,7 +71,7 @@ class Item {
         if ( $this->estoqueMinimo < 0 ) {
             $problemas[] = "O estoque mínimo do item não pode ser negativo.";
         }
-        if ( mb_strlen($this->localizao) < 1 || mb_strlen($this->localizacao) > 20 ) {
+        if ( mb_strlen($this->localizacao) < 1 || mb_strlen($this->localizacao) > 20 ) {
             $problemas[] = "A localização do item deve conter entre 1 e 20 caracteres.";
         }
         return $problemas;

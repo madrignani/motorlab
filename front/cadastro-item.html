@@ -3,9 +3,9 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="./src/visao/cadastro-veiculo.ts" type="module" defer></script>
-        <link rel="stylesheet" href="./estilo/estilo-cadastro-veiculo.css">
-        <title>MotorLab - Cadastrar Veículo</title>
+        <script src="./src/visao/cadastro-item.ts" type="module" defer></script>
+        <link rel="stylesheet" href="./estilo/estilo-cadastro-item.css">
+        <title>MotorLab - Cadastrar Item</title>
     </head>
     <body>
         <header>
@@ -27,24 +27,24 @@
             <button id="botaoLogout" type="button">LOGOUT</button>
         </header>
         <main>
-            <h1>CADASTRAR VEÍCULO</h1>
+            <h1>CADASTRAR ITEM</h1>
             <form>
-                <label for="buscaCliente">Cliente: </label>
-                <input type="search" id="buscaCliente" placeholder="Digite o nome completo ou CPF" required>
-                <button type="button" id="botaoBuscaCliente">BUSCAR</button>
-                <div id="detalhesCliente"></div>
-                <label for="placa">Placa: </label>
-                <input type="text" id="placa" required>
-                <label for="chassi">Chassi: </label>
-                <input type="text" id="chassi" placeholder="sem pontuação" required>
-                <label for="fabricante">Fabricante: </label>
+                <label for="codigo">Código: </label>
+                <input type="text" id="codigo" required>
+                <label for="titulo">Título: </label>
+                <input type="text" id="titulo" required>
+                <label for="fabricante" >Fabricante: </label>
                 <input type="text" id="fabricante" required>
-                <label for="modelo">Modelo: </label>
-                <input type="text" id="modelo" required>
-                <label for="ano">Ano de fabricação: </label>
-                <input type="number" id="ano" required>
-                <label for="quilometragem">Quilometragem atual: </label>
-                <input type="number" id="quilometragem" required>
+                <label for="descricao">Descrição: </label>
+                <input type="textarea" id="descricao" required>
+                <label for="precoVenda">Preço de venda: </label>
+                <input type="number" id="precoVenda" step="0.01" required>
+                <label for="estoque">Estoque: </label>
+                <input type="number" id="estoque" required>
+                <label for="estoqueMinimo">Estoque mínimo: </label>
+                <input type="number" id="estoqueMinimo" required>
+                <label for="localizacao">Localização: </label>
+                <input type="text" id="localizacao" required>
                 <button id="botaoEnviar" type="submit">CADASTRAR</button>
             </form>
         </main>

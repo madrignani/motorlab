@@ -14,9 +14,12 @@ use App\Transacao\TransacaoPDO;
 use App\Servico\ServicoAutenticacao;
 use App\Servico\ServicoCadastroCliente;
 use App\Servico\ServicoCadastroVeiculo;
+use App\Servico\ServicoCadastroItem;
+use App\Servico\ServicoListagemItem;
 use App\Repositorio\RepositorioUsuarioBDR;
 use App\Repositorio\RepositorioClienteBDR;
 use App\Repositorio\RepositorioVeiculoBDR;
+use App\Repositorio\RepositorioItemBDR;
 use App\Dto\UsuarioDTO;
 
 
@@ -192,6 +195,103 @@ $app->post( '/veiculos', function($req, $res) {
     }
 } );
 
+$app->post( '/itens', function($req, $res) {
+    try{
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $logado = $sessao->dadosUsuarioLogado();
+        $dados = ( (array)$req->body() );
+        if ( (empty($dados['codigo'])) || (empty($dados['titulo'])) || (empty($dados['fabricante'])) || (empty($dados['descricao']))
+            || (empty($dados['precoVenda'])) || (empty($dados['estoque'])) || (empty($dados['estoqueMinimo'])) || (empty($dados['localizacao'])) ) {
+            throw DominioException::comProblemas( ['Dados necessários para cadastrar o Item não foram recebidos.'] );
+        }
+        $pdo = Conexao::conectar();
+        $repositorio = new RepositorioItemBDR($pdo);
+        $servico = new ServicoCadastroItem($repositorio); 
+        $servico->cadastrarItem($dados, $logado['cargo_usuario']);
+        $res->status(200)->end();
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    }  catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->get( '/itens', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $pdo = Conexao::conectar();
+        $repositorio = new RepositorioItemBDR($pdo);
+        $servico = new ServicoListagemItem($repositorio);
+        $itens = $servico->listarItens();
+        $res->status(200)->json($itens);
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->delete( '/itens-remover/:id', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $logado = $sessao->dadosUsuarioLogado();
+        $id = ( (int)($req->param('id')) );
+        $pdo = Conexao::conectar();
+        $repositorio = new RepositorioItemBDR($pdo);
+        $servico = new ServicoListagemItem($repositorio);
+        $servico->removerItem($id, $logado['cargo_usuario']);
+        $res->status(200)->json($itens);
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->get( '/itens/:busca', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $busca = $req->param('busca');    
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->patch( '/itens-atualizar/:id', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $logado = $sessao->dadosUsuarioLogado();
+        $id = $req->param('id');
+        $dados = ( (array)$req->body() );
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
 
 $app->listen();
 

@@ -27,6 +27,64 @@
             <button id="botaoLogout" type="button">LOGOUT</button>
         </header>
         <h1>ESTOQUE</h1>
-        <button id="botaoCadastroItem" type="button">CADASTRAR ITEM</button>
+        <a href="./cadastro-item.html" id="linkCadastroItem">CADASTRAR ITEM</a>
+        <div id="filtros">
+            <label for="filtroPesquisa">Pesquisar: </label>
+            <input type="search" id="filtroPesquisa" placeholder="Digite código ou título" autocomplete="off">
+        </div>
+        <table id="tabelaItens">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Título</th>
+                    <th>Fabricante</th>
+                    <th>Preço</th>
+                    <th>Estoque</th>
+                    <th>Localização</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <dialog id="modalMensagem">
+            <p id="modalMensagemTexto"></p>
+            <menu>
+                <button id="modalMensagemOk">OK</button>
+            </menu>
+        </dialog>
+        <dialog id="modalConfirmacao">
+            <p id="modalConfirmacaoTexto"></p>
+            <menu>
+                <button id="modalConfirmSim">Sim</button>
+                <button id="modalConfirmCancelar">Cancelar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalGerenciarItem">
+            <h2>Gerenciar Item</h2>
+            <div id="dadosItem">
+                <p>Código: <span id="modalCodigo"></span></p>
+                <p>Título: <span id="modalTitulo"></span></p>
+                <p>Fabricante: <span id="modalFabricante"></span></p>
+                <p>Descrição: <span id="modalDescricao"></span></p>
+                <p>Localização: <span id="modalLocalizacao"></span></p>
+                <div id="camposEditaveis">
+                    <label for="modalPrecoVenda">Preço de Venda: </label>
+                    <input type="number" id="modalPrecoVenda" step="0.01">
+                    <label for="modalEstoque">Estoque: </label>
+                    <input type="number" id="modalEstoque">
+                    <label for="modalEstoqueMinimo">Estoque Mínimo: </label>
+                    <input type="number" id="modalEstoqueMinimo">
+                </div>
+                <p>Preço de Venda: <span id="modalPrecoVendaExibicao"></span></p>
+                <p>Estoque: <span id="modalEstoqueExibicao"></span></p>
+                <p>Estoque Mínimo: <span id="modalEstoqueMinimoExibicao"></span></p>
+            </div>
+            <menu>
+                <button id="modalEditarItem">Editar</button>
+                <button id="modalConfirmarEdicao">Confirmar</button>
+                <button id="modalCancelarEdicao">Cancelar</button>
+                <button id="modalFecharGerenciar">Fechar</button>
+            </menu>
+        </dialog>
     </body>
 </html>

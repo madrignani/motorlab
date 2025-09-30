@@ -1,13 +1,13 @@
-import type { VisaoCadastroCliente } from './visao-cadastro-cliente.ts';
-import { ControladoraCadastroCliente } from '../controladora/controladora-cadastro-cliente.ts';
+import type { VisaoCadastroItem } from './visao-cadastro-item.ts';
+import { ControladoraCadastroItem } from '../controladora/controladora-cadastro-item.ts';
 
 
-export class VisaoCadastroClienteHTML implements VisaoCadastroCliente {
+export class VisaoCadastroItemHTML implements VisaoCadastroItem {
 
-    private controladora: ControladoraCadastroCliente;
+    private controladora: ControladoraCadastroItem;
     
     constructor() {
-        this.controladora = new ControladoraCadastroCliente(this);
+        this.controladora = new ControladoraCadastroItem(this);
     }
     
     iniciar(): void {
@@ -59,12 +59,16 @@ export class VisaoCadastroClienteHTML implements VisaoCadastroCliente {
         form.addEventListener( "submit", (event) => {
             event.preventDefault();
             const dados = {
-                cpf: (document.getElementById("cpf") as HTMLInputElement).value.trim(),
-                nome: (document.getElementById("nome") as HTMLInputElement).value.trim(),
-                telefone: (document.getElementById("telefone") as HTMLInputElement).value.trim(),
-                email: (document.getElementById("email") as HTMLInputElement).value.trim()
+                codigo: (document.getElementById("codigo") as HTMLInputElement).value.trim(),
+                titulo: (document.getElementById("titulo") as HTMLInputElement).value.trim(),
+                fabricante: (document.getElementById("fabricante") as HTMLInputElement).value.trim(),
+                descricao: (document.getElementById("descricao") as HTMLInputElement).value.trim(),
+                precoVenda: (document.getElementById("precoVenda") as HTMLInputElement).value,
+                estoque: (document.getElementById("estoque") as HTMLInputElement).value,
+                estoqueMinimo: (document.getElementById("estoqueMinimo") as HTMLInputElement).value,
+                localizacao: (document.getElementById("localizacao") as HTMLInputElement).value.trim()
             };
-            this.controladora.enviarCliente(dados);
+            this.controladora.enviarItem(dados);
         } );
     }
 
