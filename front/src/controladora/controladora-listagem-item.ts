@@ -59,8 +59,8 @@ export class ControladoraListagemItem {
             return;
         }
         const filtrados = this.itensArmazenados.filter( (item) => {
-            const codigo = (item.codigo ?? '').toString().toLowerCase();
-            const titulo = (item.titulo ?? '').toString().toLowerCase();
+            const codigo = (item.codigo).toString().toLowerCase();
+            const titulo = (item.titulo).toString().toLowerCase();
             return codigo.includes(valorFormatado) || titulo.includes(valorFormatado);
         } );
         this.visao.exibirItens(filtrados);
@@ -70,13 +70,44 @@ export class ControladoraListagemItem {
         try {
             const itens = await this.gestor.obterItens();
             this.itensArmazenados = itens;
-            this.visao.exibirItens(this.itensArmazenados);
+            const itensComClasse = [];
+            const itensAlerta = [];
+            for (const item of this.itensArmazenados) {
+                const classeEstoque = this.determinarRiscoEstoque(item.estoque, item.estoqueMinimo);
+                itensComClasse.push({
+                    id: item.id,
+                    codigo: item.codigo,
+                    titulo: item.titulo,
+                    fabricante: item.fabricante,
+                    descricao: item.descricao,
+                    precoVenda: item.precoVenda,
+                    estoque: item.estoque,
+                    estoqueMinimo: item.estoqueMinimo,
+                    localizacao: item.localizacao,
+                    classeEstoque: classeEstoque
+                });
+                if (classeEstoque === 'linha-vermelha' || classeEstoque === 'linha-amarela') {
+                    itensAlerta.push(item.codigo);
+                }
+            }
+            this.visao.exibirItens(itensComClasse);
+            this.visao.exibirAlertaEstoque(itensAlerta);
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem(erro.getProblemas());
             } else {
                 this.visao.exibirMensagem( [`Não foi possível carregar os itens: ${erro.message}`] );
             }
+        }
+    }
+
+    private determinarRiscoEstoque(estoque: number, estoqueMinimo: number): string {
+        if (estoque <= estoqueMinimo) {
+            return 'linha-vermelha';
+        } else if (estoque <= estoqueMinimo * 1.2) {
+            return 'linha-amarela';
+        } else {
+            return 'linha-verde';
         }
     }
 
@@ -96,8 +127,12 @@ export class ControladoraListagemItem {
 
     async carregarItemParaGerenciamento(id: string): Promise<void> {
         try {
-            const item = await this.gestor.obterItem(Number(id));
-            this.visao.exibirModalGerenciamento(item);
+            const dadosItem = await this.gestor.obterItem(Number(id));
+            if (!dadosItem.id) {
+                this.visao.exibirMensagem( ["Item não encontrado."] );
+                return;
+            }
+            this.visao.exibirModalGerenciamento(dadosItem);
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem(erro.getProblemas());
@@ -107,11 +142,12 @@ export class ControladoraListagemItem {
         }
     }
 
-    async atualizarItem(id: string, precoVenda: string, estoque: string, estoqueMinimo: string): Promise<void> {
+    async atualizarItem(id: string, precoVenda: string, estoque: string, estoqueMinimo: string, localizacao: string): Promise<void> {
         const envio = {
             precoVenda: parseFloat(precoVenda),
             estoque: parseInt(estoque),
             estoqueMinimo: parseInt(estoqueMinimo),
+            localizacao: localizacao.trim()
         };
         try {
             await this.gestor.atualizarItem( Number(id), envio );

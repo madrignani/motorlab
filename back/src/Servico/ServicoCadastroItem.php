@@ -36,8 +36,7 @@ class ServicoCadastroItem {
         $this->repositorio->salvar($codigo, $titulo, $fabricante, $descricao, $precoVenda, $estoque, $estoqueMinimo, $localizacao);
     }
 
-    private function mapearItem(string $codigo, string $titulo, string $fabricante, 
-    string $descricao, float $precoVenda, int $estoque, int $estoqueMinimo, string $localizacao): Item {
+    private function mapearItem(string $codigo, string $titulo, string $fabricante, string $descricao, float $precoVenda, int $estoque, int $estoqueMinimo, string $localizacao): Item {
         return new Item(0, $codigo, $titulo, $fabricante, $descricao, $precoVenda, $estoque, $estoqueMinimo, $localizacao);
     }
 

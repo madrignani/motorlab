@@ -66,6 +66,47 @@ class RepositorioItemBDR implements RepositorioItem {
         }
     }
 
+    public function buscarPorId(int $id): ?array {
+        try {
+            $sql = <<<SQL
+                SELECT * FROM item
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['id' => $id] );
+            $dados = $stmt->fetch();
+            if ( empty($dados) ) {
+                return null;
+            }
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function atualizar(int $id, float $precoVenda, int $estoque, int $estoqueMinimo, string $localizacao): void {
+        try {
+            $sql = <<<SQL
+                UPDATE item 
+                SET preco_venda = :preco_venda, 
+                    estoque = :estoque, 
+                    estoque_minimo = :estoque_minimo, 
+                    localizacao = :localizacao 
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'id' => $id,
+                'preco_venda' => $precoVenda,
+                'estoque' => $estoque,
+                'estoque_minimo' => $estoqueMinimo,
+                'localizacao' => $localizacao
+            ]);
+        } catch (PDOException $erro) {
+            throw new RepositorioException($erro->getMessage());
+        }
+    }
+
 }
 
 

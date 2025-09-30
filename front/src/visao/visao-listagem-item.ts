@@ -6,6 +6,7 @@ export interface VisaoListagemItem {
     exibirPagina(): void;
     iniciarFiltros(): void;
     exibirItens(itens: any[]): void;
+    exibirAlertaEstoque(itensAlerta: string[]): void;
     limparTabela(): void;
     exibirModalGerenciamento(item: any): void;
        

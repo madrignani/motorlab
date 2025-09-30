@@ -30,7 +30,10 @@
         <a href="./cadastro-item.html" id="linkCadastroItem">CADASTRAR ITEM</a>
         <div id="filtros">
             <label for="filtroPesquisa">Pesquisar: </label>
-            <input type="search" id="filtroPesquisa" placeholder="Digite código ou título" autocomplete="off">
+            <input type="search" id="filtroPesquisa" placeholder="Digite o código ou título" autocomplete="off">
+        </div>
+        <div id="alertaEstoqueBaixo">
+            <span id="itensAlerta"></span>
         </div>
         <table id="tabelaItens">
             <thead>
@@ -66,7 +69,6 @@
                 <p>Título: <span id="modalTitulo"></span></p>
                 <p>Fabricante: <span id="modalFabricante"></span></p>
                 <p>Descrição: <span id="modalDescricao"></span></p>
-                <p>Localização: <span id="modalLocalizacao"></span></p>
                 <div id="camposEditaveis">
                     <label for="modalPrecoVenda">Preço de Venda: </label>
                     <input type="number" id="modalPrecoVenda" step="0.01">
@@ -74,10 +76,13 @@
                     <input type="number" id="modalEstoque">
                     <label for="modalEstoqueMinimo">Estoque Mínimo: </label>
                     <input type="number" id="modalEstoqueMinimo">
+                    <label for="modalLocalizacao">Localização: </label>
+                    <input type="text" id="modalLocalizacao">
                 </div>
                 <p>Preço de Venda: <span id="modalPrecoVendaExibicao"></span></p>
                 <p>Estoque: <span id="modalEstoqueExibicao"></span></p>
                 <p>Estoque Mínimo: <span id="modalEstoqueMinimoExibicao"></span></p>
+                <p>Localização: <span id="modalLocalizacaoExibicao"></span></p>
             </div>
             <menu>
                 <button id="modalEditarItem">Editar</button>

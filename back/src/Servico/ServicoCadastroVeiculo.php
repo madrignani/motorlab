@@ -34,14 +34,14 @@ class ServicoCadastroVeiculo {
             throw DominioException::comProblemas( ['Existe mais de um cliente com esse nome, procurar pelo CPF.'] );
         }
         $cliente = $dados[0];
-        $clientedto = new ClienteDto(
+        $clienteDto = new ClienteDto(
             ( (int)$cliente['id'] ),
             $cliente['cpf'],
             $cliente['nome'],
             $cliente['telefone'],
             $cliente['email']
         );
-        return $clientedto->arrayDados();
+        return $clienteDto->arrayDados();
     }
 
     public function cadastrarVeiculo(array $dados, string $cargoUsuarioLogado): void {

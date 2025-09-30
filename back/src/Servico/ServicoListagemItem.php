@@ -6,6 +6,7 @@ use App\Excecao\DominioException;
 use App\Excecao\AutenticacaoException;
 use App\Repositorio\RepositorioItem;
 use App\Dto\ItemDto;
+use App\Modelo\Item;
 
 
 class ServicoListagemItem {
@@ -44,6 +45,54 @@ class ServicoListagemItem {
         if (!$removido) {
             throw DominioException::comProblemas( ['Item não encontrado para remoção.'] );
         }
+    }
+
+    public function buscarItem(string $id): array {
+        $id = trim($id);
+        $dados = $this->repositorio->buscarPorId($id);
+        if ( empty($dados) ) {
+            return [];
+        }
+        $itemDto = new ItemDto(
+            ( (int)$dados['id'] ),
+            $dados['codigo'],
+            $dados['titulo'],
+            $dados['fabricante'],
+            $dados['descricao'],
+            ( (float)$dados['preco_venda'] ),
+            ( (int)$dados['estoque'] ),
+            ( (int)$dados['estoque_minimo'] ),
+            $dados['localizacao']
+        );
+        return $itemDto->arrayDados();
+    }
+
+    public function atualizarItem(int $id, array $dadosAlteracao, string $cargoUsuarioLogado): void {
+        if ($cargoUsuarioLogado !== 'ATENDENTE' && $cargoUsuarioLogado !== 'GERENTE') {
+            throw new AutenticacaoException('Permissão negada.');
+        }
+        $dados = $this->repositorio->buscarPorId($id);
+        if ( empty($dados) ) {
+            throw DominioException::comProblemas( ['Item não encontrado para alteração.'] );
+        }
+        $codigo = $dados['codigo'];
+        $titulo = $dados['titulo'];
+        $fabricante = $dados['fabricante'];
+        $descricao = $dados['descricao'];
+        $precoVenda = $dadosAlteracao['precoVenda'];
+        $estoque = $dadosAlteracao['estoque'];
+        $estoqueMinimo = $dadosAlteracao['estoqueMinimo'];
+        $localizacao = $dadosAlteracao['localizacao'];
+        $item = $this->mapearItem($codigo, $titulo, $fabricante, $descricao, $precoVenda, $estoque, $estoqueMinimo, $localizacao);
+        $problemas = $item->validar();
+        if ( !empty($problemas) ) {
+            throw DominioException::comProblemas($problemas);
+        }
+        $this->repositorio->atualizar($id, $precoVenda, $estoque, $estoqueMinimo, $localizacao);
+    }
+
+    private function mapearItem(string $codigo, string $titulo, string $fabricante, string $descricao, float $precoVenda, int $estoque, int $estoqueMinimo, string $localizacao): Item {
+        return new Item(0, $codigo, $titulo, $fabricante, $descricao, $precoVenda, $estoque, $estoqueMinimo, $localizacao);
     }
 
 }

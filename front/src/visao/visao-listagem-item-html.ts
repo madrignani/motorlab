@@ -63,6 +63,7 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
         tbody.innerHTML = '';
         for (const item of itens) {
             const linha = document.createElement("tr");
+            linha.classList.add(item.classeEstoque);
             const dadosItem = [
                 item.codigo, item.titulo, item.fabricante, item.precoVenda,
                 item.estoque, item.localizacao
@@ -90,6 +91,26 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
         this.iniciarRemocao();
         this.iniciarGerenciamento();
     }
+
+    exibirAlertaEstoque(itensAlerta: string[]): void {
+    const alertaDiv = document.getElementById("alertaEstoqueBaixo") as HTMLDivElement;
+    
+    if (itensAlerta.length === 0) {
+        alertaDiv.style.display = 'none';
+        return;
+    }
+
+    let mensagem = '';
+    if (itensAlerta.length === 1) {
+        mensagem = `ATENÇÃO, O ITEM #${itensAlerta[0]} ESTÁ EM ESTADO DE BAIXO ESTOQUE`;
+    } else {
+        const itensTexto = itensAlerta.map(codigo => `#${codigo}`).join(', ');
+        mensagem = `ATENÇÃO, OS ITENS ${itensTexto} ESTÃO EM ESTADO DE BAIXO ESTOQUE`;
+    }
+
+    alertaDiv.innerHTML = `<p>${mensagem}</p>`;
+    alertaDiv.style.display = 'block';
+}
 
     private iniciarRemocao(): void {
         const botoes = document.querySelectorAll<HTMLButtonElement>(".botaoRemover");
@@ -138,18 +159,18 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
         const modalTitulo = document.getElementById("modalTitulo") as HTMLSpanElement;
         const modalFabricante = document.getElementById("modalFabricante") as HTMLSpanElement;
         const modalDescricao = document.getElementById("modalDescricao") as HTMLSpanElement;
-        const modalLocalizacao = document.getElementById("modalLocalizacao") as HTMLSpanElement;
         const modalPrecoVendaExibicao = document.getElementById("modalPrecoVendaExibicao") as HTMLSpanElement;
         const modalEstoqueExibicao = document.getElementById("modalEstoqueExibicao") as HTMLSpanElement;
         const modalEstoqueMinimoExibicao = document.getElementById("modalEstoqueMinimoExibicao") as HTMLSpanElement;
+        const modalLocalizacaoExibicao = document.getElementById("modalLocalizacaoExibicao") as HTMLSpanElement;
         modalCodigo.textContent = item.codigo;
         modalTitulo.textContent = item.titulo;
         modalFabricante.textContent = item.fabricante;
         modalDescricao.textContent = item.descricao;
-        modalLocalizacao.textContent = item.localizacao;
         modalPrecoVendaExibicao.textContent = item.precoVenda;
         modalEstoqueExibicao.textContent = item.estoque;
         modalEstoqueMinimoExibicao.textContent = item.estoqueMinimo;
+        modalLocalizacaoExibicao.textContent = item.localizacao;
         const botaoEditar = document.getElementById("modalEditarItem") as HTMLButtonElement;
         const botaoConfirmar = document.getElementById("modalConfirmarEdicao") as HTMLButtonElement;
         const botaoCancelar = document.getElementById("modalCancelarEdicao") as HTMLButtonElement;
@@ -158,9 +179,11 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
         const inputPrecoVenda = document.getElementById("modalPrecoVenda") as HTMLInputElement;
         const inputEstoque = document.getElementById("modalEstoque") as HTMLInputElement;
         const inputEstoqueMinimo = document.getElementById("modalEstoqueMinimo") as HTMLInputElement;
+        const inputLocalizacao = document.getElementById("modalLocalizacao") as HTMLInputElement;
         inputPrecoVenda.value = item.precoVenda;
         inputEstoque.value = item.estoque;
         inputEstoqueMinimo.value = item.estoqueMinimo;
+        inputLocalizacao.value = item.localizacao;
         camposEditaveis.style.display = 'none';
         botaoEditar.style.display = 'inline';
         botaoConfirmar.style.display = 'none';
@@ -170,6 +193,7 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
             modalPrecoVendaExibicao.style.display = 'none';
             modalEstoqueExibicao.style.display = 'none';
             modalEstoqueMinimoExibicao.style.display = 'none';
+            modalLocalizacaoExibicao.style.display = 'none';
             botaoEditar.style.display = 'none';
             botaoConfirmar.style.display = 'inline';
             botaoCancelar.style.display = 'inline';
@@ -178,7 +202,12 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
             const precoVenda = inputPrecoVenda.value;
             const estoque = inputEstoque.value;
             const estoqueMinimo = inputEstoqueMinimo.value;
-            this.controladora.atualizarItem(item.id, precoVenda, estoque, estoqueMinimo);
+            const localizacao = inputLocalizacao.value;
+            this.controladora.atualizarItem(item.id, precoVenda, estoque, estoqueMinimo, localizacao);
+            modalPrecoVendaExibicao.style.display = 'inline';
+            modalEstoqueExibicao.style.display = 'inline';
+            modalEstoqueMinimoExibicao.style.display = 'inline';
+            modalLocalizacaoExibicao.style.display = 'inline';
             dialog.close();
         };
         botaoCancelar.onclick = () => {
@@ -186,6 +215,7 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
             modalPrecoVendaExibicao.style.display = 'inline';
             modalEstoqueExibicao.style.display = 'inline';
             modalEstoqueMinimoExibicao.style.display = 'inline';
+            modalLocalizacaoExibicao.style.display = 'inline';
             botaoEditar.style.display = 'inline';
             botaoConfirmar.style.display = 'none';
             botaoCancelar.style.display = 'none';

@@ -56,8 +56,8 @@ export class GestorListagemItem {
         return await response.json();
     }
 
-    async atualizarItem(idItem: number, dados:any): Promise<void> {
-        const response = await fetch( `${API_URL}/itens-atualizar/${idItem}`, {
+    async atualizarItem(id: number, dados:any): Promise<void> {
+        const response = await fetch( `${API_URL}/itens-atualizar/${id}`, {
             method: 'PATCH',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },

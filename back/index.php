@@ -154,10 +154,7 @@ $app->get( '/clientes/:busca', function($req, $res) {
         $repositorioCliente = new RepositorioClienteBDR($pdo);
         $repositorioVeiculo = new RepositorioVeiculoBDR($pdo);
         $servico = new ServicoCadastroVeiculo($repositorioCliente, $repositorioVeiculo);
-        $cliente = $servico->buscarCliente(
-            $busca,
-            $logado['cargo_usuario'] 
-        );
+        $cliente = $servico->buscarCliente($busca, $logado['cargo_usuario']);
         $res->status(200)->json($cliente);
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
@@ -267,7 +264,12 @@ $app->get( '/itens/:busca', function($req, $res) {
     try {
         $sessao = new Sessao();
         $sessao->estaLogado();
-        $busca = $req->param('busca');    
+        $busca = $req->param('busca');
+        $pdo = Conexao::conectar();
+        $repositorio = new RepositorioItemBDR($pdo);
+        $servico = new ServicoListagemItem($repositorio);
+        $item = $servico->buscarItem($busca);
+        $res->status(200)->json($item);
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
     } catch (RepositorioException $erro) {
@@ -282,8 +284,13 @@ $app->patch( '/itens-atualizar/:id', function($req, $res) {
         $sessao = new Sessao();
         $sessao->estaLogado();
         $logado = $sessao->dadosUsuarioLogado();
-        $id = $req->param('id');
+        $id = ( (int)($req->param('id')) );
         $dados = ( (array)$req->body() );
+        $pdo = Conexao::conectar();
+        $repositorio = new RepositorioItemBDR($pdo);
+        $servico = new ServicoListagemItem($repositorio);
+        $item = $servico->atualizarItem($id, $dados, $logado['cargo_usuario']);
+        $res->status(200)->end();
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
     } catch (RepositorioException $erro) {

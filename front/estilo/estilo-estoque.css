@@ -51,6 +51,10 @@ nav {
     display: block;
 }
 
+.alertaEstoqueBaixo {
+    display: none;
+}
+
 #camposEditaveis {
     display: none;
 }
@@ -61,4 +65,16 @@ nav {
 
 #modalCancelarEdicao {
     display: none;
+}
+
+.linha-vermelha {
+    background-color: #b32727;
+}
+
+.linha-amarela {
+    background-color: #c1b23e;
+}
+
+.linha-verde {
+    background-color: #48c948;
 }
