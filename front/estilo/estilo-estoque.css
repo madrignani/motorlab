@@ -67,6 +67,16 @@ nav {
     display: none;
 }
 
+#inicioLogo {
+    display: inline-block;
+    text-decoration: none;
+}
+
+#inicioLogo img {
+    width: 30px;
+    height: auto;
+}
+
 .linha-vermelha {
     background-color: #b32727;
 }

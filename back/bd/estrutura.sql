@@ -24,8 +24,8 @@ CREATE TABLE cliente (
 CREATE TABLE veiculo (
     id INT PRIMARY KEY AUTO_INCREMENT,
     cliente_id INT NOT NULL,
-    placa CHAR(7) NOT NULL,
-    chassi CHAR(17) NOT NULL,
+    placa CHAR(7) NOT NULL UNIQUE,
+    chassi CHAR(17) NOT NULL UNIQUE,
     fabricante VARCHAR(30) NOT NULL,
     modelo VARCHAR(70) NOT NULL,
     ano INT NOT NULL,

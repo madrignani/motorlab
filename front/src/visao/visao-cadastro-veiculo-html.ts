@@ -5,6 +5,7 @@ import { ControladoraCadastroVeiculo } from '../controladora/controladora-cadast
 export class VisaoCadastroVeiculoHTML implements VisaoCadastroVeiculo {
 
     private controladora: ControladoraCadastroVeiculo;
+    private permissao = false;
 
     constructor() {
         this.controladora = new ControladoraCadastroVeiculo(this);
@@ -31,10 +32,16 @@ export class VisaoCadastroVeiculoHTML implements VisaoCadastroVeiculo {
         cargo.textContent = dados.cargo;
         div.appendChild(nome);
         div.appendChild(cargo);
+        this.permissao = (dados.cargo === 'ATENDENTE' || dados.cargo === 'GERENTE');  
+        this.exibirElementos();
     }
 
     redirecionarParaLogin(): void {
         window.location.href = "./login.html";
+    }
+
+    retornarNavegacao(): void {
+        window.location.href = "./index.html";
     }
 
     exibirMensagem( mensagens: string[] ): void {
@@ -47,12 +54,23 @@ export class VisaoCadastroVeiculoHTML implements VisaoCadastroVeiculo {
         dialog.showModal();
     }
 
-    redirecionarParaIndex(): void {
-        window.location.href = "./index.html";
-    }
-
     exibirPagina(): void {
         document.body.style.visibility = "visible";
+    }
+
+    private exibirElementos(): void {
+        const linkCadastroCliente = document.getElementById("cadastroCliente") as HTMLAnchorElement;
+        const linkCadastroVeiculo = document.getElementById("cadastroVeiculo") as HTMLAnchorElement;
+        const linkCadastroOs = document.getElementById("cadastroOs") as HTMLAnchorElement;
+        const linksCadastroCVO = [linkCadastroCliente, linkCadastroVeiculo, linkCadastroOs];
+        if (!this.permissao) {
+            for (const link of linksCadastroCVO) {
+                link.removeAttribute('href');
+                link.style.opacity = '0.5';
+                link.style.cursor = 'default';
+                link.title = 'Acesso não permitido';
+            }
+        }
     }
 
     private buscaCliente(): void {

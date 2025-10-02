@@ -55,7 +55,8 @@ export class ControladoraListagemItem {
     aplicarFiltros(valor: string): void {
         const valorFormatado = ( (valor).trim().toLowerCase() );
         if (!valorFormatado) {
-            this.visao.exibirItens(this.itensArmazenados);
+            const itensComClasse = this.aplicarClasseItens(this.itensArmazenados)
+            this.visao.exibirItens(itensComClasse);
             return;
         }
         const filtrados = this.itensArmazenados.filter( (item) => {
@@ -63,29 +64,18 @@ export class ControladoraListagemItem {
             const titulo = (item.titulo).toString().toLowerCase();
             return codigo.includes(valorFormatado) || titulo.includes(valorFormatado);
         } );
-        this.visao.exibirItens(filtrados);
+        const filtradosComClasse = this.aplicarClasseItens(filtrados)
+        this.visao.exibirItens(filtradosComClasse);
     }
 
     private async carregarItens(): Promise<void> {
         try {
             const itens = await this.gestor.obterItens();
             this.itensArmazenados = itens;
-            const itensComClasse = [];
+            const itensComClasse = this.aplicarClasseItens(itens);
             const itensAlerta = [];
-            for (const item of this.itensArmazenados) {
+            for (const item of itensComClasse) {
                 const classeEstoque = this.determinarRiscoEstoque(item.estoque, item.estoqueMinimo);
-                itensComClasse.push({
-                    id: item.id,
-                    codigo: item.codigo,
-                    titulo: item.titulo,
-                    fabricante: item.fabricante,
-                    descricao: item.descricao,
-                    precoVenda: item.precoVenda,
-                    estoque: item.estoque,
-                    estoqueMinimo: item.estoqueMinimo,
-                    localizacao: item.localizacao,
-                    classeEstoque: classeEstoque
-                });
                 if (classeEstoque === 'linha-vermelha' || classeEstoque === 'linha-amarela') {
                     itensAlerta.push(item.codigo);
                 }
@@ -94,11 +84,31 @@ export class ControladoraListagemItem {
             this.visao.exibirAlertaEstoque(itensAlerta);
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
-                this.visao.exibirMensagem(erro.getProblemas());
+                this.visao.exibirMensagem( erro.getProblemas() );
             } else {
                 this.visao.exibirMensagem( [`Não foi possível carregar os itens: ${erro.message}`] );
             }
         }
+    }
+
+    private aplicarClasseItens(itens: any[]): any[] {
+        const itensClassificados: any[] = [];
+        for (const item of itens) {
+            const classeEstoque = this.determinarRiscoEstoque(item.estoque, item.estoqueMinimo);
+            itensClassificados.push({
+                id: item.id,
+                codigo: item.codigo,
+                titulo: item.titulo,
+                fabricante: item.fabricante,
+                descricao: item.descricao,
+                precoVenda: item.precoVenda,
+                estoque: item.estoque,
+                estoqueMinimo: item.estoqueMinimo,
+                localizacao: item.localizacao,
+                classeEstoque: classeEstoque
+            });
+        }
+        return itensClassificados;
     }
 
     private determinarRiscoEstoque(estoque: number, estoqueMinimo: number): string {
@@ -108,20 +118,6 @@ export class ControladoraListagemItem {
             return 'linha-amarela';
         } else {
             return 'linha-verde';
-        }
-    }
-
-    async removerItem(id: string): Promise<void> {
-        try{
-            await this.gestor.removerItem(Number(id));
-            this.visao.exibirMensagem( ['Item removido com sucesso.'] );
-            await this.carregarItens();
-        } catch (erro: any) {
-            if (erro instanceof ErroGestor) {
-                this.visao.exibirMensagem( erro.getProblemas() );
-            } else {
-                this.visao.exibirMensagem( [`Não foi possível carregar os itens: ${erro.message}`] ); 
-            }
         }
     }
 
@@ -158,6 +154,20 @@ export class ControladoraListagemItem {
                 this.visao.exibirMensagem( erro.getProblemas() );
             } else {
                 this.visao.exibirMensagem( [`Não foi possível atualizar o item: ${erro.message}`] );
+            }
+        }
+    }
+
+    async removerItem(id: string): Promise<void> {
+        try{
+            await this.gestor.removerItem(Number(id));
+            this.visao.exibirMensagem( ['Item removido com sucesso.'] );
+            await this.carregarItens();
+        } catch (erro: any) {
+            if (erro instanceof ErroGestor) {
+                this.visao.exibirMensagem( erro.getProblemas() );
+            } else {
+                this.visao.exibirMensagem( [`Não foi possível carregar os itens: ${erro.message}`] ); 
             }
         }
     }

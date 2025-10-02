@@ -50,3 +50,13 @@ nav {
 .dropdown:hover .dropdown-conteudo {
     display: block;
 }
+
+#inicioLogo {
+    display: inline-block;
+    text-decoration: none;
+}
+
+#inicioLogo img {
+    width: 30px;
+    height: auto;
+}

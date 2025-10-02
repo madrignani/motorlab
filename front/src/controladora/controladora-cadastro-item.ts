@@ -54,8 +54,7 @@ export class ControladoraCadastroItem {
     private validarCargoUsuario( dadosUsuario: any ): void {
         const permitido = (dadosUsuario.cargo === 'ATENDENTE' || dadosUsuario.cargo === 'GERENTE');
         if (!permitido) {
-            this.visao.exibirMensagem( ["Permissão negada."] )
-            this.visao.redirecionarParaIndex();
+            this.visao.retornarNavegacao();
             return;
         }
     }

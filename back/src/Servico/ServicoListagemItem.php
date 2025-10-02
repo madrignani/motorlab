@@ -75,6 +75,9 @@ class ServicoListagemItem {
         if ( empty($dados) ) {
             throw DominioException::comProblemas( ['Item não encontrado para alteração.'] );
         }
+        if ( $dados['preco_venda'] == $dadosAlteracao['precoVenda'] && $dados['estoque'] == $dadosAlteracao['estoque'] && $dados['estoque_minimo'] == $dadosAlteracao['estoqueMinimo'] && $dados['localizacao'] === $dadosAlteracao['localizacao'] ) {
+            throw DominioException::comProblemas( ['Nenhum campo foi alterado.'] );
+        }
         $codigo = $dados['codigo'];
         $titulo = $dados['titulo'];
         $fabricante = $dados['fabricante'];

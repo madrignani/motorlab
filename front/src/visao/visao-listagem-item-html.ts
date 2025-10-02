@@ -5,6 +5,7 @@ import { ControladoraListagemItem } from '../controladora/controladora-listagem-
 export class VisaoListagemItemHTML implements VisaoListagemItem {
 
     private controladora: ControladoraListagemItem;
+    private permissao = false;
     
     constructor() {
         this.controladora = new ControladoraListagemItem(this);
@@ -30,6 +31,8 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
         cargo.textContent = dados.cargo;
         div.appendChild(nome);
         div.appendChild(cargo);
+        this.permissao = (dados.cargo === 'ATENDENTE' || dados.cargo === 'GERENTE');  
+        this.exibirElementos();
     }
 
     redirecionarParaLogin(): void {
@@ -48,6 +51,23 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
 
     exibirPagina(): void {
         document.body.style.visibility = "visible";
+    }
+
+    private exibirElementos(): void {
+        const linkCadastroItem = document.getElementById("cadastroItem") as HTMLAnchorElement;
+        const linkCadastroCliente = document.getElementById("cadastroCliente") as HTMLAnchorElement;
+        const linkCadastroVeiculo = document.getElementById("cadastroVeiculo") as HTMLAnchorElement;
+        const linkCadastroOs = document.getElementById("cadastroOs") as HTMLAnchorElement;
+        const linksCadastroCVO = [linkCadastroCliente, linkCadastroVeiculo, linkCadastroOs];
+        if (!this.permissao) {
+            linkCadastroItem.style.display = 'none';
+            for (const link of linksCadastroCVO) {
+                link.removeAttribute('href');
+                link.style.opacity = '0.5';
+                link.style.cursor = 'default';
+                link.title = 'Acesso não permitido';
+            }
+        }
     }
 
     iniciarFiltros(): void {
@@ -92,55 +112,23 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
         this.iniciarGerenciamento();
     }
 
-    exibirAlertaEstoque(itensAlerta: string[]): void {
-    const alertaDiv = document.getElementById("alertaEstoqueBaixo") as HTMLDivElement;
-    
-    if (itensAlerta.length === 0) {
-        alertaDiv.style.display = 'none';
-        return;
-    }
-
-    let mensagem = '';
-    if (itensAlerta.length === 1) {
-        mensagem = `ATENÇÃO, O ITEM #${itensAlerta[0]} ESTÁ EM ESTADO DE BAIXO ESTOQUE`;
-    } else {
-        const itensTexto = itensAlerta.map(codigo => `#${codigo}`).join(', ');
-        mensagem = `ATENÇÃO, OS ITENS ${itensTexto} ESTÃO EM ESTADO DE BAIXO ESTOQUE`;
-    }
-
-    alertaDiv.innerHTML = `<p>${mensagem}</p>`;
-    alertaDiv.style.display = 'block';
-}
-
-    private iniciarRemocao(): void {
-        const botoes = document.querySelectorAll<HTMLButtonElement>(".botaoRemover");
-        for (const botao of botoes) {
-            botao.addEventListener( "click", () => {
-                const idItem = botao.dataset.id!;
-                this.confirmarRemocaoItem("Confirma a remoção deste item?", idItem);
-            } );
+    exibirAlertaEstoque(codigoItensAlerta: string[]): void {
+        const alertaDiv = document.getElementById("alertaEstoqueBaixo") as HTMLDivElement;
+        let mensagem = '';
+        if (codigoItensAlerta.length === 0) {
+            alertaDiv.style.display = "none";
+            alertaDiv.textContent = "";
+            return;
         }
-    }
-
-    private confirmarRemocaoItem(mensagem: string, idItem: string): void {
-        const dialog = document.getElementById("modalConfirmacao") as HTMLDialogElement;
-        const p = document.getElementById("modalConfirmacaoTexto") as HTMLParagraphElement;
-        const botaoSim = document.getElementById("modalConfirmSim") as HTMLButtonElement;
-        const botaoCancelar = document.getElementById("modalConfirmCancelar") as HTMLButtonElement;
-        p.textContent = mensagem;
-        botaoSim.onclick = () => {
-            dialog.close();
-            this.controladora.removerItem(idItem);
-        };
-        botaoCancelar.onclick = () => {
-            dialog.close();
-        };
-        dialog.showModal();
-    }
-
-    limparTabela(): void {
-        const tbody = document.querySelector("tbody") as HTMLTableSectionElement;
-        tbody.innerHTML = '';
+        if (codigoItensAlerta.length === 1) {
+            mensagem = `ATENÇÃO: O ESTOQUE DO ITEM <strong>#${codigoItensAlerta[0]}</strong> ESTÁ BAIXO.`;
+        } 
+        if (codigoItensAlerta.length > 1) {
+            const itensTexto = codigoItensAlerta.map(codigo => `#${codigo}`).join(", ");
+            mensagem = `ATENÇÃO: O ESTOQUE DOS ITENS <strong>${itensTexto}</strong> ESTÁ BAIXO.`;
+        }
+        alertaDiv.innerHTML = `<p>${mensagem}</p>`;
+        alertaDiv.style.display = 'block';
     }
 
     private iniciarGerenciamento(): void {
@@ -170,12 +158,13 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
         modalPrecoVendaExibicao.textContent = item.precoVenda;
         modalEstoqueExibicao.textContent = item.estoque;
         modalEstoqueMinimoExibicao.textContent = item.estoqueMinimo;
-        modalLocalizacaoExibicao.textContent = item.localizacao;
+        modalLocalizacaoExibicao.textContent = item.localizacao;    
         const botaoEditar = document.getElementById("modalEditarItem") as HTMLButtonElement;
         const botaoConfirmar = document.getElementById("modalConfirmarEdicao") as HTMLButtonElement;
         const botaoCancelar = document.getElementById("modalCancelarEdicao") as HTMLButtonElement;
         const botaoFechar = document.getElementById("modalFecharGerenciar") as HTMLButtonElement;
         const camposEditaveis = document.getElementById("camposEditaveis") as HTMLDivElement;
+        const camposEditaveisExibicao = document.getElementById("camposEditaveisExibicao") as HTMLDivElement;
         const inputPrecoVenda = document.getElementById("modalPrecoVenda") as HTMLInputElement;
         const inputEstoque = document.getElementById("modalEstoque") as HTMLInputElement;
         const inputEstoqueMinimo = document.getElementById("modalEstoqueMinimo") as HTMLInputElement;
@@ -188,12 +177,12 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
         botaoEditar.style.display = 'inline';
         botaoConfirmar.style.display = 'none';
         botaoCancelar.style.display = 'none';
+        if (!this.permissao) {
+            botaoEditar.style.display = 'none';
+        } 
         botaoEditar.onclick = () => {
             camposEditaveis.style.display = 'block';
-            modalPrecoVendaExibicao.style.display = 'none';
-            modalEstoqueExibicao.style.display = 'none';
-            modalEstoqueMinimoExibicao.style.display = 'none';
-            modalLocalizacaoExibicao.style.display = 'none';
+            camposEditaveisExibicao.style.display = 'none';
             botaoEditar.style.display = 'none';
             botaoConfirmar.style.display = 'inline';
             botaoCancelar.style.display = 'inline';
@@ -203,27 +192,64 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
             const estoque = inputEstoque.value;
             const estoqueMinimo = inputEstoqueMinimo.value;
             const localizacao = inputLocalizacao.value;
+            if ( precoVenda == item.precoVenda && estoque == item.estoque && estoqueMinimo == item.estoqueMinimo && localizacao == item.localizacao ) {
+                this.exibirMensagem( ["Nenhum campo foi editado."] );
+                return;
+            }
             this.controladora.atualizarItem(item.id, precoVenda, estoque, estoqueMinimo, localizacao);
-            modalPrecoVendaExibicao.style.display = 'inline';
-            modalEstoqueExibicao.style.display = 'inline';
-            modalEstoqueMinimoExibicao.style.display = 'inline';
-            modalLocalizacaoExibicao.style.display = 'inline';
+            camposEditaveisExibicao.style.display = 'inline';
             dialog.close();
         };
         botaoCancelar.onclick = () => {
             camposEditaveis.style.display = 'none';
-            modalPrecoVendaExibicao.style.display = 'inline';
-            modalEstoqueExibicao.style.display = 'inline';
-            modalEstoqueMinimoExibicao.style.display = 'inline';
-            modalLocalizacaoExibicao.style.display = 'inline';
+            camposEditaveisExibicao.style.display = 'inline';
             botaoEditar.style.display = 'inline';
             botaoConfirmar.style.display = 'none';
             botaoCancelar.style.display = 'none';
+            modalCodigo.textContent = item.codigo;
+            inputPrecoVenda.value = item.precoVenda;
+            inputEstoque.value = item.estoque;
+            inputEstoqueMinimo.value = item.estoqueMinimo;
+            inputLocalizacao.value = item.localizacao;
         };
         botaoFechar.onclick = () => {
             dialog.close();
         };
         dialog.showModal();
+    }
+
+    private iniciarRemocao(): void {
+        const botoes = document.querySelectorAll<HTMLButtonElement>(".botaoRemover");
+        for (const botao of botoes) {
+            if (!this.permissao) {
+                botao.style.display = 'none';
+            } 
+            botao.addEventListener( "click", () => {
+                const idItem = botao.dataset.id!;
+                this.confirmarRemocao("Confirma a remoção deste item?", idItem);
+            } );
+        }
+    }
+
+    private confirmarRemocao(mensagem: string, idItem: string): void {
+        const dialog = document.getElementById("modalConfirmacao") as HTMLDialogElement;
+        const p = document.getElementById("modalConfirmacaoTexto") as HTMLParagraphElement;
+        const botaoSim = document.getElementById("modalConfirmSim") as HTMLButtonElement;
+        const botaoCancelar = document.getElementById("modalConfirmCancelar") as HTMLButtonElement;
+        p.textContent = mensagem;
+        botaoSim.onclick = () => {
+            dialog.close();
+            this.controladora.removerItem(idItem);
+        };
+        botaoCancelar.onclick = () => {
+            dialog.close();
+        };
+        dialog.showModal();
+    }
+
+    limparTabela(): void {
+        const tbody = document.querySelector("tbody") as HTMLTableSectionElement;
+        tbody.innerHTML = '';
     }
 
 }

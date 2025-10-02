@@ -158,6 +158,8 @@ $app->get( '/clientes/:busca', function($req, $res) {
         $res->status(200)->json($cliente);
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
     } catch (RepositorioException $erro) {
         $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
     } catch (Exception $erro) {
@@ -272,6 +274,8 @@ $app->get( '/itens/:busca', function($req, $res) {
         $res->status(200)->json($item);
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
     } catch (RepositorioException $erro) {
         $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
     } catch (Exception $erro) {
@@ -293,6 +297,8 @@ $app->patch( '/itens-atualizar/:id', function($req, $res) {
         $res->status(200)->end();
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
     } catch (RepositorioException $erro) {
         $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
     } catch (Exception $erro) {
