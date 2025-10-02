@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="./src/visao/cadastro-os.ts" type="module" defer></script>
+        <link rel="stylesheet" href="./estilo/estilo-cadastro-os.css">
+        <title>MotorLab - Cadastrar OS</title>
+    </head>
+    <body>
+        <header>
+            <nav aria-label="Navegação principal">
+                <a id="inicioLogo" href="./index.html">
+                    <img src="./estilo/img/logo-temp.png" class="logo">
+                </a>
+                <div class="dropdown">
+                    <button class="dropdown-botao" id="dropdownBotaoUsuario">Usuário</button>
+                    <div class="dropdown-conteudo" id="dropdownConteudoUsuario"></div>
+                </div>
+                <div class="dropdown">
+                    <button class="dropdown-botao" id="dropdownBotaoCadastro">Cadastro</button>
+                    <div class="dropdown-conteudo" id="dropdownConteudoCadastro">
+                        <a id="cadastroCliente" href="./cadastro-cliente.html">Cliente</a>
+                        <a id="cadastroVeiculo" href="./cadastro-veiculo.html">Veículo</a>
+                        <a id="cadastroOs" href="./cadastro-os.html">Ordem de Serviço</a>
+                    </div>
+                </div>
+                <a href="./index.html">Ordens de Serviço</a>
+                <a href="./estoque.html">Estoque</a>
+            </nav>
+            <button id="botaoLogout" type="button">LOGOUT</button>
+        </header>
+        <main>
+            <h1>CADASTRAR OS</h1>
+            <form>
+                <label for="buscaCliente">Cliente: </label>
+                <input type="search" id="buscaCliente" placeholder="Digite o nome completo ou CPF" required>
+                <button type="button" id="botaoBuscaCliente">BUSCAR</button>
+                <div id="detalhesCliente"></div>
+                <div id="divVeiculos">
+                    <label for="veiculos">Veículo: </label>
+                    <select id="veiculos"></select>
+                </div>
+                <div id="divResponsaveis">
+                    <label for="responsaveis">Responsável: </label>
+                    <select id="responsaveis"></select>
+                </div>
+                <button id="botaoEnviar" type="submit">CADASTRAR</button>
+            </form>
+        </main>
+        <dialog id="modalMensagem">
+            <p id="modalMensagemTexto"></p>
+            <menu>
+                <button id="modalMensagemOk">OK</button>
+            </menu>
+        </dialog>
+    </body>
+</html>

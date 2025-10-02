@@ -16,6 +16,7 @@ use App\Servico\ServicoCadastroCliente;
 use App\Servico\ServicoCadastroVeiculo;
 use App\Servico\ServicoCadastroItem;
 use App\Servico\ServicoListagemItem;
+use App\Servico\ServicoCadastroOs;
 use App\Repositorio\RepositorioUsuarioBDR;
 use App\Repositorio\RepositorioClienteBDR;
 use App\Repositorio\RepositorioVeiculoBDR;
@@ -299,6 +300,27 @@ $app->patch( '/itens-atualizar/:id', function($req, $res) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
     } catch (DominioException $erro) {
         $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->get( '/veiculos-por-cliente/:idCliente', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $logado = $sessao->dadosUsuarioLogado();
+        $idCliente = ( (int)$req->param('idCliente') );
+        $pdo = Conexao::conectar();
+        $transacao = new TransacaoPDO($pdo);
+        $repositorioVeiculo = new RepositorioVeiculoBDR($pdo);
+        $servico = new ServicoCadastroOs($transacao, $repositorioVeiculo);
+        $veiculos = $servico->buscarVeiculosPorCliente($idCliente, $logado['cargo_usuario']);
+        $res->status(200)->json($veiculos);
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
     } catch (RepositorioException $erro) {
         $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
     } catch (Exception $erro) {

@@ -1,15 +1,15 @@
 import { ErroGestor } from '../infra/erro-gestor.ts';
-import type { VisaoCadastroVeiculo } from '../visao/visao-cadastro-veiculo.ts';
-import { GestorCadastroVeiculo } from '../gestor/gestor-cadastro-veiculo.ts';
+import type { VisaoCadastroOs } from '../visao/visao-cadastro-os.ts';
+import { GestorCadastroOs } from '../gestor/gestor-cadastro-os.ts';
 
 
-export class ControladoraCadastroVeiculo {
+export class ControladoraCadastroOs {
 
-    private gestor = new GestorCadastroVeiculo();
-    private visao: VisaoCadastroVeiculo;
+    private gestor = new GestorCadastroOs();
+    private visao: VisaoCadastroOs;
     private idClienteSelecionado = null;
 
-    constructor(visao: VisaoCadastroVeiculo) {
+    constructor(visao: VisaoCadastroOs) {
         this.visao = visao;
     }
 
@@ -35,7 +35,7 @@ export class ControladoraCadastroVeiculo {
         }
         await this.carregarDadosUsuario();
         this.visao.exibirPagina();
-        this.visao.iniciarFormulario();
+        await this.carregarResponsaveis();
     }
 
     private async carregarDadosUsuario(): Promise<void> {
@@ -75,6 +75,7 @@ export class ControladoraCadastroVeiculo {
             }
             this.idClienteSelecionado = dadosCliente.id;
             this.visao.exibirCliente(dadosCliente);
+            this.carregarVeiculosPorCliente(dadosCliente.id);
         } catch (erro: any) {
             this.idClienteSelecionado = null;
             if (erro instanceof ErroGestor) {
@@ -85,40 +86,30 @@ export class ControladoraCadastroVeiculo {
         }
     }
 
-    async enviarVeiculo(dados: any): Promise<void> {
-        if (!this.idClienteSelecionado) {
-            this.visao.exibirMensagem( ["Informe um cliente válido."] );
-        }
-        if (!dados.placa || !dados.chassi || !dados.fabricante || !dados.modelo || !dados.ano || !dados.quilometragem) {
-            this.visao.exibirMensagem( ["Todos os campos do fomulário devem ser preenchidos."] );
-            return;
-        }
-        if (isNaN(Number(dados.ano)) || Number(dados.ano) <= 0 || isNaN(Number(dados.quilometragem)) || Number(dados.quilometragem) <= 0) {
-            this.visao.exibirMensagem( ["Ano e quilometragem devem ser números positivos."] );
-            return;
-        }
-        const envio = {
-            cliente_id: this.idClienteSelecionado,
-            placa: dados.placa,
-            chassi: dados.chassi,
-            fabricante: dados.fabricante,
-            modelo: dados.modelo,
-            ano: ( Number(dados.ano) ),
-            quilometragem: ( Number(dados.quilometragem) )
-        };
+    async carregarResponsaveis(): Promise<void> {
         try {
-            await this.gestor.cadastrarVeiculo(envio);
-            this.visao.exibirMensagem( ["Veículo cadastrado com sucesso."] );
-            this.visao.limparFormulario();
-            this.idClienteSelecionado = null;
-            this.visao.limparDivCliente();
+            const responsaveis = await this.gestor.obterResponsaveis();
+            this.visao.listarResponsaveis(responsaveis);
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem( erro.getProblemas() );
             } else {
-                this.visao.exibirMensagem( [`Não foi possível cadastrar o veículo: ${erro.message}`] );
+                this.visao.exibirMensagem( [`Não foi possível buscar o cliente: ${erro.message}`] );
             }
-        } 
+        }
+    }
+
+    async carregarVeiculosPorCliente(idCliente: string): Promise<void> {
+        try {
+            const veiculos = await this.gestor.obterVeiculosPorCliente( parseInt(idCliente) );
+            this.visao.listarVeiculos(veiculos);
+        } catch (erro: any) {
+            if (erro instanceof ErroGestor) {
+                this.visao.exibirMensagem( erro.getProblemas() );
+            } else {
+                this.visao.exibirMensagem( [`Não foi possível carregar os veículos: ${erro.message}`] ); 
+            }
+        }
     }
 
 }

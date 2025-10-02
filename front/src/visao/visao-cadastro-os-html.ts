@@ -1,16 +1,16 @@
-import type { VisaoCadastroVeiculo } from './visao-cadastro-veiculo.ts';
-import { ControladoraCadastroVeiculo } from '../controladora/controladora-cadastro-veiculo.ts';
+import type { VisaoCadastroOs } from './visao-cadastro-os.ts';
+import { ControladoraCadastroOs } from '../controladora/controladora-cadastro-os.ts';
 
 
-export class VisaoCadastroVeiculoHTML implements VisaoCadastroVeiculo {
+export class VisaoCadastroOsHTML implements VisaoCadastroOs {
 
-    private controladora: ControladoraCadastroVeiculo;
+    private controladora: ControladoraCadastroOs;
     private permissao = false;
-
+    
     constructor() {
-        this.controladora = new ControladoraCadastroVeiculo(this);
+        this.controladora = new ControladoraCadastroOs(this);
     }
-
+    
     iniciar(): void {
         this.controladora.iniciarSessao();
         this.iniciarLogout();
@@ -19,12 +19,12 @@ export class VisaoCadastroVeiculoHTML implements VisaoCadastroVeiculo {
 
     private iniciarLogout(): void {
         const botaoLogout = document.getElementById("botaoLogout") as HTMLButtonElement;
-        botaoLogout.addEventListener('click', () => {
+        botaoLogout.addEventListener( 'click', () => {
             this.controladora.logout();
-        });
+        } );
     }
 
-    exibirDadosUsuario(dados: any): void {
+    exibirDadosUsuario( dados: any ): void {
         const div = document.getElementById("dropdownConteudoUsuario") as HTMLDivElement;
         const nome = document.createElement("p");
         nome.textContent = dados.nome;
@@ -92,20 +92,33 @@ export class VisaoCadastroVeiculoHTML implements VisaoCadastroVeiculo {
         `;
     }
 
+    listarVeiculos(veiculos: any): void {
+        const select = document.getElementById("veiculos") as HTMLSelectElement;
+        select.innerHTML = '<option value="">Selecione</option>';
+        for (const veiculo of veiculos) {
+            const option = document.createElement("option");
+            option.value = veiculo.id;
+            option.textContent = `${veiculo.fabricante} ${veiculo.modelo} ${veiculo.ano} (${veiculo.placa})`;
+            select.appendChild(option);
+        }
+    }
+
+    listarResponsaveis(responsaveis: any): void {
+        const select = document.getElementById("responsaveis") as HTMLSelectElement;
+        select.innerHTML = '<option value="">Selecione</option>';
+        for (const responsavel of responsaveis) {
+            const option = document.createElement("option");
+            option.value = responsavel.id;
+            option.textContent = `${responsavel.nome}`;
+            select.appendChild(option);
+        }
+    }
+
     iniciarFormulario(): void {
         const form = document.querySelector("form") as HTMLFormElement;
-        form.addEventListener("submit", (event) => {
+        form.addEventListener( "submit", (event) => {
             event.preventDefault();
-            const dados = {
-                placa: (document.getElementById("placa") as HTMLInputElement).value.trim(),
-                chassi: (document.getElementById("chassi") as HTMLInputElement).value.trim(),
-                fabricante: (document.getElementById("fabricante") as HTMLInputElement).value.trim(),
-                modelo: (document.getElementById("modelo") as HTMLInputElement).value.trim(),
-                ano: (document.getElementById("ano") as HTMLInputElement).value.trim(),
-                quilometragem: (document.getElementById("quilometragem") as HTMLInputElement).value.trim()
-            };
-            this.controladora.enviarVeiculo(dados);
-        });
+        } );
     }
 
     limparFormulario(): void {
