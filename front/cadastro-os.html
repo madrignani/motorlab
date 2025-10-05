@@ -33,10 +33,12 @@
         <main>
             <h1>CADASTRAR OS</h1>
             <form>
-                <label for="buscaCliente">Cliente: </label>
-                <input type="search" id="buscaCliente" placeholder="Digite o nome completo ou CPF" required>
-                <button type="button" id="botaoBuscaCliente">BUSCAR</button>
-                <div id="detalhesCliente"></div>
+                <div id="divCliente">
+                    <label for="buscaCliente">Cliente: </label>
+                    <input type="search" id="buscaCliente" placeholder="Digite o nome completo ou CPF" required>
+                    <button type="button" id="botaoBuscaCliente">BUSCAR</button>
+                    <div id="detalhesCliente"></div>
+                </div>
                 <div id="divVeiculos">
                     <label for="veiculos">Veículo: </label>
                     <select id="veiculos"></select>
@@ -44,6 +46,28 @@
                 <div id="divResponsaveis">
                     <label for="responsaveis">Responsável: </label>
                     <select id="responsaveis"></select>
+                </div>
+                <div id="divItens">
+                    <h3>ITENS</h3>
+                    <label for="pesquisaItem">Pesquisa: </label>
+                    <input type="search" id="pesquisaItem" placeholder="Digite o código ou título" required>
+                    <label for="quantidadeItem">Quantidade: </label>
+                    <input type="number" id="quantidadeItem" required>
+                    <button type="button" id="botaoBuscaCliente">BUSCAR E ADICIONAR</button>
+                    <table id="tabelaItens">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Título</th>
+                                <th>Fabricante</th>
+                                <th>Quantidade</th>
+                                <th>Preço</th>
+                                <th>Subtotal</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaItens"></tbody>
+                    </table>
                 </div>
                 <button id="botaoEnviar" type="submit">CADASTRAR</button>
             </form>

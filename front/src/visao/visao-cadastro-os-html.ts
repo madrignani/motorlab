@@ -131,4 +131,38 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         divDetalhesCliente.innerHTML = '';
     }
 
+    iniciarBuscaItem(): void {
+        const pesquisa = document.getElementById("pesquisaItem") as HTMLInputElement;
+        const quantidade = document.getElementById("quantidadeItem") as HTMLInputElement;
+        const botaoAdicionar = document.getElementById("botaoBuscaCliente") as HTMLButtonElement;
+        botaoAdicionar.addEventListener( "click", () => {
+            this.controladora.buscarItem(pesquisa.value, quantidade.value);
+        } );
+    }
+
+    adicionarItemTabela(item: any, quantidade: number, subtotal: number): void {
+        const tbody = document.getElementById("corpoTabelaItens") as HTMLTableSectionElement;
+        const linha = document.createElement("tr");
+        const dadosItem = [
+            item.codigo, item.titulo, item.fabricante, quantidade.toString(),
+            `R$ ${item.precoVenda.toFixed(2)}`, `R$ ${subtotal.toFixed(2)}`
+        ];
+        for (const dado of dadosItem) {
+            const td = document.createElement("td");
+            td.textContent = dado;
+            linha.appendChild(td);
+        }
+        const acao = document.createElement("td");
+        const botaoRemover = document.createElement("button");
+        botaoRemover.textContent = "REMOVER";
+        botaoRemover.addEventListener( "click", () => {
+            this.controladora.removerItem(item.id);
+            linha.remove();
+        } );
+        acao.appendChild(botaoRemover);
+        linha.appendChild(acao);
+        linha.dataset.id = item.id;
+        tbody.appendChild(linha);
+    }
+
 }

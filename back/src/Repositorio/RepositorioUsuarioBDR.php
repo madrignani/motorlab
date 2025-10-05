@@ -67,6 +67,22 @@ class RepositorioUsuarioBDR implements RepositorioUsuario {
         }
     }
 
+    public function listarMecanicos(): array {
+        try {
+            $sql = <<<SQL
+                SELECT id, cpf, nome, email, cargo FROM usuario
+                WHERE cargo='MECANICO' AND ativo=TRUE
+                ORDER BY nome ASC, id ASC
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            $dados = $stmt->fetchAll();
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
 }
 
 

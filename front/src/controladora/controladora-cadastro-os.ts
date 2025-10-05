@@ -8,6 +8,7 @@ export class ControladoraCadastroOs {
     private gestor = new GestorCadastroOs();
     private visao: VisaoCadastroOs;
     private idClienteSelecionado = null;
+    private itensSelecionados: any[] = [];
 
     constructor(visao: VisaoCadastroOs) {
         this.visao = visao;
@@ -36,6 +37,7 @@ export class ControladoraCadastroOs {
         await this.carregarDadosUsuario();
         this.visao.exibirPagina();
         await this.carregarResponsaveis();
+        this.visao.iniciarBuscaItem();
     }
 
     private async carregarDadosUsuario(): Promise<void> {
@@ -109,6 +111,49 @@ export class ControladoraCadastroOs {
             } else {
                 this.visao.exibirMensagem( [`Não foi possível carregar os veículos: ${erro.message}`] ); 
             }
+        }
+    }
+
+    async buscarItem(busca: string, quantidade: string): Promise<void> {
+        if (!busca || !quantidade) {
+            this.visao.exibirMensagem( ["Preencha os campos para buscar o item."] );
+            return;
+        }
+        const quantidadeFormat = Number(quantidade);
+        if (isNaN(quantidadeFormat) || quantidadeFormat <= 0) {
+            this.visao.exibirMensagem( ["Quantidade deve ser um número inteiro positivo."] );
+            return;
+        }
+        try {
+            const dadosItem = await this.gestor.obterItem( busca.trim() );
+            if (!dadosItem.id) {
+                this.visao.exibirMensagem( ["Item não encontrado."] );
+                return;
+            }
+            const itemComQuantidade = {
+                id: dadosItem.id,
+                codigo: dadosItem.codigo,
+                titulo: dadosItem.titulo,
+                fabricante: dadosItem.fabricante,
+                precoVenda: dadosItem.precoVenda,
+                quantidade: quantidadeFormat
+            };
+            this.itensSelecionados.push(itemComQuantidade);
+            const subtotal = (quantidadeFormat * Number(dadosItem['precoVenda']));
+            this.visao.adicionarItemTabela(dadosItem, quantidadeFormat, subtotal);
+        } catch (erro: any) {
+            if (erro instanceof ErroGestor) {
+                this.visao.exibirMensagem(erro.getProblemas());
+            } else {
+                this.visao.exibirMensagem( [`Não foi possível buscar o item: ${erro.message}`] );
+            }
+        }
+    }
+
+    removerItem(id: string): void {
+        const indice = this.itensSelecionados.findIndex(item => item.id === id);
+        if (indice !== -1) {
+            this.itensSelecionados.splice(indice, 1);
         }
     }
 

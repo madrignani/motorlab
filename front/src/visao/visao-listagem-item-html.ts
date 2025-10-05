@@ -73,8 +73,7 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
     iniciarFiltros(): void {
         const pesquisa = document.getElementById("filtroPesquisa") as HTMLInputElement;
         pesquisa.addEventListener( "input", () => {
-            const valor = ( (pesquisa.value).trim() );
-            this.controladora.aplicarFiltros(valor);
+            this.controladora.aplicarFiltros(pesquisa.value);
         } );
     }
 

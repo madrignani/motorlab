@@ -57,4 +57,16 @@ export class GestorCadastroOs {
         return await response.json();    
     }
 
+    async obterItem(busca: string): Promise<any> {
+        const response = await fetch( `${API_URL}/itens/${busca}`, {
+            method: 'GET',
+            credentials: 'include'
+        } );
+        if (!response.ok) {
+            const dadosResposta = await response.json();
+            throw ErroGestor.comProblemas(dadosResposta.mensagens);
+        }
+        return await response.json();
+    }
+
 }
