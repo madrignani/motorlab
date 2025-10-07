@@ -80,6 +80,7 @@ export class GestorCadastroOs {
             const dadosResposta = await response.json();
             throw ErroGestor.comProblemas(dadosResposta.mensagens);
         }
+        return await response.json();
     }
 
 }

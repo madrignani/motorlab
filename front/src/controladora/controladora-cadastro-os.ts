@@ -247,7 +247,7 @@ export class ControladoraCadastroOs {
             return;
         }
         try {
-            await this.gestor.cadastrarOs( {
+            const osId = await this.gestor.cadastrarOs( {
                 clienteId: this.clienteSelecionadoId,
                 veiculoId: veiculoSelecionadoId,
                 responsavelId: responsavelSelecionadoId,
@@ -256,8 +256,8 @@ export class ControladoraCadastroOs {
                 previsaoEntrega: previsaoEntrega,
                 observacoes: observacoes
             } );
-            this.visao.exibirMensagem( ["Ordem de Serviço cadastrada com sucesso."] );
             this.limparFormulario();
+            this.visao.exibirMensagemComAcao( ["Ordem de Servico cadastrada com sucesso."], osId! );
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem( erro.getProblemas() );

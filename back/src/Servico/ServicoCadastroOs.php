@@ -132,7 +132,7 @@ class ServicoCadastroOs {
         if (!empty($problemas)) {
             throw DominioException::comProblemas( $problemas );
         }
-        $this->persistirOs($dados, $idUsuarioLogado, $itensValidados, $valorEstimado);
+        return $this->persistirOs($dados, $idUsuarioLogado, $itensValidados, $valorEstimado);
     }
 
     private function validarEntidades(array $dados, int $idUsuarioLogado) {
@@ -248,6 +248,7 @@ class ServicoCadastroOs {
                 ] );
             }
             $this->transacao->finalizar();
+            return $osId;
         } catch (Throwable $erro) {
             $this->transacao->desfazer();
             throw $erro;

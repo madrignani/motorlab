@@ -4,6 +4,7 @@ export interface VisaoCadastroOs {
     redirecionarParaLogin(): void;
     retornarNavegacao(): void;
     exibirMensagem( mensagens: string[] ): void;
+    exibirMensagemComAcao( mensagens: string[], id: string ): void;
     exibirPagina(): void;
     exibirCliente(cliente: any[]): void;
     listarVeiculos(veiculos: any[]): void;
@@ -24,5 +25,6 @@ export interface VisaoCadastroOs {
     atualizarValorTotal(total: number): void;
     limparValorTotal(): void;
     iniciarFormulario(): void;
+    redirecionarParaOsCriada(id: string): void;
 
 }

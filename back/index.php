@@ -404,8 +404,8 @@ $app->post( '/ordens-servico', function($req, $res) {
         $repositorioUsuario = new RepositorioUsuarioBDR($pdo);
         $repositorioVeiculo = new RepositorioVeiculoBDR($pdo);
         $servico = new ServicoCadastroOs($transacao, $repositorioCliente, $repositorioItem, $repositorioOs, $repositorioOsCusto, $repositorioUsuario, $repositorioVeiculo);
-        $servico->cadastrarOs($dados, $logado['id_usuario'], $logado['cargo_usuario']);
-        $res->status(200)->end();
+        $osId = $servico->cadastrarOs($dados, $logado['id_usuario'], $logado['cargo_usuario']);
+        $res->status(200)->json($osId);
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
     } catch (DominioException $erro) {

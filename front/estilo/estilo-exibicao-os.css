@@ -1,0 +1,78 @@
+/*////////////////////////////     HEADER E APRESENTAÇÃO      /////////////////////////////////*/
+
+
+@font-face {
+    font-family: 'Open Sans Variable';
+    src: url('./fonte/OpenSans-VariableFont.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    visibility: hidden;
+    font-family: 'Open Sans Variable', sans-serif;
+}
+
+button {
+    font-family: 'Open Sans Variable', sans-serif;
+}
+
+header {
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+nav {
+    display: flex;
+    gap: 1rem;
+}
+
+.dropdown-botao {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.dropdown-conteudo {
+    display: none;
+    position: absolute;
+}
+
+.dropdown:hover .dropdown-conteudo {
+    display: block;
+}
+
+.alertaEstoqueBaixo {
+    display: none;
+}
+
+#camposEditaveis {
+    display: none;
+}
+
+#modalConfirmarEdicao {
+    display: none;
+}
+
+#modalCancelarEdicao {
+    display: none;
+}
+
+#inicioLogo {
+    display: inline-block;
+    text-decoration: none;
+}
+
+#inicioLogo img {
+    width: 30px;
+    height: auto;
+}

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="./src/visao/exibicao-os.ts" type="module" defer></script>
+        <link rel="stylesheet" href="./estilo/estilo-exibicao-os.css">
+        <title>MotorLab - OS</title>
+    </head>
+    <body>
+        <header>
+            <nav aria-label="Navegação principal">
+                <a id="inicioLogo" href="./index.html">
+                    <img src="./estilo/img/logo-temp.png" class="logo">
+                </a>
+                <div class="dropdown">
+                    <button class="dropdown-botao" id="dropdownBotaoUsuario">Usuário</button>
+                    <div class="dropdown-conteudo" id="dropdownConteudoUsuario"></div>
+                </div>
+                <div class="dropdown">
+                    <button class="dropdown-botao" id="dropdownBotaoCadastro">Cadastro</button>
+                    <div class="dropdown-conteudo" id="dropdownConteudoCadastro">
+                        <a id="cadastroCliente" href="./cadastro-cliente.html">Cliente</a>
+                        <a id="cadastroVeiculo" href="./cadastro-veiculo.html">Veículo</a>
+                        <a id="cadastroOs" href="./cadastro-os.html">Ordem de Serviço</a>
+                    </div>
+                </div>
+                <a href="./index.html">Ordens de Serviço</a>
+                <a href="./estoque.html">Estoque</a>
+            </nav>
+            <button id="botaoLogout" type="button">LOGOUT</button>
+        </header>
+        <h1>ORDEM DE SERVIÇO #<span id="idOs"></span></h1>
+        <div id="informacoesOsNaoEditaveis">
+            <p>Criação: <span id="dataHoraCriacaoOs"></span></p>
+            <p>Cliente: <span id="nomeCliente"></span></p>
+            <p>Veículo: <span id="fabricanteVeiculo"></span> <span id="modeloVeiculo"></span> <span id="anoVeiculo"> (<span id="placaVeiculo"></span>)</p>
+            <p>Responsável: <span id="nomeResponsavel"></span></p>
+            <p>Status: <span id="statusOs"></span></p>
+        </div>
+        <div id="alertaOs">
+            <button id="botaoAlertaOs">COLOCAR EM ALERTA</button>
+        </div>
+        <div id="editarOs">
+            <button id="botaoEditarOs">EDITAR</button>
+        </div>
+        <div id="informacoesOsEditaveis">
+            <label for="selectStatusOs">Status: </label>
+            <select id="selectStatusOs" disabled></select>
+            <label for="previsaoEntrega">Previsão para a entrega do veículo: </label>
+            <input type="datetime-local" id="previsaoEntrega" disabled>
+            <h3>ITENS</h3>
+            <label for="pesquisaItem">Pesquisa: </label>
+            <input type="search" id="pesquisaItem" placeholder="Digite o código" disabled>
+            <label for="quantidadeItem">Quantidade: </label>
+            <input type="number" id="quantidadeItem" disabled>
+            <button type="button" id="botaoBuscaItem" disabled>BUSCAR E ADICIONAR</button>
+            <table id="tabelaItens">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Título</th>
+                        <th>Fabricante</th>
+                        <th>Preço</th>
+                        <th>Quantidade</th>
+                        <th>Subtotal</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabelaItens"></tbody>
+            </table>
+            <h3>CUSTOS</h3>
+            <label for="tipoCusto">Tipo: </label>
+            <select id="tipoCusto" disabled></select>
+            <label for="descricaoCusto">Descrição: </label>
+            <input type="text" id="descricaoCusto" disabled>
+            <label for="valorCusto">Valor: </label>
+            <input type="number" id="valorCusto" disabled>
+            <label for="quantidadeCusto">Quantidade: </label>
+            <input type="number" id="quantidadeCusto" disabled>
+            <button type="button" id="botaoAdicionarCusto" disabled>ADICIONAR</button>
+            <table id="tabelaCustos">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th>Preço</th>
+                        <th>Quantidade</th>
+                        <th>Subtotal</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabelaCustos"></tbody>
+            </table>
+            <label for="observacoes">Observações: </label>
+            <textarea id="observacoes" disabled></textarea>
+        </div>
+        <div id="informacoesOsProcessadas">
+            <p>Valor total: <span id="valorTotalOs"></span></p>
+        </div>
+        <div id ="acoesPosEdicao">
+            <button id="botaoSalvarEdicaoOs" hidden>SALVAR</button>
+            <button id="botaoCancelarEdicaoOs" hidden>CANCELAR</button>
+        </div>
+        <dialog id="modalMensagem">
+            <p id="modalMensagemTexto"></p>
+            <menu>
+                <button id="modalMensagemOk">OK</button>
+            </menu>
+        </dialog>
+    </body>
+</html>

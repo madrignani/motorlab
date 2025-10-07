@@ -54,6 +54,12 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         dialog.showModal();
     }
 
+    exibirMensagemComAcao( mensagens: string[], id: string ): void {
+        this.exibirMensagem(mensagens);
+        const botaoOk = document.getElementById("modalMensagemOk") as HTMLButtonElement;
+        botaoOk.addEventListener( "click", () => this.redirecionarParaOsCriada(id) );
+    }
+
     exibirPagina(): void {
         document.body.style.visibility = "visible";
     }
@@ -266,6 +272,10 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
             event.preventDefault();
             this.controladora.enviarOs();
         } );
+    }
+
+    redirecionarParaOsCriada(id: string): void {
+        window.location.href = `./exibicao-os.html?id=${id}`;
     }
 
 }
