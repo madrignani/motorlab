@@ -50,6 +50,24 @@ class RepositorioVeiculoBDR implements RepositorioVeiculo {
         }
     }
 
+    public function buscarPorId(int $id): ?array {
+        try {
+            $sql = <<<SQL
+                SELECT * FROM veiculo
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['id' => $id] );
+            $dados = $stmt->fetch();
+            if ( empty($dados) ) {
+                return null;
+            }
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
 }
 
 

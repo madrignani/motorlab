@@ -21,6 +21,8 @@ use App\Repositorio\RepositorioUsuarioBDR;
 use App\Repositorio\RepositorioClienteBDR;
 use App\Repositorio\RepositorioVeiculoBDR;
 use App\Repositorio\RepositorioItemBDR;
+use App\Repositorio\RepositorioOsBDR;
+use App\Repositorio\RepositorioOsCustoBDR;
 use App\Dto\UsuarioDTO;
 
 
@@ -182,7 +184,7 @@ $app->post( '/veiculos', function($req, $res) {
         $repositorioCliente = new RepositorioClienteBDR($pdo);
         $repositorioVeiculo = new RepositorioVeiculoBDR($pdo);
         $servico = new ServicoCadastroVeiculo($repositorioCliente, $repositorioVeiculo);
-        $cliente = $servico->cadastrarVeiculo($dados, $logado['cargo_usuario'] );
+        $servico->cadastrarVeiculo($dados, $logado['cargo_usuario'] );
         $res->status(200)->end();
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
@@ -315,9 +317,13 @@ $app->get( '/veiculos-por-cliente/:idCliente', function($req, $res) {
         $idCliente = ( (int)$req->param('idCliente') );
         $pdo = Conexao::conectar();
         $transacao = new TransacaoPDO($pdo);
+        $repositorioCliente = new RepositorioClienteBDR($pdo);
+        $repositorioItem = new RepositorioItemBDR($pdo);
+        $repositorioOs = new RepositorioOsBDR($pdo);
+        $repositorioOsCusto = new RepositorioOsCustoBDR($pdo);
         $repositorioUsuario = new RepositorioUsuarioBDR($pdo);
         $repositorioVeiculo = new RepositorioVeiculoBDR($pdo);
-        $servico = new ServicoCadastroOs($transacao, $repositorioUsuario, $repositorioVeiculo);
+        $servico = new ServicoCadastroOs($transacao, $repositorioCliente, $repositorioItem, $repositorioOs, $repositorioOsCusto, $repositorioUsuario, $repositorioVeiculo);
         $veiculos = $servico->buscarVeiculosPorCliente($idCliente, $logado['cargo_usuario']);
         $res->status(200)->json($veiculos);
     } catch (AutenticacaoException $erro) {
@@ -336,9 +342,13 @@ $app->get( '/responsaveis', function($req, $res) {
         $logado = $sessao->dadosUsuarioLogado();
         $pdo = Conexao::conectar();
         $transacao = new TransacaoPDO($pdo);
+        $repositorioCliente = new RepositorioClienteBDR($pdo);
+        $repositorioItem = new RepositorioItemBDR($pdo);
+        $repositorioOs = new RepositorioOsBDR($pdo);
+        $repositorioOsCusto = new RepositorioOsCustoBDR($pdo);
         $repositorioUsuario = new RepositorioUsuarioBDR($pdo);
         $repositorioVeiculo = new RepositorioVeiculoBDR($pdo);
-        $servico = new ServicoCadastroOs($transacao, $repositorioUsuario, $repositorioVeiculo);
+        $servico = new ServicoCadastroOs($transacao, $repositorioCliente, $repositorioItem, $repositorioOs, $repositorioOsCusto, $repositorioUsuario, $repositorioVeiculo);
         $responsaveis = $servico->listarResponsaveis($logado['cargo_usuario']);
         $res->status(200)->json($responsaveis);
     } catch (AutenticacaoException $erro) {
@@ -346,6 +356,61 @@ $app->get( '/responsaveis', function($req, $res) {
     } catch (DominioException $erro) {
         $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
     } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->get( '/itens-cod/:busca', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $codigo = $req->param('busca');
+        $pdo = Conexao::conectar();
+        $transacao = new TransacaoPDO($pdo);
+        $repositorioCliente = new RepositorioClienteBDR($pdo);
+        $repositorioItem = new RepositorioItemBDR($pdo);
+        $repositorioOs = new RepositorioOsBDR($pdo);
+        $repositorioOsCusto = new RepositorioOsCustoBDR($pdo);
+        $repositorioUsuario = new RepositorioUsuarioBDR($pdo);
+        $repositorioVeiculo = new RepositorioVeiculoBDR($pdo);
+        $servico = new ServicoCadastroOs($transacao, $repositorioCliente, $repositorioItem, $repositorioOs, $repositorioOsCusto, $repositorioUsuario, $repositorioVeiculo);
+        $item = $servico->buscarItemPorCodigo($codigo);
+        $res->status(200)->json($item);
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->post( '/ordens-servico', function($req, $res) {
+    try{
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $logado = $sessao->dadosUsuarioLogado();
+        $dados = ( (array)$req->body() );
+        $pdo = Conexao::conectar();
+        $transacao = new TransacaoPDO($pdo);
+        $repositorioCliente = new RepositorioClienteBDR($pdo);
+        $repositorioItem = new RepositorioItemBDR($pdo);
+        $repositorioOs = new RepositorioOsBDR($pdo);
+        $repositorioOsCusto = new RepositorioOsCustoBDR($pdo);
+        $repositorioUsuario = new RepositorioUsuarioBDR($pdo);
+        $repositorioVeiculo = new RepositorioVeiculoBDR($pdo);
+        $servico = new ServicoCadastroOs($transacao, $repositorioCliente, $repositorioItem, $repositorioOs, $repositorioOsCusto, $repositorioUsuario, $repositorioVeiculo);
+        $servico->cadastrarOs($dados, $logado['id_usuario'], $logado['cargo_usuario']);
+        $res->status(200)->end();
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    }  catch (RepositorioException $erro) {
         $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
     } catch (Exception $erro) {
         $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );

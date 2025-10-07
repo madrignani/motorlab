@@ -58,7 +58,7 @@ export class GestorCadastroOs {
     }
 
     async obterItem(busca: string): Promise<any> {
-        const response = await fetch( `${API_URL}/itens/${busca}`, {
+        const response = await fetch( `${API_URL}/itens-cod/${busca}`, {
             method: 'GET',
             credentials: 'include'
         } );
@@ -67,6 +67,19 @@ export class GestorCadastroOs {
             throw ErroGestor.comProblemas(dadosResposta.mensagens);
         }
         return await response.json();
+    }
+
+    async cadastrarOs(envio: any): Promise<void> {
+        const response = await fetch( `${API_URL}/ordens-servico`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(envio)
+        } );
+        if (!response.ok) {
+            const dadosResposta = await response.json();
+            throw ErroGestor.comProblemas(dadosResposta.mensagens);
+        }
     }
 
 }

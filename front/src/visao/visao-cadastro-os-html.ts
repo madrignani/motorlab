@@ -114,13 +114,6 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         }
     }
 
-    iniciarFormulario(): void {
-        const form = document.querySelector("form") as HTMLFormElement;
-        form.addEventListener( "submit", (event) => {
-            event.preventDefault();
-        } );
-    }
-
     limparFormulario(): void {
         const form = document.querySelector("form") as HTMLFormElement;
         form.reset();
@@ -134,9 +127,11 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
     iniciarBuscaItem(): void {
         const pesquisa = document.getElementById("pesquisaItem") as HTMLInputElement;
         const quantidade = document.getElementById("quantidadeItem") as HTMLInputElement;
-        const botaoAdicionar = document.getElementById("botaoBuscaCliente") as HTMLButtonElement;
+        const botaoAdicionar = document.getElementById("botaoBuscaItem") as HTMLButtonElement;
         botaoAdicionar.addEventListener( "click", () => {
             this.controladora.buscarItem(pesquisa.value, quantidade.value);
+            pesquisa.value = '';
+            quantidade.value = '';
         } );
     }
 
@@ -144,8 +139,8 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         const tbody = document.getElementById("corpoTabelaItens") as HTMLTableSectionElement;
         const linha = document.createElement("tr");
         const dadosItem = [
-            item.codigo, item.titulo, item.fabricante, quantidade.toString(),
-            `R$ ${item.precoVenda.toFixed(2)}`, `R$ ${subtotal.toFixed(2)}`
+            item.codigo, item.titulo, item.fabricante, `R$ ${item.precoVenda.toFixed(2)}`,
+            quantidade.toString(), `R$ ${subtotal.toFixed(2)}`
         ];
         for (const dado of dadosItem) {
             const td = document.createElement("td");
@@ -163,6 +158,114 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         linha.appendChild(acao);
         linha.dataset.id = item.id;
         tbody.appendChild(linha);
+    }
+
+    iniciarCustos(): void {
+        const tipos = [
+            { label: "Serviço", value: "SERVICO" },
+            { label: "Extra", value: "EXTRA" }
+        ];
+        const selectCustos = document.getElementById("tipoCusto") as HTMLSelectElement;
+        selectCustos.innerHTML = '';
+        for (const tipo of tipos) {
+            const option = document.createElement('option');
+            option.value = tipo.value;
+            option.textContent = tipo.label;
+            selectCustos.appendChild(option);
+        } ;
+        const botaoAdicionar = document.getElementById("botaoAdicionarCusto") as HTMLButtonElement;
+        botaoAdicionar.addEventListener( 'click', () => {
+            const tipo = document.getElementById("tipoCusto") as HTMLSelectElement ;
+            const descricao = document.getElementById("descricaoCusto") as HTMLInputElement;
+            const valor = document.getElementById("valorCusto") as HTMLInputElement;
+            const quantidade = document.getElementById("quantidadeCusto") as HTMLInputElement;
+            this.controladora.adicionarCusto(tipo.value, descricao.value, valor.value, quantidade.value);
+            descricao.value = '';
+            valor.value = '';
+            quantidade.value = '';
+        } );
+    }
+
+    adicionarCustoTabela(custo: any): void {
+        const tbody = document.getElementById("corpoTabelaCustos") as HTMLTableSectionElement;
+        const linha = document.createElement("tr");
+        let tipoFormat;
+        if (custo.tipo == "SERVICO") {
+            tipoFormat = "Serviço";
+        }
+        if (custo.tipo == "EXTRA"){
+            tipoFormat = "Extra";
+        }
+        const dadosCusto = [
+            tipoFormat, custo.descricao, `R$ ${custo.valor.toFixed(2)}`,
+            custo.quantidade.toString(), `R$ ${custo.subtotal.toFixed(2)}`
+        ];
+        for (const dado of dadosCusto) {
+            const td = document.createElement("td");
+            td.textContent = dado;
+            linha.appendChild(td);
+        }
+        const acao = document.createElement("td");
+        const botaoRemover = document.createElement("button");
+        botaoRemover.textContent = "REMOVER";
+        botaoRemover.addEventListener( "click", () => {
+            this.controladora.removerCusto(custo.id);
+            linha.remove();
+        } );
+        acao.appendChild(botaoRemover);
+        linha.appendChild(acao);
+        linha.dataset.id = custo.id;
+        tbody.appendChild(linha);
+    }
+
+    obterVeiculoSelecionadoId(): string | null {
+        const select = document.getElementById("veiculos") as HTMLSelectElement;
+        return select.value || null;
+    }
+
+    obterResponsavelSelecionadoId(): string | null {
+        const select = document.getElementById("responsaveis") as HTMLSelectElement;
+        return select.value || null;
+    }
+
+    obterObservacoes(): string {
+        const textarea = document.getElementById("observacoes") as HTMLTextAreaElement;
+        return textarea.value.trim();
+    }
+
+    obterPrevisaoEntrega(): string | null {
+        const input = document.getElementById("previsaoEntrega") as HTMLInputElement;
+        return input.value || null;
+    }
+
+    limparTabelaItens(): void {
+        const tbody = document.getElementById("corpoTabelaItens") as HTMLTableSectionElement;
+        tbody.innerHTML = '';
+    }
+
+    limparTabelaCustos(): void {
+        const tbody = document.getElementById("corpoTabelaCustos") as HTMLTableSectionElement;
+        tbody.innerHTML = '';
+    }
+
+    atualizarValorTotal(total: any): void {
+        const divValorTotal = document.getElementById("valorTotal") as HTMLDivElement;
+        divValorTotal.style.display = 'block';
+        const formatado = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        divValorTotal.textContent = `Total: ${formatado}`;
+    }
+
+    limparValorTotal(): void {
+        const divValorTotal = document.getElementById("valorTotal") as HTMLDivElement;
+        divValorTotal.style.display = 'none';
+    }
+
+    iniciarFormulario(): void {
+        const form = document.querySelector("form") as HTMLFormElement;
+        form.addEventListener( "submit", (event) => {
+            event.preventDefault();
+            this.controladora.enviarOs();
+        } );
     }
 
 }

@@ -35,7 +35,7 @@
             <form>
                 <div id="divCliente">
                     <label for="buscaCliente">Cliente: </label>
-                    <input type="search" id="buscaCliente" placeholder="Digite o nome completo ou CPF" required>
+                    <input type="search" id="buscaCliente" placeholder="Digite o nome completo ou CPF">
                     <button type="button" id="botaoBuscaCliente">BUSCAR</button>
                     <div id="detalhesCliente"></div>
                 </div>
@@ -50,24 +50,58 @@
                 <div id="divItens">
                     <h3>ITENS</h3>
                     <label for="pesquisaItem">Pesquisa: </label>
-                    <input type="search" id="pesquisaItem" placeholder="Digite o código ou título" required>
+                    <input type="search" id="pesquisaItem" placeholder="Digite o código">
                     <label for="quantidadeItem">Quantidade: </label>
-                    <input type="number" id="quantidadeItem" required>
-                    <button type="button" id="botaoBuscaCliente">BUSCAR E ADICIONAR</button>
+                    <input type="number" id="quantidadeItem">
+                    <button type="button" id="botaoBuscaItem">BUSCAR E ADICIONAR</button>
                     <table id="tabelaItens">
                         <thead>
                             <tr>
                                 <th>Código</th>
                                 <th>Título</th>
                                 <th>Fabricante</th>
-                                <th>Quantidade</th>
                                 <th>Preço</th>
+                                <th>Quantidade</th>
                                 <th>Subtotal</th>
                                 <th>Ação</th>
                             </tr>
                         </thead>
                         <tbody id="corpoTabelaItens"></tbody>
                     </table>
+                </div>
+                <div id="divCustos">
+                    <h3>CUSTOS</h3>
+                    <label for="tipoCusto">Tipo: </label>
+                    <select id="tipoCusto"></select>
+                    <label for="descricaoCusto">Descrição: </label>
+                    <input type="text" id="descricaoCusto">
+                    <label for="valorCusto">Valor: </label>
+                    <input type="number" id="valorCusto">
+                    <label for="quantidadeCusto">Quantidade: </label>
+                    <input type="number" id="quantidadeCusto">
+                    <button type="button" id="botaoAdicionarCusto">ADICIONAR</button>
+                    <table id="tabelaCustos">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Preço</th>
+                                <th>Quantidade</th>
+                                <th>Subtotal</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaCustos"></tbody>
+                    </table>
+                </div>
+                <div id="valorTotal"></div>
+                <div id="divObservacoes">
+                    <label for="observacoes">Observações: </label>
+                    <textarea id="observacoes"></textarea>
+                </div>
+                <div id="divPrevisaoEntrega">
+                    <label for="previsaoEntrega">Previsão para a entrega do veículo: </label>
+                    <input type="datetime-local" id="previsaoEntrega">
                 </div>
                 <button id="botaoEnviar" type="submit">CADASTRAR</button>
             </form>

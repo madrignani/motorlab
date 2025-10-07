@@ -7,8 +7,9 @@ export class ControladoraCadastroOs {
 
     private gestor = new GestorCadastroOs();
     private visao: VisaoCadastroOs;
-    private idClienteSelecionado = null;
+    private clienteSelecionadoId = null;
     private itensSelecionados: any[] = [];
+    private custosSelecionados: any[] = [];
 
     constructor(visao: VisaoCadastroOs) {
         this.visao = visao;
@@ -38,6 +39,8 @@ export class ControladoraCadastroOs {
         this.visao.exibirPagina();
         await this.carregarResponsaveis();
         this.visao.iniciarBuscaItem();
+        this.visao.iniciarCustos();
+        this.visao.iniciarFormulario();
     }
 
     private async carregarDadosUsuario(): Promise<void> {
@@ -71,15 +74,15 @@ export class ControladoraCadastroOs {
             const dadosCliente = await this.gestor.obterCliente(busca.trim());
             if (!dadosCliente.id) {
                 this.visao.exibirMensagem( ["Cliente não encontrado."] );
-                this.idClienteSelecionado = null;
+                this.clienteSelecionadoId = null;
                 this.visao.limparDivCliente();
                 return;
             }
-            this.idClienteSelecionado = dadosCliente.id;
+            this.clienteSelecionadoId = dadosCliente.id;
             this.visao.exibirCliente(dadosCliente);
             this.carregarVeiculosPorCliente(dadosCliente.id);
         } catch (erro: any) {
-            this.idClienteSelecionado = null;
+            this.clienteSelecionadoId = null;
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem( erro.getProblemas() );
             } else {
@@ -130,6 +133,15 @@ export class ControladoraCadastroOs {
                 this.visao.exibirMensagem( ["Item não encontrado."] );
                 return;
             }
+            const existe = this.itensSelecionados.some(item => item.id === dadosItem.id);
+            if (existe) {
+                this.visao.exibirMensagem( ["Este item já foi adicionado à tabela."] );
+                return;
+            }
+            if (Number(dadosItem.estoque) < quantidadeFormat){
+                this.visao.exibirMensagem( ["Quantidade solicitada indisponível em estoque."] );
+                return;
+            }
             const itemComQuantidade = {
                 id: dadosItem.id,
                 codigo: dadosItem.codigo,
@@ -139,8 +151,9 @@ export class ControladoraCadastroOs {
                 quantidade: quantidadeFormat
             };
             this.itensSelecionados.push(itemComQuantidade);
-            const subtotal = (quantidadeFormat * Number(dadosItem['precoVenda']));
+            const subtotal = ( quantidadeFormat * Number(dadosItem['precoVenda']) );
             this.visao.adicionarItemTabela(dadosItem, quantidadeFormat, subtotal);
+            this.atualizarValorTotalVisao();
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem(erro.getProblemas());
@@ -155,6 +168,114 @@ export class ControladoraCadastroOs {
         if (indice !== -1) {
             this.itensSelecionados.splice(indice, 1);
         }
+        this.atualizarValorTotalVisao();
+    }
+
+    adicionarCusto(tipo: string, descricao: string, valor: string, quantidade: string): void {
+        const valorFormat = Number(valor);
+        const quantidadeFormat = Number(quantidade);
+        if ( !tipo || !descricao || isNaN(valorFormat) || isNaN(quantidadeFormat) ) {
+            this.visao.exibirMensagem( ['Preencha todos os campos do custo corretamente.'] );
+            return;
+        }
+        if ( valorFormat <= 0 || quantidadeFormat <= 0 ) {
+            this.visao.exibirMensagem( ['Quantidade e valor devem ser números positivos.'] );
+            return;
+        }
+        const custo = {
+            tipo,
+            descricao,
+            valor: valorFormat,
+            quantidade: quantidadeFormat,
+            subtotal: (valorFormat * quantidadeFormat)
+        };
+        this.custosSelecionados.push(custo);
+        this.visao.adicionarCustoTabela(custo);
+        this.atualizarValorTotalVisao();
+    }
+
+    removerCusto(id: string): void {
+        const indice = this.custosSelecionados.findIndex(c => c.id === id);
+        if (indice !== -1) {
+            this.custosSelecionados.splice(indice, 1);
+        }
+        this.atualizarValorTotalVisao();
+    }
+
+    private atualizarValorTotalVisao(): void {
+        const total = this.calcularValorTotal();
+        this.visao.atualizarValorTotal(total);
+    }
+
+    private calcularValorTotal(): number {
+        let total = 0;
+        for (const item of this.itensSelecionados) {
+            const preco = Number(item.precoVenda);
+            const qtd = Number(item.quantidade);
+            total += ( preco * qtd );
+        }
+        for (const custo of this.custosSelecionados) {
+            const subtotal = Number(custo.subtotal);
+            total += subtotal;
+        }
+        return total;
+    }
+
+    async enviarOs(): Promise<void> {
+        const veiculoSelecionadoId = this.visao.obterVeiculoSelecionadoId();
+        const responsavelSelecionadoId = this.visao.obterResponsavelSelecionadoId();
+        const observacoes = this.visao.obterObservacoes();
+        const previsaoEntrega = this.visao.obterPrevisaoEntrega();
+        if (!this.clienteSelecionadoId) {
+            this.visao.exibirMensagem( ["Selecione um cliente."] );
+            return;
+        }
+        if (!veiculoSelecionadoId) {
+            this.visao.exibirMensagem( ["Selecione um veículo."] );
+            return;
+        }
+        if (!responsavelSelecionadoId) {
+            this.visao.exibirMensagem( ["Selecione um responsável."] );
+            return;
+        }
+        if (this.itensSelecionados.length === 0 && this.custosSelecionados.length === 0) {
+            this.visao.exibirMensagem( ["Adicione pelo menos um item ou custo."] );
+            return;
+        }
+        if (!previsaoEntrega) {
+            this.visao.exibirMensagem( ["Informe a previsão de entrega."] );
+            return;
+        }
+        try {
+            await this.gestor.cadastrarOs( {
+                clienteId: this.clienteSelecionadoId,
+                veiculoId: veiculoSelecionadoId,
+                responsavelId: responsavelSelecionadoId,
+                itens: this.itensSelecionados,
+                custos: this.custosSelecionados,
+                previsaoEntrega: previsaoEntrega,
+                observacoes: observacoes
+            } );
+            this.visao.exibirMensagem( ["Ordem de Serviço cadastrada com sucesso."] );
+            this.limparFormulario();
+        } catch (erro: any) {
+            if (erro instanceof ErroGestor) {
+                this.visao.exibirMensagem( erro.getProblemas() );
+            } else {
+                this.visao.exibirMensagem( [`Não foi possível cadastrar a ordem de serviço: ${erro.message}`] );
+            }
+        }
+    }
+
+    private limparFormulario(): void {
+        this.clienteSelecionadoId = null;
+        this.itensSelecionados = [];
+        this.custosSelecionados = [];
+        this.visao.limparFormulario();
+        this.visao.limparDivCliente();
+        this.visao.limparTabelaItens();
+        this.visao.limparTabelaCustos();
+        this.visao.limparValorTotal();
     }
 
 }

@@ -12,6 +12,17 @@ export interface VisaoCadastroOs {
     limparFormulario(): void;
     limparDivCliente(): void;
     iniciarBuscaItem(): void;
-     adicionarItemTabela(item: any, quantidade: number, subtotal: number): void;
-       
+    adicionarItemTabela(item: any, quantidade: number, subtotal: number): void;
+    iniciarCustos(): void;
+    adicionarCustoTabela(custo: any): void;
+    obterVeiculoSelecionadoId(): string | null;
+    obterResponsavelSelecionadoId(): string | null;
+    obterObservacoes(): string;
+    obterPrevisaoEntrega(): string | null;
+    limparTabelaItens(): void;
+    limparTabelaCustos(): void;
+    atualizarValorTotal(total: number): void;
+    limparValorTotal(): void;
+    iniciarFormulario(): void;
+
 }
