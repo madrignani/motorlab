@@ -23,7 +23,7 @@ use App\Repositorio\RepositorioVeiculoBDR;
 use App\Repositorio\RepositorioItemBDR;
 use App\Repositorio\RepositorioOsBDR;
 use App\Repositorio\RepositorioOsCustoBDR;
-use App\Dto\UsuarioDTO;
+use App\Dto\UsuarioDto;
 
 
 use \phputil\router\Router;
@@ -107,7 +107,7 @@ $app->get( '/dados-usuario', function($req, $res) {
         $sessao = new Sessao();
         $sessao->estaLogado();
         $logado = $sessao->dadosUsuarioLogado();
-        $usuarioDto = new UsuarioDTO (
+        $usuarioDto = new UsuarioDto (
             $logado['id_usuario'],
             $logado['cpf_usuario'],
             $logado['nome_usuario'],
