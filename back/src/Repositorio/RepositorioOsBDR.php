@@ -61,6 +61,24 @@ class RepositorioOsBDR implements RepositorioOs {
         }
     }
 
+    public function buscarPorId(int $id): ?array {
+        try {
+            $sql = <<<SQL
+                SELECT * FROM os
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['id' => $id] );
+            $dados = $stmt->fetch();
+            if ( empty($dados) ) {
+                return null;
+            }
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
 }
 
 

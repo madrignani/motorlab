@@ -6,6 +6,7 @@ export interface VisaoCadastroOs {
     exibirMensagem( mensagens: string[] ): void;
     exibirMensagemComAcao( mensagens: string[], id: string ): void;
     exibirPagina(): void;
+    buscarCliente(): void;
     exibirCliente(cliente: any[]): void;
     listarVeiculos(veiculos: any[]): void;
     listarResponsaveis(responsaveis: any): void;

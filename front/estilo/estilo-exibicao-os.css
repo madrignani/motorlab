@@ -76,3 +76,18 @@ nav {
     width: 30px;
     height: auto;
 }
+
+input:disabled,
+textarea:disabled,
+button:disabled {
+    opacity: 0.8;
+    color: #4b4b4b;
+    background-color: #f9f9f9;
+}
+
+select:disabled {
+    opacity: 1;
+    background-color: #f9f9f9; 
+    color: #4b4b4b;
+    appearance: none;
+}

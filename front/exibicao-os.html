@@ -34,27 +34,26 @@
         <div id="informacoesOsNaoEditaveis">
             <p>Criação: <span id="dataHoraCriacaoOs"></span></p>
             <p>Cliente: <span id="nomeCliente"></span></p>
-            <p>Veículo: <span id="fabricanteVeiculo"></span> <span id="modeloVeiculo"></span> <span id="anoVeiculo"> (<span id="placaVeiculo"></span>)</p>
+            <p>Veículo: <span id="fabricanteVeiculo"></span> <span id="modeloVeiculo"></span> <span id="anoVeiculo"></span> (<span id="placaVeiculo"></span>)</p>
             <p>Responsável: <span id="nomeResponsavel"></span></p>
-            <p>Status: <span id="statusOs"></span></p>
         </div>
-        <div id="alertaOs">
+        <div id="botoesGerenciamentoOs">
             <button id="botaoAlertaOs">COLOCAR EM ALERTA</button>
-        </div>
-        <div id="editarOs">
             <button id="botaoEditarOs">EDITAR</button>
         </div>
         <div id="informacoesOsEditaveis">
-            <label for="selectStatusOs">Status: </label>
-            <select id="selectStatusOs" disabled></select>
+            <label for="statusOs">Status: </label>
+            <select id="statusOs" disabled></select>
             <label for="previsaoEntrega">Previsão para a entrega do veículo: </label>
             <input type="datetime-local" id="previsaoEntrega" disabled>
             <h3>ITENS</h3>
-            <label for="pesquisaItem">Pesquisa: </label>
-            <input type="search" id="pesquisaItem" placeholder="Digite o código" disabled>
-            <label for="quantidadeItem">Quantidade: </label>
-            <input type="number" id="quantidadeItem" disabled>
-            <button type="button" id="botaoBuscaItem" disabled>BUSCAR E ADICIONAR</button>
+            <div id="camposAdicaoItens" hidden>
+                <label for="pesquisaItem">Pesquisa: </label>
+                <input type="search" id="pesquisaItem" placeholder="Digite o código" disabled>
+                <label for="quantidadeItem">Quantidade: </label>
+                <input type="number" id="quantidadeItem" disabled>
+                <button type="button" id="botaoBuscaItem" disabled>BUSCAR E ADICIONAR</button>
+            </div>
             <table id="tabelaItens">
                 <thead>
                     <tr>
@@ -64,21 +63,23 @@
                         <th>Preço</th>
                         <th>Quantidade</th>
                         <th>Subtotal</th>
-                        <th>Ação</th>
+                        <th hidden>Ação</th>
                     </tr>
                 </thead>
                 <tbody id="corpoTabelaItens"></tbody>
             </table>
             <h3>CUSTOS</h3>
-            <label for="tipoCusto">Tipo: </label>
-            <select id="tipoCusto" disabled></select>
-            <label for="descricaoCusto">Descrição: </label>
-            <input type="text" id="descricaoCusto" disabled>
-            <label for="valorCusto">Valor: </label>
-            <input type="number" id="valorCusto" disabled>
-            <label for="quantidadeCusto">Quantidade: </label>
-            <input type="number" id="quantidadeCusto" disabled>
-            <button type="button" id="botaoAdicionarCusto" disabled>ADICIONAR</button>
+            <div id="camposAdicaoCustos" hidden>
+                <label for="tipoCusto">Tipo: </label>
+                <select id="tipoCusto"></select>
+                <label for="descricaoCusto">Descrição: </label>
+                <input type="text" id="descricaoCusto" disabled>
+                <label for="valorCusto">Valor: </label>
+                <input type="number" id="valorCusto" disabled>
+                <label for="quantidadeCusto">Quantidade: </label>
+                <input type="number" id="quantidadeCusto" disabled>
+                <button type="button" id="botaoAdicionarCusto" disabled>ADICIONAR</button>
+            </div>
             <table id="tabelaCustos">
                 <thead>
                     <tr>
@@ -87,7 +88,7 @@
                         <th>Preço</th>
                         <th>Quantidade</th>
                         <th>Subtotal</th>
-                        <th>Ação</th>
+                        <th hidden>Ação</th>
                     </tr>
                 </thead>
                 <tbody id="corpoTabelaCustos"></tbody>

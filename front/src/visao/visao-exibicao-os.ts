@@ -7,5 +7,5 @@ export interface VisaoExibicaoOs {
     exibirMensagem( mensagens: string[] ): void;
     exibirPagina(): void;
     preencherCampos(dados: any): void;
-    atualizarValorTotal(total: any): void;
+    
 }

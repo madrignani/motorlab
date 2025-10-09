@@ -38,6 +38,7 @@ export class ControladoraCadastroOs {
         await this.carregarDadosUsuario();
         this.visao.exibirPagina();
         await this.carregarResponsaveis();
+        this.visao.buscarCliente();
         this.visao.iniciarBuscaItem();
         this.visao.iniciarCustos();
         this.visao.iniciarFormulario();
@@ -65,7 +66,7 @@ export class ControladoraCadastroOs {
         }
     }
 
-    async buscarCliente(busca: string): Promise<void> {
+    async carregarCliente(busca: string): Promise<void> {
         if (!busca || !busca.trim()) {
             this.visao.exibirMensagem( ["Informe o nome ou CPF para buscar o cliente."] );
             return;
@@ -99,7 +100,7 @@ export class ControladoraCadastroOs {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem( erro.getProblemas() );
             } else {
-                this.visao.exibirMensagem( [`Não foi possível buscar o cliente: ${erro.message}`] );
+                this.visao.exibirMensagem( [`Não foi possível buscar os responsáveis: ${erro.message}`] );
             }
         }
     }
@@ -262,7 +263,7 @@ export class ControladoraCadastroOs {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem( erro.getProblemas() );
             } else {
-                this.visao.exibirMensagem( [`Não foi possível cadastrar a ordem de serviço: ${erro.message}`] );
+                this.visao.exibirMensagem( [`Não foi possível cadastrar a Ordem de Serviço: ${erro.message}`] );
             }
         }
     }

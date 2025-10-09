@@ -84,7 +84,7 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
             const linha = document.createElement("tr");
             linha.classList.add(item.classeEstoque);
             const dadosItem = [
-                item.codigo, item.titulo, item.fabricante, item.precoVenda,
+                item.codigo, item.titulo, item.fabricante, ( Number(item.precoVenda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) ),
                 item.estoque, item.localizacao
             ];
             for (const dado of dadosItem) {
@@ -154,7 +154,7 @@ export class VisaoListagemItemHTML implements VisaoListagemItem {
         modalTitulo.textContent = item.titulo;
         modalFabricante.textContent = item.fabricante;
         modalDescricao.textContent = item.descricao;
-        modalPrecoVendaExibicao.textContent = item.precoVenda;
+        modalPrecoVendaExibicao.textContent = ( Number(item.precoVenda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) );
         modalEstoqueExibicao.textContent = item.estoque;
         modalEstoqueMinimoExibicao.textContent = item.estoqueMinimo;
         modalLocalizacaoExibicao.textContent = item.localizacao;    

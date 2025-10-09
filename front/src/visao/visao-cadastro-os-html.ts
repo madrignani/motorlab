@@ -14,7 +14,6 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
     iniciar(): void {
         this.controladora.iniciarSessao();
         this.iniciarLogout();
-        this.buscarCliente();
     }
 
     private iniciarLogout(): void {
@@ -79,12 +78,12 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         }
     }
 
-    private buscarCliente(): void {
+    buscarCliente(): void {
         const inputBuscaCliente = document.getElementById("buscaCliente") as HTMLInputElement;
         const botaoBuscaCliente = document.getElementById("botaoBuscaCliente") as HTMLButtonElement;
         botaoBuscaCliente.addEventListener( "click", () => {
             const busca = inputBuscaCliente.value.trim();
-            this.controladora.buscarCliente(busca);
+            this.controladora.carregarCliente(busca);
         } );
     }
 
@@ -145,8 +144,8 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         const tbody = document.getElementById("corpoTabelaItens") as HTMLTableSectionElement;
         const linha = document.createElement("tr");
         const dadosItem = [
-            item.codigo, item.titulo, item.fabricante, `R$ ${item.precoVenda.toFixed(2)}`,
-            quantidade.toString(), `R$ ${subtotal.toFixed(2)}`
+            item.codigo, item.titulo, item.fabricante, ( Number(item.precoVenda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) ),
+            quantidade.toString(), ( Number(subtotal).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) )
         ];
         for (const dado of dadosItem) {
             const td = document.createElement("td");
@@ -203,8 +202,8 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
             tipoFormat = "Extra";
         }
         const dadosCusto = [
-            tipoFormat, custo.descricao, `R$ ${custo.valor.toFixed(2)}`,
-            custo.quantidade.toString(), `R$ ${custo.subtotal.toFixed(2)}`
+            tipoFormat, custo.descricao, ( Number(custo.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) ),
+            custo.quantidade.toString(), ( Number(custo.subtotal).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) )
         ];
         for (const dado of dadosCusto) {
             const td = document.createElement("td");

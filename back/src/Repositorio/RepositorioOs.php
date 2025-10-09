@@ -8,6 +8,7 @@ interface RepositorioOs {
 
     public function salvar(array $dados): int;
     public function existeAtivaPeriodo(int $veiculoId, string $previsaoEntrega): bool;
+    public function buscarPorId(int $id): ?array;
 
 }
 

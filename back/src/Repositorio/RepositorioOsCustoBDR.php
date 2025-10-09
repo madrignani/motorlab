@@ -35,6 +35,21 @@ class RepositorioOsCustoBDR implements RepositorioOsCusto {
         }
     }
 
+    public function buscarPorOsId(int $osId): array {
+        try {
+            $sql = <<<SQL
+                SELECT * FROM os_custo
+                WHERE os_id = :os_id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['os_id' => $osId] );
+            $dados = $stmt->fetchAll();
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
 }
 
 
