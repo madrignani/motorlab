@@ -13,7 +13,7 @@ class Conexao {
         try {
             return new PDO(
                 'mysql:host=localhost;dbname=motorlab;charset=utf8',
-                'root',
+                'dev',
                 '', 
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
