@@ -417,6 +417,32 @@ $app->post( '/ordens-servico', function($req, $res) {
     }
 } );
 
+$app->get( '/os/:busca', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $id = $req->param('busca');
+        $pdo = Conexao::conectar();
+        $repositorioCliente = new RepositorioClienteBDR($pdo);
+        $repositorioItem = new RepositorioItemBDR($pdo);
+        $repositorioOs = new RepositorioOsBDR($pdo);
+        $repositorioOsCusto = new RepositorioOsCustoBDR($pdo);
+        $repositorioUsuario = new RepositorioUsuarioBDR($pdo);
+        $repositorioVeiculo = new RepositorioVeiculoBDR($pdo);
+        $servico = new ServicoExibicaoOs($repositorioCliente, $repositorioItem, $repositorioOs, $repositorioOsCusto, $repositorioUsuario, $repositorioVeiculo);
+        $os = $servico->buscarDadosOs($id);
+        $res->status(200)->json($os);
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
 $app->listen();
 
 
