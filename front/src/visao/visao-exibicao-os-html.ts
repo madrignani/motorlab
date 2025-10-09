@@ -89,7 +89,7 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         const observacoes = document.getElementById("observacoes") as HTMLTextAreaElement;
         const valorTotal = document.getElementById("valorTotalOs") as HTMLSpanElement;
         idOs.textContent = dados.id;
-        dataHoraCriacao.textContent = ( new Date(dados.dataHoraCriacao).toLocaleString('pt-BR') );
+        dataHoraCriacao.textContent = ( new Date(dados.dataHoraCriacao).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) );
         nomeCliente.textContent = dados.cliente.nome;
         fabricanteVeiculo.textContent = dados.veiculo.fabricante;
         modeloVeiculo.textContent = dados.veiculo.modelo;
