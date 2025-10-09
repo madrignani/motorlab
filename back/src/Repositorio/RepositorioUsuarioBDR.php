@@ -7,7 +7,7 @@ use PDO;
 use PDOException;
 
 
-class RepositorioUsuarioBDR implements RepositorioUsuario {
+class RepositorioUsuarioBdr implements RepositorioUsuario {
 
     private PDO $pdo;
 

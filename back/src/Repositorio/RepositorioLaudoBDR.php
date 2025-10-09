@@ -7,7 +7,7 @@ use PDO;
 use PDOException;
 
 
-class RepositorioLaudoBDR implements RepositorioLaudo {
+class RepositorioLaudoBdr implements RepositorioLaudo {
 
     private PDO $pdo;
 

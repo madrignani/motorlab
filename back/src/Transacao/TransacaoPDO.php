@@ -7,7 +7,7 @@ use Throwable;
 use PDO;
 
 
-class TransacaoPDO implements Transacao {
+class TransacaoPdo implements Transacao {
     
     public function __construct(private PDO $pdo) {
         $this->pdo = $pdo;
