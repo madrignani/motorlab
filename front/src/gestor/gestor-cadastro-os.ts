@@ -57,7 +57,19 @@ export class GestorCadastroOs {
         return await response.json();    
     }
 
-    async obterItem(busca: string): Promise<any> {
+    async obterServicosPorTermo(busca: string): Promise<any[]> {
+        const response = await fetch( `${API_URL}/servicos/${busca}`, {
+            method: 'GET',
+            credentials: 'include'
+        } );
+        if (!response.ok) {
+            const dadosResposta = await response.json();
+            throw ErroGestor.comProblemas(dadosResposta.mensagens);
+        }
+        return await response.json();    
+    }
+
+    async obterItemPorCodigo(busca: string): Promise<any> {
         const response = await fetch( `${API_URL}/itens-cod/${busca}`, {
             method: 'GET',
             credentials: 'include'
@@ -69,18 +81,19 @@ export class GestorCadastroOs {
         return await response.json();
     }
 
-    async cadastrarOs(envio: any): Promise<void> {
+    async cadastrarOs(dadosOs: any): Promise<string> {
         const response = await fetch( `${API_URL}/ordens-servico`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(envio)
+            body: JSON.stringify(dadosOs)
         } );
         if (!response.ok) {
             const dadosResposta = await response.json();
             throw ErroGestor.comProblemas(dadosResposta.mensagens);
         }
-        return await response.json();
+        const resultado = await response.json();
+        return resultado.id;
     }
 
 }

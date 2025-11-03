@@ -33,6 +33,21 @@ CREATE TABLE veiculo (
     FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
+CREATE TABLE servico (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    descricao VARCHAR(70) NOT NULL,
+    valor_mao_obra DECIMAL(10,2) NOT NULL,
+    execucao_minutos INT NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE tarefa (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    servico_id INT NOT NULL,
+    descricao VARCHAR(70) NOT NULL,
+    ordenacao INT NOT NULL,
+    FOREIGN KEY (servico_id) REFERENCES servico(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 CREATE TABLE item (
     id INT PRIMARY KEY AUTO_INCREMENT,
     codigo VARCHAR(30) NOT NULL UNIQUE,
@@ -53,7 +68,10 @@ CREATE TABLE os (
     usuario_responsavel INT NOT NULL,
     status ENUM('PROVISORIA', 'ANDAMENTO', 'ALERTA', 'CONCLUIDA', 'FINALIZADA', 'CANCELADA') NOT NULL,
     data_hora_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    previsao_entrega_sugerida DATETIME NOT NULL,
     previsao_entrega DATETIME NOT NULL,
+    valor_mao_obra_sugerido DECIMAL(10,2) DEFAULT 0.00,
+    valor_mao_obra DECIMAL(10,2) DEFAULT 0.00,
     valor_estimado DECIMAL(10,2) DEFAULT 0.00,
     valor_final DECIMAL(10,2) DEFAULT 0.00,
     observacoes TEXT,
@@ -63,16 +81,35 @@ CREATE TABLE os (
     FOREIGN KEY (usuario_responsavel) REFERENCES usuario(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
+CREATE TABLE os_servico (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    os_id INT NOT NULL,
+    servico_id INT NOT NULL,
+    FOREIGN KEY (os_id) REFERENCES os(id) ON DELETE CASCADE,
+    FOREIGN KEY (servico_id) REFERENCES servico(id) ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE os_tarefa (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    os_servico_id INT NOT NULL,
+    descricao VARCHAR(70) NOT NULL,
+    ordenacao INT NOT NULL,
+    FOREIGN KEY (os_servico_id) REFERENCES os_servico(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 CREATE TABLE os_custo (
     id INT PRIMARY KEY AUTO_INCREMENT,
     os_id INT NOT NULL,
     item_id INT DEFAULT NULL,
-    tipo ENUM('SERVICO', 'ITEM', 'EXTRA') NOT NULL,
-    descricao TEXT,
+    os_servico_id INT DEFAULT NULL,
+    os_tarefa_id INT NULL, 
+    tipo ENUM('ITEM', 'EXTRA') NOT NULL,
+    descricao VARCHAR(70),
     quantidade INT NOT NULL,
     subtotal DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (os_id) REFERENCES os(id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE CASCADE
+    FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE CASCADE,
+    FOREIGN KEY (os_tarefa_id) REFERENCES os_tarefa(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE laudo (

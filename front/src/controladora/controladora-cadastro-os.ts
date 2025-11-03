@@ -7,9 +7,11 @@ export class ControladoraCadastroOs {
 
     private gestor = new GestorCadastroOs();
     private visao: VisaoCadastroOs;
-    private clienteSelecionadoId = null;
-    private itensSelecionados: any[] = [];
-    private custosSelecionados: any[] = [];
+    private clienteSelecionado: any = null;
+    private servicosSelecionados: any[] = [];
+    private produtosSelecionados: any[] = [];
+    private extrasSelecionados: any[] = [];
+    private maoObraManual: number | null = null;
 
     constructor(visao: VisaoCadastroOs) {
         this.visao = visao;
@@ -39,9 +41,9 @@ export class ControladoraCadastroOs {
         this.visao.exibirPagina();
         await this.carregarResponsaveis();
         this.visao.buscarCliente();
-        this.visao.iniciarBuscaItem();
-        this.visao.iniciarCustos();
-        this.visao.iniciarFormulario();
+        this.visao.iniciarBuscaServicos();
+        this.visao.iniciarModais();
+        this.visao.enviarFormulario();
     }
 
     private async carregarDadosUsuario(): Promise<void> {
@@ -53,7 +55,7 @@ export class ControladoraCadastroOs {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem( erro.getProblemas() );
             } else {
-                this.visao.exibirMensagem( [`Não foi possível carregar os dados do usuário: ${erro.message}`] ); 
+                this.visao.exibirMensagem( [`Não foi possível carregar os dados do usuário: ${erro.message}`] );
             }
         }
     }
@@ -67,216 +69,451 @@ export class ControladoraCadastroOs {
     }
 
     async carregarCliente(busca: string): Promise<void> {
-        if (!busca || !busca.trim()) {
-            this.visao.exibirMensagem( ["Informe o nome ou CPF para buscar o cliente."] );
-            return;
-        }
         try {
-            const dadosCliente = await this.gestor.obterCliente(busca.trim());
-            if (!dadosCliente.id) {
-                this.visao.exibirMensagem( ["Cliente não encontrado."] );
-                this.clienteSelecionadoId = null;
+            const cliente = await this.gestor.obterCliente(busca);
+            if (cliente.id) {
+                this.clienteSelecionado = cliente;
+                this.visao.exibirCliente(cliente);
+                await this.carregarVeiculosCliente(cliente.id);
+            } else {
+                this.visao.exibirMensagem( ['Cliente não encontrado.'] );
                 this.visao.limparDivCliente();
-                return;
             }
-            this.clienteSelecionadoId = dadosCliente.id;
-            this.visao.exibirCliente(dadosCliente);
-            this.carregarVeiculosPorCliente(dadosCliente.id);
-        } catch (erro: any) {
-            this.clienteSelecionadoId = null;
-            if (erro instanceof ErroGestor) {
-                this.visao.exibirMensagem( erro.getProblemas() );
-            } else {
-                this.visao.exibirMensagem( [`Não foi possível buscar o cliente: ${erro.message}`] );
-            }
-        }
-    }
-
-    async carregarResponsaveis(): Promise<void> {
-        try {
-            const responsaveis = await this.gestor.obterResponsaveis();
-            this.visao.listarResponsaveis(responsaveis);
-        } catch (erro: any) {
-            if (erro instanceof ErroGestor) {
-                this.visao.exibirMensagem( erro.getProblemas() );
-            } else {
-                this.visao.exibirMensagem( [`Não foi possível buscar os responsáveis: ${erro.message}`] );
-            }
-        }
-    }
-
-    async carregarVeiculosPorCliente(idCliente: string): Promise<void> {
-        try {
-            const veiculos = await this.gestor.obterVeiculosPorCliente( parseInt(idCliente) );
-            this.visao.listarVeiculos(veiculos);
-        } catch (erro: any) {
-            if (erro instanceof ErroGestor) {
-                this.visao.exibirMensagem( erro.getProblemas() );
-            } else {
-                this.visao.exibirMensagem( [`Não foi possível carregar os veículos: ${erro.message}`] ); 
-            }
-        }
-    }
-
-    async buscarItem(busca: string, quantidade: string): Promise<void> {
-        if (!busca || !quantidade) {
-            this.visao.exibirMensagem( ["Preencha os campos para buscar o item."] );
-            return;
-        }
-        const quantidadeFormat = Number(quantidade);
-        if (isNaN(quantidadeFormat) || quantidadeFormat <= 0) {
-            this.visao.exibirMensagem( ["Quantidade deve ser um número inteiro positivo."] );
-            return;
-        }
-        try {
-            const dadosItem = await this.gestor.obterItem( busca.trim() );
-            if (!dadosItem.id) {
-                this.visao.exibirMensagem( ["Item não encontrado."] );
-                return;
-            }
-            const existe = this.itensSelecionados.some(item => item.id === dadosItem.id);
-            if (existe) {
-                this.visao.exibirMensagem( ["Este item já foi adicionado à tabela."] );
-                return;
-            }
-            if (Number(dadosItem.estoque) < quantidadeFormat){
-                this.visao.exibirMensagem( ["Quantidade solicitada indisponível em estoque."] );
-                return;
-            }
-            const itemComQuantidade = {
-                id: dadosItem.id,
-                codigo: dadosItem.codigo,
-                titulo: dadosItem.titulo,
-                fabricante: dadosItem.fabricante,
-                precoVenda: dadosItem.precoVenda,
-                quantidade: quantidadeFormat
-            };
-            this.itensSelecionados.push(itemComQuantidade);
-            const subtotal = ( quantidadeFormat * Number(dadosItem['precoVenda']) );
-            this.visao.adicionarItemTabela(dadosItem, quantidadeFormat, subtotal);
-            this.atualizarValorTotalVisao();
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem(erro.getProblemas());
             } else {
-                this.visao.exibirMensagem( [`Não foi possível buscar o item: ${erro.message}`] );
+                this.visao.exibirMensagem( [`Não foi possível carregar os dados do cliente: ${erro.message}`] );
             }
         }
     }
 
-    removerItem(id: string): void {
-        const indice = this.itensSelecionados.findIndex(item => item.id === id);
-        if (indice !== -1) {
-            this.itensSelecionados.splice(indice, 1);
-        }
-        this.atualizarValorTotalVisao();
-    }
-
-    adicionarCusto(tipo: string, descricao: string, valor: string, quantidade: string): void {
-        const valorFormat = Number(valor);
-        const quantidadeFormat = Number(quantidade);
-        if ( !tipo || !descricao || isNaN(valorFormat) || isNaN(quantidadeFormat) ) {
-            this.visao.exibirMensagem( ['Preencha todos os campos do custo corretamente.'] );
-            return;
-        }
-        if ( valorFormat <= 0 || quantidadeFormat <= 0 ) {
-            this.visao.exibirMensagem( ['Quantidade e valor devem ser números positivos.'] );
-            return;
-        }
-        const custo = {
-            tipo,
-            descricao,
-            valor: valorFormat,
-            quantidade: quantidadeFormat,
-            subtotal: (valorFormat * quantidadeFormat)
-        };
-        this.custosSelecionados.push(custo);
-        this.visao.adicionarCustoTabela(custo);
-        this.atualizarValorTotalVisao();
-    }
-
-    removerCusto(id: string): void {
-        const indice = this.custosSelecionados.findIndex(c => c.id === id);
-        if (indice !== -1) {
-            this.custosSelecionados.splice(indice, 1);
-        }
-        this.atualizarValorTotalVisao();
-    }
-
-    private atualizarValorTotalVisao(): void {
-        const total = this.calcularValorTotal();
-        this.visao.atualizarValorTotal(total);
-    }
-
-    private calcularValorTotal(): number {
-        let total = 0;
-        for (const item of this.itensSelecionados) {
-            const preco = Number(item.precoVenda);
-            const qtd = Number(item.quantidade);
-            total += ( preco * qtd );
-        }
-        for (const custo of this.custosSelecionados) {
-            const subtotal = Number(custo.subtotal);
-            total += subtotal;
-        }
-        return total;
-    }
-
-    async enviarOs(): Promise<void> {
-        const veiculoSelecionadoId = this.visao.obterVeiculoSelecionadoId();
-        const responsavelSelecionadoId = this.visao.obterResponsavelSelecionadoId();
-        const observacoes = this.visao.obterObservacoes();
-        const previsaoEntrega = this.visao.obterPrevisaoEntrega();
-        if (!this.clienteSelecionadoId) {
-            this.visao.exibirMensagem( ["Selecione um cliente."] );
-            return;
-        }
-        if (!veiculoSelecionadoId) {
-            this.visao.exibirMensagem( ["Selecione um veículo."] );
-            return;
-        }
-        if (!responsavelSelecionadoId) {
-            this.visao.exibirMensagem( ["Selecione um responsável."] );
-            return;
-        }
-        if (this.itensSelecionados.length === 0 && this.custosSelecionados.length === 0) {
-            this.visao.exibirMensagem( ["Adicione pelo menos um item ou custo."] );
-            return;
-        }
-        if (!previsaoEntrega) {
-            this.visao.exibirMensagem( ["Informe a previsão de entrega."] );
-            return;
-        }
+    async carregarVeiculosCliente(clienteId: any): Promise<void> {
         try {
-            const osId = await this.gestor.cadastrarOs( {
-                clienteId: this.clienteSelecionadoId,
-                veiculoId: veiculoSelecionadoId,
-                responsavelId: responsavelSelecionadoId,
-                itens: this.itensSelecionados,
-                custos: this.custosSelecionados,
-                previsaoEntrega: previsaoEntrega,
-                observacoes: observacoes
-            } );
-            this.limparFormulario();
-            this.visao.exibirMensagemComAcao( ["Ordem de Servico cadastrada com sucesso."], osId! );
+            const veiculos = await this.gestor.obterVeiculosPorCliente(clienteId);
+            this.visao.listarVeiculos(veiculos);
+        } catch (erro: any) {
+            if (erro instanceof ErroGestor) {
+                this.visao.exibirMensagem(erro.getProblemas());
+            } else {
+                this.visao.exibirMensagem( [`Não foi possível carregar os veículos: ${erro.message}`] );
+            }
+        }
+    }
+
+    async carregarResponsaveis(mostrarIndisponiveis: boolean = false): Promise<void> {
+        try {
+            const responsaveis = await this.gestor.obterResponsaveis();
+            this.visao.listarResponsaveis(responsaveis, mostrarIndisponiveis);
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem( erro.getProblemas() );
             } else {
-                this.visao.exibirMensagem( [`Não foi possível cadastrar a Ordem de Serviço: ${erro.message}`] );
+                this.visao.exibirMensagem( [`Erro ao carregar responsáveis: ${erro.message}`] );
             }
         }
     }
 
-    private limparFormulario(): void {
-        this.clienteSelecionadoId = null;
-        this.itensSelecionados = [];
-        this.custosSelecionados = [];
-        this.visao.limparFormulario();
-        this.visao.limparDivCliente();
-        this.visao.limparTabelaItens();
-        this.visao.limparTabelaCustos();
-        this.visao.limparValorTotal();
+    async buscarServicos(termo: string): Promise<void> {
+        try {
+            const servicos = await this.gestor.obterServicosPorTermo(termo);
+            this.visao.exibirTarefasServicos(servicos);
+        } catch (erro: any) {
+            if (erro instanceof ErroGestor) {
+                this.visao.exibirMensagem( erro.getProblemas() );
+            } else {
+                this.visao.exibirMensagem( [`Erro ao buscar serviços: ${erro.message}`] );
+            }
+        }
+    }
+
+    adicionarServico(servico: any): void {
+        this.maoObraManual = null;
+        const novoServico = {
+            id: servico.id,
+            descricao: servico.descricao,
+            valorMaoObra: servico.valorMaoObra,
+            execucaoMinutos: servico.execucaoMinutos,
+            tarefas: [] as any[]
+        };
+        if (servico.tarefas && servico.tarefas.length > 0) {
+            for (const tarefa of servico.tarefas) {
+                const novaTarefa = {
+                    id: tarefa.id,
+                    descricao: tarefa.descricao,
+                    produtos: []
+                };
+                novoServico.tarefas.push(novaTarefa);
+            }
+        }
+        this.servicosSelecionados.push(novoServico);
+        this.visao.adicionarServicoNaLista(servico);
+        this.atualizarCalculos();
+    }
+
+    removerServico(servicoId: string): void {
+        const servico = this.servicosSelecionados.find( (servico) => servico.id === servicoId ) ;
+        for (const tarefa of servico.tarefas) {
+            if (tarefa.produtos) {
+                for (const produto of tarefa.produtos) {
+                    this.produtosSelecionados = this.produtosSelecionados.filter( (prod) => {
+                        const mesmoId = ( prod.id === produto.id );
+                        const mesmoServico = ( prod.servicoId === servicoId );
+                        const mesmaTarefa = ( prod.tarefaId === tarefa.id );
+                        const remocao = ( mesmoId && mesmoServico && mesmaTarefa );
+                        return !remocao;
+                    } );
+                }
+            }
+        }
+        this.servicosSelecionados = this.servicosSelecionados.filter( (servico) => servico.id !== servicoId );
+        this.visao.removerServicoNaLista(servicoId);
+        this.atualizarCalculos();
+    }
+
+    adicionarTarefaManual(servicoId: string, descricao?: string): void {
+        const servico = this.servicosSelecionados.find( (servico) => servico.id === servicoId );
+        const novaTarefa = {
+            id: Date.now(),
+            descricao: descricao,
+            produtos: []
+        };
+        servico.tarefas.push(novaTarefa);
+        this.visao.adicionarTarefaManual(servicoId, novaTarefa);
+        this.atualizarCalculos();
+    }
+
+    reordenarTarefa(origemServicoId: string, origemTarefaId: string, destinoServicoId: string, destinoTarefaId: string): void {
+        const origemServico = this.servicosSelecionados.find( (servico) => servico.id === origemServicoId );
+        const destinoServico = this.servicosSelecionados.find( (servico) => servico.id === destinoServicoId );
+        const tarefaIndex = origemServico.tarefas.findIndex( (tarefa: any) => tarefa.id === origemTarefaId );
+        const [tarefa] = origemServico.tarefas.splice(tarefaIndex, 1);
+        const destinoIndex = destinoServico.tarefas.findIndex( (tarefa: any) => tarefa.id === destinoTarefaId ) ;
+        if (destinoIndex !== -1) {
+            destinoServico.tarefas.splice(destinoIndex, 0, tarefa);
+        } else {
+            destinoServico.tarefas.push(tarefa);
+        }
+        this.visao.atualizarTarefasServico(origemServico);
+        this.visao.atualizarTarefasServico(destinoServico);
+        this.atualizarCalculos();
+    }
+
+    removerTarefa(servicoId: string, tarefaId: string): void {
+        const servico = this.servicosSelecionados.find( (servico) => servico.id === servicoId );
+        const tarefa = servico.tarefas.find( (tarefa: any) => tarefa.id === tarefaId );
+            if (tarefa && tarefa.produtos) {
+                for (const produto of tarefa.produtos) {
+                    this.produtosSelecionados = this.produtosSelecionados.filter( (prod) => {
+                        const mesmoId = ( prod.id === produto.id );
+                        const mesmoServico = ( prod.servicoId === servicoId );
+                        const mesmaTarefa = ( prod.tarefaId === tarefa.id );
+                        const remocao = ( mesmoId && mesmoServico && mesmaTarefa );
+                        return !remocao;
+                    } );
+                }
+            }
+        servico.tarefas = servico.tarefas.filter( (tarefa: any) => tarefa.id !== tarefaId );
+        this.visao.removerTarefaNaLista(servicoId, tarefaId);
+        this.visao.atualizarTarefasServico(servico);
+        this.atualizarCalculos();
+    }
+
+    async buscarProduto(codigoProduto: string): Promise<void> {
+        if (!codigoProduto) {
+            this.visao.exibirMensagem( ['Informe o código do produto.'] );
+            return;
+        }
+        try {
+            const produto = await this.gestor.obterItemPorCodigo(codigoProduto);
+            this.visao.exibirProdutoEncontradoModal(produto);
+        } catch (erro: any) {
+            if (erro instanceof ErroGestor) {
+                this.visao.exibirMensagem( erro.getProblemas() );
+            } else {
+                this.visao.exibirMensagem( [`Erro ao buscar o produto: ${erro.message}`] );
+            }
+        }
+    }
+
+    confirmarProduto(modal: HTMLDialogElement, quantidade: string): void {
+        const quantidadeFormat = parseInt(quantidade);
+        const produto = this.visao.obterProdutoAtual();
+        const servicoId = modal.dataset.servicoIdDoProduto!;
+        const tarefaId = modal.dataset.tarefaIdDoProduto!;
+        if (!produto) {
+            this.visao.exibirMensagem( ['Busque e selecione um produto primeiro.'] );
+            return;
+        }
+        if (isNaN(quantidadeFormat) || quantidadeFormat <= 0) {
+            this.visao.exibirMensagem( ['Informe uma quantidade válida.'] );
+            return;
+        }
+        if (quantidadeFormat > produto.estoque) {
+            this.visao.exibirMensagem( ['Quantidade solicitada indisponível em estoque.'] );
+            return;
+        }
+        const existe = this.produtosSelecionados.some( (prod) =>
+            String(prod.id) === String(produto.id) &&
+            String(prod.servicoId) === String(servicoId) &&
+            String(prod.tarefaId) === String(tarefaId)
+        );
+        if (existe) {
+            this.visao.exibirMensagem( ['Produto já adicionado a esta tarefa.'] );
+            return;
+        }
+        this.visao.adicionarProdutoLista(produto, quantidadeFormat, servicoId, tarefaId);
+        this.adicionarProduto(produto, quantidadeFormat, servicoId, tarefaId);
+    }
+
+    adicionarProduto(produto: any, quantidade: number, servicoId: string, tarefaId: string): void {
+        const existe = this.produtosSelecionados.some( (prod) =>
+            String(prod.id) === String(produto.id) &&
+            String(prod.servicoId) === String(servicoId) &&
+            String(prod.tarefaId) === String(tarefaId)
+        );
+        if (existe) {
+            this.visao.exibirMensagem( ['Produto já adicionado a esta tarefa.'] );
+            return;
+        }
+        const servico = this.servicosSelecionados.find( (servico) => String(servico.id) === String(servicoId) );
+        if (!servico) {
+            this.visao.exibirMensagem( ['Serviço não encontrado ao adicionar produto.'] );
+            return;
+        }
+        const tarefa = servico.tarefas.find((t: any) => String(t.id) === String(tarefaId));
+        if (!tarefa) {
+            this.visao.exibirMensagem( ['Tarefa não encontrada ao adicionar produto.'] );
+            return;
+        }
+        const produtoComQuantidade = {
+            ...produto,
+            quantidade: Number(quantidade),
+            subtotal: Number(produto.precoVenda) * Number(quantidade),
+            servicoId: String(servicoId),
+            tarefaId: String(tarefaId)
+        };
+        tarefa.produtos = tarefa.produtos || [];
+        tarefa.produtos = tarefa.produtos.filter( (prod: any) => {
+            const mesmoId = (String(prod.id) === String(produto.id));
+            const mesmoServico = (String(prod.servicoId) === String(servicoId));
+            const mesmaTarefa = (String(prod.tarefaId) === String(tarefaId));
+            const remocao = (mesmoId && mesmoServico && mesmaTarefa);
+            return !remocao;
+        } );
+        tarefa.produtos.push(produtoComQuantidade);
+        this.produtosSelecionados = this.produtosSelecionados.filter( (prod) => {
+            const mesmoId = (String(prod.id) === String(produto.id));
+            const mesmoServico = (String(prod.servicoId) === String(servicoId));
+            const mesmaTarefa = (String(prod.tarefaId) === String(tarefaId));
+            const remocao = (mesmoId && mesmoServico && mesmaTarefa);
+            return !remocao;
+        } );
+        this.produtosSelecionados.push(produtoComQuantidade);
+        this.visao.atualizarTarefasServico(servico);
+        this.atualizarCalculos();
+    }
+
+    removerProduto(produtoId: string, servicoId: string, tarefaId: string): void {
+        const servico = this.servicosSelecionados.find( (servico) => servico.id === servicoId );
+        const tarefa = servico.tarefas.find( (tarefa: any) => tarefa.id === tarefaId);
+        const produtoRemovido = (tarefa.produtos || []).find( (prod: any) => 
+            prod.id === produtoId &&
+            prod.servicoId === servicoId &&
+            prod.tarefaId === tarefaId
+        );
+        tarefa.produtos = tarefa.produtos || [];
+        tarefa.produtos = tarefa.produtos.filter( (prod: any) => {
+            const mesmoId = (prod.id === produtoId);
+            const mesmoServico = (prod.servicoId === servicoId);
+            const mesmaTarefa = (prod.tarefaId === tarefaId);
+            const remocao = (mesmoId && mesmoServico && mesmaTarefa);
+            return !remocao;
+        } );
+        if (produtoRemovido) {
+            this.produtosSelecionados = this.produtosSelecionados.filter( (prod) => {
+                const mesmoId = ( prod.id === produtoId );
+                const mesmoServico = ( prod.servicoId === servicoId );
+                const mesmaTarefa = ( prod.tarefaId === tarefa.id );
+                const remocao = ( mesmoId && mesmoServico && mesmaTarefa );
+                return !remocao;
+            } );
+        }
+        this.visao.atualizarTarefasServico(servico);
+        this.atualizarCalculos();
+    }
+
+    confirmarExtra(descricao: string, valor: string, quantidade: string): void {
+        const valorFormat = parseFloat(valor);
+        const quantidadeFormat = parseInt(quantidade);
+        if (!descricao) {
+            this.visao.exibirMensagem( ['Informe a descrição do custo extra.'] );
+            return;
+        }
+        if (isNaN(valorFormat) || valorFormat <= 0) {
+            this.visao.exibirMensagem( ['Informe um valor válido para o custo extra.'] );
+            return;
+        }
+        if (isNaN(quantidadeFormat) || quantidadeFormat <= 0) {
+            this.visao.exibirMensagem( ['Informe uma quantidade válida para o custo extra.'] );
+            return;
+        }
+        const extra = {
+            id: Date.now(),
+            descricao: descricao,
+            valor: valorFormat,
+            quantidade: quantidadeFormat,
+            subtotal: ( valorFormat * quantidadeFormat )
+        };
+        this.visao.adicionarExtraLista(extra);
+    }
+
+    adicionarExtra(extra: any): void {
+        this.extrasSelecionados.push(extra);
+        this.visao.exibirExtras(this.extrasSelecionados);
+        this.atualizarCalculos();
+    }
+
+    removerExtra(extraId: string): void {
+        this.extrasSelecionados = this.extrasSelecionados.filter( (extra) => extra.id !== extraId );
+        this.visao.exibirExtras(this.extrasSelecionados);
+        this.atualizarCalculos();
+    }
+
+    private calcularMaoObra(): void {
+        if (this.maoObraManual !== null) {
+            this.visao.atualizarValorMaoObra(this.maoObraManual);
+            return;
+        }
+        let maoObraTotal = 0;
+        for (const servico of this.servicosSelecionados) {
+            maoObraTotal += servico.valorMaoObra;
+        }
+        this.visao.atualizarValorMaoObra(maoObraTotal);
+    }
+
+    private calcularMaoObraAtual(): number {
+        return this.servicosSelecionados.reduce( (total, servico) => 
+            total + Number(servico.valorMaoObra), 0 
+        );
+    }
+
+    gerenciarValorMaoObra(): number {
+        const valorAtual = this.servicosSelecionados.reduce( (total, servico) => 
+            total + Number(servico.valorMaoObra), 0 
+        );
+        let valorParaExibir = valorAtual;
+        if (this.maoObraManual !== null) {
+            valorParaExibir = this.maoObraManual;
+        }
+        return valorParaExibir;
+    }
+
+    confirmarMaoObra(novoValor: string): void {
+        const valorFormat = parseFloat(novoValor);
+        if (!isNaN(valorFormat) && valorFormat >= 0) {
+            this.maoObraManual = valorFormat;
+            this.visao.atualizarValorMaoObra(valorFormat);
+            this.calcularValorTotal();
+        }
+    }
+
+    private calcularDataEntrega(): void {
+        let minutosTotais = 0;
+        for (const servico of this.servicosSelecionados) {
+            minutosTotais += servico.execucaoMinutos;
+        }
+        const data = new Date();
+        data.setMinutes(data.getMinutes() + minutosTotais);
+        const dataISO = data.toISOString();
+        this.visao.atualizarDataEntrega(dataISO);
+    }
+
+    confirmarDataEntrega(novaData: string): void {
+        if (novaData) {
+            const data = new Date(novaData);
+            if (data< ( new Date(Date.now()) )){
+                this.visao.exibirMensagem( ['Previsão de entrega não pode ser no passado.'] );
+                return;
+            }
+            const dataISO = data.toISOString();
+            this.visao.atualizarDataEntrega(dataISO);
+        }
+    }
+
+    atualizarCalculos(): void {
+        this.calcularMaoObra();
+        this.calcularDataEntrega();
+        this.calcularValorTotal();
+    }
+
+    private calcularValorTotal(): void {
+        let totalMaoObra = 0;
+        let totalProdutos = 0;
+        let totalExtras = 0;
+        for (const servico of this.servicosSelecionados) {
+            totalMaoObra += servico.valorMaoObra;
+        }
+        for (const produto of this.produtosSelecionados) {
+            totalProdutos += produto.subtotal;
+        }
+        for (const extra of this.extrasSelecionados) {
+            totalExtras += extra.subtotal;
+        }
+        let maoObraAUsar = totalMaoObra;
+        if (this.maoObraManual !== null) {
+            maoObraAUsar = this.maoObraManual;
+        }
+        const total = ( maoObraAUsar + totalProdutos + totalExtras );
+        this.visao.atualizarValorMaoObra(maoObraAUsar);
+        this.visao.atualizarValorExtras(totalExtras);
+        this.visao.atualizarValorProdutos(totalProdutos);
+        this.visao.atualizarValorTotal(total);
+    }
+
+    async enviarOs(): Promise<void> {
+        const dadosForm = this.visao.obterDadosFormulario();
+        if (!this.clienteSelecionado) {
+            this.visao.exibirMensagem( ['Selecione um cliente.'] );
+            return;
+        }
+        if (!dadosForm.veiculoId) {
+            this.visao.exibirMensagem( ['Selecione um veículo.'] );
+            return;
+        }
+        if (!dadosForm.responsavelId) {
+            this.visao.exibirMensagem( ['Selecione um responsável.'] );
+            return;
+        }
+        if (this.servicosSelecionados.length === 0) {
+            this.visao.exibirMensagem( ['Adicione pelo menos um serviço.'] );
+            return;
+        }
+        try {
+            let valorMaoObra = this.calcularMaoObraAtual();
+            if (this.maoObraManual !== null) {
+                valorMaoObra = this.maoObraManual;
+            }
+            const osData = {
+                clienteId: this.clienteSelecionado.id,
+                veiculoId: dadosForm.veiculoId,
+                responsavelId: dadosForm.responsavelId,
+                servicos: this.servicosSelecionados,
+                produtos: this.produtosSelecionados,
+                extras: this.extrasSelecionados,
+                observacoes: dadosForm.observacoes,
+                valorMaoObra,
+                dataEntrega: this.visao.obterDataEntregaAtual()
+            };
+            const osId = await this.gestor.cadastrarOs(osData);
+            this.visao.exibirMensagemComAcao( ['Ordem de Serviço cadastrada com sucesso.'], osId );
+        } catch (erro: any) {
+            if (erro instanceof ErroGestor) {
+                this.visao.exibirMensagem( erro.getProblemas() );
+            } else {
+                this.visao.exibirMensagem( [`Erro ao cadastrar Ordem de Serviço: ${erro.message}`] );
+            }
+        }
     }
 
 }

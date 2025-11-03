@@ -9,9 +9,12 @@ use App\Repositorio\RepositorioCliente;
 use App\Repositorio\RepositorioItem;
 use App\Repositorio\RepositorioOs;
 use App\Repositorio\RepositorioOsCusto;
+use App\Repositorio\RepositorioServico;
 use App\Repositorio\RepositorioUsuario;
 use App\Repositorio\RepositorioVeiculo;
 use App\Dto\ItemDto;
+use App\Dto\ServicoDto;
+use App\Dto\TarefaDto;
 use App\Dto\UsuarioDto;
 use App\Dto\VeiculoDto;
 use App\Modelo\Cliente;
@@ -29,6 +32,7 @@ class ServicoCadastroOs {
     private RepositorioItem $repositorioItem;
     private RepositorioOs $repositorioOs;
     private RepositorioOsCusto $repositorioOsCusto;
+    private RepositorioServico $repositorioServico;
     private RepositorioUsuario $repositorioUsuario;
     private RepositorioVeiculo $repositorioVeiculo;
 
@@ -38,6 +42,7 @@ class ServicoCadastroOs {
         RepositorioItem $repositorioItem,
         RepositorioOs $repositorioOs,
         RepositorioOsCusto $repositorioOsCusto,
+        RepositorioServico $repositorioServico,
         RepositorioUsuario $repositorioUsuario,
         RepositorioVeiculo $repositorioVeiculo
     ) {
@@ -46,6 +51,7 @@ class ServicoCadastroOs {
         $this->repositorioItem = $repositorioItem;
         $this->repositorioOs = $repositorioOs;
         $this->repositorioOsCusto = $repositorioOsCusto;
+        $this->repositorioServico = $repositorioServico;
         $this->repositorioUsuario = $repositorioUsuario;
         $this->repositorioVeiculo = $repositorioVeiculo;
     }
@@ -73,16 +79,48 @@ class ServicoCadastroOs {
         $mecanicos = $this->repositorioUsuario->listarMecanicos();
         $usuariosDTO = [];
         foreach ($mecanicos as $mecanico) {
+            $disponivel = true;
+            if ($this->repositorioOs->existeAtivaPorResponsavel( (int)$mecanico['id']) ) {
+                $disponivel = false;
+            }
             $dto = new UsuarioDto(
                 ( (int)$mecanico['id'] ),
                 $mecanico['cpf'],
                 $mecanico['nome'],
                 $mecanico['email'],
-                $mecanico['cargo']
+                $mecanico['cargo'],
+                $disponivel
             );
             $usuariosDTO[] = $dto->arrayDados();
         }
         return $usuariosDTO;
+    }
+
+    public function buscarServicos(string $termo, string $cargoUsuarioLogado): array {
+        if ($cargoUsuarioLogado !== 'ATENDENTE' && $cargoUsuarioLogado !== 'GERENTE') {
+            throw new AutenticacaoException('Permissão negada.');
+        }
+        $servicos = $this->repositorioServico->buscarPorTermo($termo);
+        $servicosDto = [];
+        foreach ($servicos as $servico) {
+            $tarefasDto = [];
+            foreach ($servico['tarefas'] as $tarefa) {
+                $tarefasDto[] = new TarefaDto(
+                    $tarefa['id'], 
+                    $tarefa['descricao'], 
+                    ( (int)$tarefa['ordenacao'] )
+                );
+            }
+            $dto = new ServicoDto(
+                ( (int)$servico['id'] ), 
+                $servico['descricao'], 
+                ( (float)$servico['valor_mao_obra'] ), 
+                ( (int)$servico['execucao_minutos'] ), 
+                $tarefasDto
+            );
+            $servicosDto[] = $dto->arrayDados();
+        }
+        return $servicosDto;
     }
 
     public function buscarItemPorCodigo(string $codigo): array {
@@ -108,7 +146,7 @@ class ServicoCadastroOs {
         if ($cargoUsuarioLogado !== 'ATENDENTE' && $cargoUsuarioLogado !== 'GERENTE') {
             throw new AutenticacaoException( 'Permissão negada.' );
         }
-        if (empty($dados['clienteId']) || empty($dados['veiculoId']) || empty($dados['responsavelId']) || empty($dados['previsaoEntrega'])) {
+        if (empty($dados['clienteId']) || empty($dados['veiculoId']) || empty($dados['responsavelId']) || empty($dados['servicos'])) {
             throw DominioException::comProblemas( ['Dados obrigatórios não informados.'] );
         }
         $entidades = $this->validarEntidades($dados, $idUsuarioLogado);
@@ -116,23 +154,45 @@ class ServicoCadastroOs {
         $veiculo = $entidades['veiculo'];
         $usuResp = $entidades['usuResp'];
         $usuCriacao = $entidades['usuCriacao'];
-        $previsaoEntrega = new DateTime($dados['previsaoEntrega']);
+        $previsaoEntrega = $this->validarDataEntrega($dados['dataEntrega']);
         if ($this->repositorioOs->existeAtivaPeriodo($dados['veiculoId'], $previsaoEntrega->format('Y-m-d H:i:s'))) {
             throw DominioException::comProblemas( ['Já existe uma OS ativa para este veículo no período informado.'] );
         }
-        $valores = $this->validarCustos($dados);
-        $itensValidados = $valores['itensValidados'];
-        $valorEstimado = $valores['valorEstimado'];
+        $valores = $this->validarCustosEServicos($dados);
+        $produtosValidados = $valores['produtosValidados'];
+        $extrasValidados = $valores['extrasValidados'];
+        $valorMaoObraSugerido = $valores['valorMaoObraSugerido'];
+        $minutosTotais = $valores['minutosTotais'];
+        $valorEstimado = $valores['valorTotalEstimado'];
         $clienteObj = $this->mapearCliente($cliente['cpf'], $cliente['nome'], $cliente['telefone'], $cliente['email']);
         $usuCriacaoObj = $this->mapearUsuario($usuCriacao['cpf'], $usuCriacao['nome'], $usuCriacao['email'], $usuCriacao['cargo'], $usuCriacao['ativo']);
-        $usuarioResponsavelObj = $this->mapearUsuario($usuResp['cpf'], $usuResp['nome'], $usuResp['email'], $usuResp['cargo'], $usuResp['ativo']);
+        $usuResponsavelObj = $this->mapearUsuario($usuResp['cpf'], $usuResp['nome'], $usuResp['email'], $usuResp['cargo'], $usuResp['ativo']);
         $veiculoObj = $this->mapearVeiculo($clienteObj, $veiculo['placa'], $veiculo['chassi'], $veiculo['fabricante'], $veiculo['modelo'], ( (int)$veiculo['ano'] ), ( (int)$veiculo['quilometragem'] ));
-        $osObj = $this->mapearOs($clienteObj, $veiculoObj, $usuCriacaoObj, $usuarioResponsavelObj, 'PROVISORIA', $previsaoEntrega, $valorEstimado, $dados['observacoes'] ?? null);
+        $previsaoSugerida = new DateTime();
+        if ($minutosTotais > 0) {
+            $previsaoSugerida->modify("+{$minutosTotais} minutes");
+        }
+        $osObj = new Os(
+            0,
+            $clienteObj,
+            $veiculoObj,
+            $usuCriacaoObj,
+            $usuResponsavelObj,
+            'PROVISORIA',
+            new DateTime(),
+            $previsaoSugerida,
+            $previsaoEntrega,
+            $valorMaoObraSugerido,
+            $dados['valorMaoObra'],
+            $valorEstimado,
+            0.0,
+            $dados['observacoes'] ?? null
+        );
         $problemas = $osObj->validar();
         if (!empty($problemas)) {
             throw DominioException::comProblemas( $problemas );
         }
-        return $this->persistirOs($dados, $idUsuarioLogado, $itensValidados, $valorEstimado);
+        return $this->persistirOsComDetalhes($dados, $idUsuarioLogado, $produtosValidados, $extrasValidados, $valorEstimado, $valorMaoObraSugerido, $previsaoSugerida, $previsaoEntrega, $minutosTotais);
     }
 
     private function validarEntidades(array $dados, int $idUsuarioLogado) {
@@ -160,37 +220,80 @@ class ServicoCadastroOs {
         ];
     }
 
-    private function validarCustos(array $dados) {
-        if (empty($dados['itens']) && empty($dados['custos'])) {
-            throw DominioException::comProblemas( ['Nenhum item ou custo encontrado.'] );
+    private function validarDataEntrega(?string $dataStr): ?DateTime {
+        if (empty($dataStr)) {
+            throw DominioException::comProblemas( ['Previsão de entrega não informada.'] );
         }
-        $itensValidados = [];
-        $valorEstimado = 0;
-        foreach ($dados['itens'] as $item) {
-            $item = ( (array)$item );
-            $itemExistente = $this->repositorioItem->buscarPorId($item['id']);
+        try {
+            return new DateTime($dataStr);
+        } catch (Exception $e) {
+            throw DominioException::comProblemas( ['Erro ao formatar data previsão de entrega.'] );
+        }
+    }
+
+    private function validarCustosEServicos(array $dados) {
+        $produtosValidados = [];
+        $extrasValidados = [];
+        $valorMaoObraSugerido = 0.0;
+        $minutosTotais = 0;
+        $valorTotalEstimado = 0.0;
+        foreach ($dados['servicos'] as $servico) {
+            $servico = ( (array)$servico );
+            $servicoExistente = $this->repositorioServico->buscarPorId( (int)$servico['id'] );
+            if (!$servicoExistente) {
+                throw DominioException::comProblemas( ["Serviço ID {$servico['id']} não encontrado."] );
+            }
+            $valorMaoObraSugerido += $servicoExistente['valor_mao_obra'];
+            $minutosTotais += $servicoExistente['execucao_minutos'];
+            $valorTotalEstimado += $servicoExistente['valor_mao_obra'];
+        }
+        foreach ($dados['produtos'] as $produto) {
+            $produto = ( (array)$produto );
+            $itemExistente = $this->repositorioItem->buscarPorId( (int)$produto['id'] );
             if (!$itemExistente) {
-                throw new DominioException( ["Item {$item['codigo']} não encontrado."] );
+                throw new DominioException( ["Item ID {$produto['id']} não encontrado."] );
             }
-            if ($item['quantidade'] > $itemExistente['estoque']) {
-                throw new DominioException( ["Quantidade solicitada para {$item['codigo']} excede o estoque disponível."] );
+            if ($produto['quantidade'] <= 0) {
+                throw new DominioException( ["Quantidade inválida para item {$itemExistente['codigo']}."] );
             }
-            $valorEstimado += ( $itemExistente['preco_venda'] * $item['quantidade'] );
-            $itensValidados[] = [
+            if ($produto['quantidade'] > $itemExistente['estoque']) {
+                throw new DominioException( ["Quantidade solicitada para {$itemExistente['codigo']} excede o estoque disponível."] );
+            }
+            $subtotal = ( $itemExistente['preco_venda'] * $produto['quantidade'] );
+            $valorTotalEstimado += $subtotal;
+            $produtosValidados[] = [
                 'id' => $itemExistente['id'],
+                'codigo' => $itemExistente['codigo'],
                 'titulo' => $itemExistente['titulo'],
                 'precoVenda' => $itemExistente['preco_venda'],
                 'estoque' => $itemExistente['estoque'],
-                'quantidade' => $item['quantidade']
+                'quantidade' => $produto['quantidade'],
+                'subtotal' => $subtotal,
+                'servicoId' => $produto['servicoId'] ?? null,
+                'tarefaId' => $produto['tarefaId'] ?? null
             ];
         }
-        foreach ($dados['custos'] as $custo) {
-            $custo = ( (array)$custo );
-            $valorEstimado += $custo['subtotal'];
+        foreach ($dados['extras'] as $extra) {
+            $extra = ( (array)$extra );
+            if ($extra['quantidade'] <= 0 || $extra['valor'] < 0) {
+                throw new DominioException( ["Custo extra inválido."] );
+            }
+            $subtotal = ( $extra['valor'] * $extra['quantidade'] );
+            $valorTotalEstimado += $subtotal;
+            $extrasValidados[] = [
+                'descricao' => $extra['descricao'],
+                'quantidade' => $extra['quantidade'],
+                'valor' => $extra['valor'],
+                'subtotal' => $subtotal,
+                'tipo' => 'EXTRA'
+            ];
         }
         return [
-            'itensValidados' => $itensValidados,
-            'valorEstimado' => $valorEstimado
+            'produtosValidados' => $produtosValidados,
+            'extrasValidados' => $extrasValidados,
+            'valorMaoObraSugerido' => $valorMaoObraSugerido,
+            'minutosTotais' => $minutosTotais,
+            'valorTotalEstimado' => $valorTotalEstimado
         ];
     }
 
@@ -206,11 +309,7 @@ class ServicoCadastroOs {
         return new Usuario(0, $cpf, $nome, $email, $cargo, $ativo);
     }
 
-    private function mapearOs(Cliente $cli, Veiculo $vei, Usuario $usuarioC, Usuario $usuarioR, string $status, DateTime $previsaoEntrega, float $valorE, ?string $obs): Os {
-        return new Os(0, $cli, $vei, $usuarioC, $usuarioR, $status, new DateTime(), $previsaoEntrega, $valorE, 0, $obs);
-    }
-
-    private function persistirOs(array $dados, int $idUsuarioLogado, array $itensValidados, float $valorEstimado) {
+    private function persistirOsComDetalhes(array $dados, int $idUsuarioLogado, array $produtosValidados, array $extrasValidados, float $valorEstimado, float $valorMaoObraSugerido, DateTime $previsaoSugerida, DateTime $previsaoEntrega, int $minutosTotais) {
         $this->transacao->iniciar();
         try {
             $osId = $this->repositorioOs->salvar( [
@@ -219,29 +318,44 @@ class ServicoCadastroOs {
                 'usuario_criacao' => $idUsuarioLogado,
                 'usuario_responsavel' => $dados['responsavelId'],
                 'status' => 'PROVISORIA',
-                'previsao_entrega' => ( new DateTime($dados['previsaoEntrega']) )->format('Y-m-d H:i:s'),
+                'previsao_entrega_sugerida' => $previsaoSugerida->format('Y-m-d H:i:s'),
+                'previsao_entrega' => $previsaoEntrega->format('Y-m-d H:i:s'),
+                'valor_mao_obra_sugerido' => $valorMaoObraSugerido,
+                'valor_mao_obra' => $dados['valorMaoObra'],
                 'valor_estimado' => $valorEstimado,
                 'valor_final' => 0,
-                'observacoes' => $dados['observacoes'] ?? null
+                'observacoes' => $dados['observacoes'] ?? null,
             ] );
-            foreach ($itensValidados as $itemValidado) {
+            foreach ($dados['servicos'] as $servico) {
+                $servico = ( (array)$servico );
+                $servId = ( (int)$servico['id'] );
+                $osServicoId = $this->repositorioOs->salvarServico($osId, $servId);
+                $ordenacao = 1;
+                foreach ($servico['tarefas'] as $tarefa) {
+                    $tarefa = ( (array)$tarefa );
+                    $descricao = $tarefa['descricao'];
+                    $tarefaId = $this->repositorioOs->salvarTarefa($osServicoId, $descricao, $ordenacao);
+                    $ordenacao++;
+                }
+            }
+            foreach ($produtosValidados as $produto) {
                 $this->repositorioOsCusto->salvar( [
                     'os_id' => $osId,
-                    'item_id' => $itemValidado['id'],
+                    'os_tarefa_id' => $tarefaId,
+                    'item_id' => $produto['id'],
                     'tipo' => 'ITEM',
-                    'descricao' => $itemValidado['titulo'],
-                    'quantidade' => $itemValidado['quantidade'],
-                    'subtotal' => ($itemValidado['precoVenda'] * $itemValidado['quantidade'])
+                    'descricao' => $produto['titulo'],
+                    'quantidade' => $produto['quantidade'],
+                    'subtotal' => $produto['subtotal']
                 ] );
-                $novoEstoque = ($itemValidado['estoque'] - $itemValidado['quantidade']);
-                $this->repositorioItem->atualizarEstoque($itemValidado['id'], $novoEstoque);
+                $novoEstoque = ($produto['estoque'] - $produto['quantidade']);
+                $this->repositorioItem->atualizarEstoque($produto['id'], $novoEstoque);
             }
-            foreach ($dados['custos'] as $custo) {
-                $custo = ( (array)$custo );
+            foreach ($extrasValidados as $custo) {
                 $this->repositorioOsCusto->salvar( [
                     'os_id' => $osId,
                     'item_id' => null,
-                    'tipo' => $custo['tipo'],
+                    'tipo' => 'EXTRA',
                     'descricao' => $custo['descricao'],
                     'quantidade' => $custo['quantidade'],
                     'subtotal' => $custo['subtotal']
@@ -254,7 +368,7 @@ class ServicoCadastroOs {
             throw $erro;
         }
     }
-
+    
 }
 
 

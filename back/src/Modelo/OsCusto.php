@@ -42,7 +42,7 @@ class OsCusto {
 
     public function validar(): array {
         $problemas = [];
-        $tiposValidos = ['SERVICO', 'ITEM', 'EXTRA'];
+        $tiposValidos = [ 'ITEM', 'EXTRA' ];
         if ( !in_array($this->tipo, $tiposValidos, true) ) {
             $problemas[] = "Tipo de custo inválido.";
         }

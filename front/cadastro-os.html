@@ -3,9 +3,8 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="./src/visao/cadastro-os.ts" type="module" defer></script>
         <link rel="stylesheet" href="./estilo/estilo-cadastro-os.css">
-        <title>MotorLab - Cadastrar OS</title>
+        <script src="./src/visao/cadastro-os.ts" type="module" defer></script>
     </head>
     <body>
         <header>
@@ -31,85 +30,137 @@
             <button id="botaoLogout" type="button">LOGOUT</button>
         </header>
         <main>
-            <h1>CADASTRAR OS</h1>
+            <h1>CADASTRAR ORDEM DE SERVIÇO</h1>
             <form>
-                <div id="divCliente">
-                    <label for="buscaCliente">Cliente: </label>
-                    <input type="search" id="buscaCliente" placeholder="Digite o nome completo ou CPF">
-                    <button type="button" id="botaoBuscaCliente">BUSCAR</button>
-                    <div id="detalhesCliente"></div>
-                </div>
-                <div id="divVeiculos">
-                    <label for="veiculos">Veículo: </label>
-                    <select id="veiculos"></select>
-                </div>
-                <div id="divResponsaveis">
-                    <label for="responsaveis">Responsável: </label>
-                    <select id="responsaveis"></select>
-                </div>
-                <div id="divItens">
-                    <h3>ITENS</h3>
-                    <label for="pesquisaItem">Pesquisa: </label>
-                    <input type="search" id="pesquisaItem" placeholder="Digite o código">
-                    <label for="quantidadeItem">Quantidade: </label>
-                    <input type="number" id="quantidadeItem">
-                    <button type="button" id="botaoBuscaItem">BUSCAR E ADICIONAR</button>
-                    <table id="tabelaItens">
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Título</th>
-                                <th>Fabricante</th>
-                                <th>Preço</th>
-                                <th>Quantidade</th>
-                                <th>Subtotal</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="corpoTabelaItens"></tbody>
-                    </table>
-                </div>
-                <div id="divCustos">
-                    <h3>CUSTOS</h3>
-                    <label for="tipoCusto">Tipo: </label>
-                    <select id="tipoCusto"></select>
-                    <label for="descricaoCusto">Descrição: </label>
-                    <input type="text" id="descricaoCusto">
-                    <label for="valorCusto">Valor: </label>
-                    <input type="number" id="valorCusto">
-                    <label for="quantidadeCusto">Quantidade: </label>
-                    <input type="number" id="quantidadeCusto">
-                    <button type="button" id="botaoAdicionarCusto">ADICIONAR</button>
-                    <table id="tabelaCustos">
-                        <thead>
-                            <tr>
-                                <th>Tipo</th>
-                                <th>Descrição</th>
-                                <th>Preço</th>
-                                <th>Quantidade</th>
-                                <th>Subtotal</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="corpoTabelaCustos"></tbody>
-                    </table>
-                </div>
-                <div id="valorTotal"></div>
-                <div id="divObservacoes">
-                    <label for="observacoes">Observações: </label>
+                <section>
+                    <h2>Cliente e Veículo</h2>
+                    <div class="campo-grupo">
+                        <div id="divCliente">
+                            <label for="buscaCliente">Cliente: </label>
+                            <input type="search" id="buscaCliente" placeholder="nome completo ou CPF">
+                            <button type="button" id="botaoBuscaCliente">BUSCAR</button>
+                            <div id="detalhesCliente"></div>
+                        </div>
+                        <div id="divVeiculo">
+                            <label for="veiculos">Veículo: </label>
+                            <select id="veiculos"></select>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h2>Responsável</h2>
+                    <div class="campo-grupo">
+                        <div id="divResponsavel">
+                            <label for="responsaveis">Mecânico: </label>
+                            <select id="responsaveis"></select>
+                            <input type="checkbox" id="mostrarIndisponiveis">Mostrar indisponíveis
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h2>Serviços</h2>
+                    <div class="campo-grupo">
+                        <label for="buscaServico">Adicionar: </label>
+                        <input type="text" id="buscaServico" placeholder="Digite o nome">
+                        <div id="listaTarefasServico"></div>
+                    </div>
+                    <div id="listaServicos"></div>
+                    <div id="listaExtras"></div>
+                    <div id="acoesServicos">
+                        <button type="button" id="botaoAdicionarExtra" class="botao-secundario">+ Custo Extra</button>
+                    </div>
+                </section>
+                <section>
+                    <h2>Resumo</h2>
+                    <div id="resumo">
+                        <div id="maoObra">
+                            <label>Mão de Obra:</label>
+                            <span id="valorMaoObra">R$ 0,00</span>
+                            <button type="button" id="botaoEditarMaoObra">Editar</button>
+                        </div>
+                        <div id="produtos">
+                            <label>Produtos:</label>
+                            <span id="valorProdutos">R$ 0,00</span>
+                        </div>
+                        <div id="extras">
+                            <label>Extras:</label>
+                            <span id="valorExtras">R$ 0,00</span>
+                        </div>
+                        <div id="previsaoEntrega">
+                            <label>Previsão de Entrega:</label>
+                            <span id="dataEntregaCalculada">--/--/---- --:--</span>
+                            <button type="button" id="botaoEditarPrevisaoEntrega">Editar</button>
+                        </div>
+                        <div id="total">
+                            <strong>Valor Total: <span id="valorTotal">R$ 0,00</span></strong>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h2>Observações</h2>
                     <textarea id="observacoes"></textarea>
-                </div>
-                <div id="divPrevisaoEntrega">
-                    <label for="previsaoEntrega">Previsão para a entrega do veículo: </label>
-                    <input type="datetime-local" id="previsaoEntrega">
-                </div>
-                <button id="botaoEnviar" type="submit">CADASTRAR</button>
+                </section>
+                <button id="botaoEnviar" type="submit">CADASTRAR ORDEM DE SERVIÇO</button>
             </form>
         </main>
         <dialog id="modalMensagem">
             <p id="modalMensagemTexto"></p>
             <menu>
                 <button id="modalMensagemOk">OK</button>
+            </menu>
+        </dialog>
+        <dialog id="modalEdicaoMaoObra">
+            <h3>Editar Valor da Mão de Obra</h3>
+            <label for="novoValorMaoObra">Novo Valor:</label>
+            <input type="number" id="novoValorMaoObra" step="0.01">
+            <menu>
+                <button type="button" id="modalMaoObraCancelar" class="botao-secundario">Cancelar</button>
+                <button type="button" id="modalMaoObraConfirmar" class="botao-principal">Confirmar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalEdicaoDataEntrega">
+            <h3>Editar Data de Entrega</h3>
+            <label for="novaDataEntrega">Nova Data:</label>
+            <input type="datetime-local" id="novaDataEntrega">
+            <menu>
+                <button type="button" id="modalDataCancelar" class="botao-secundario">Cancelar</button>
+                <button type="button" id="modalDataConfirmar" class="botao-principal">Confirmar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalAdicionarProduto">
+            <h3>Adicionar Produto</h3>
+            <div class="campo-modal">
+                <label for="codigoProduto">Código do Produto:</label>
+                <input type="text" id="codigoProduto">
+                <button type="button" id="botaoBuscarProduto" class="botao-secundario">Buscar</button>
+            </div>
+            <div class="campo-modal">
+                <label for="quantidadeProduto">Quantidade:</label>
+                <input type="number" id="quantidadeProduto">
+            </div>
+            <div id="detalhesProduto"></div>
+            <menu>
+                <button type="button" id="modalProdutoCancelar" class="botao-secundario">Cancelar</button>
+                <button type="button" id="modalProdutoConfirmar" class="botao-principal">Adicionar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalAdicionarExtra">
+            <h3>Adicionar Custo Extra</h3>
+            <div class="campo-modal">
+                <label for="descricaoExtra">Descrição:</label>
+                <input type="text" id="descricaoExtra">
+            </div>
+            <div class="campo-modal">
+                <label for="valorExtra">Valor Unitário:</label>
+                <input type="number" id="valorExtra" step="0.01">
+            </div>
+            <div class="campo-modal">
+                <label for="quantidadeExtra">Quantidade:</label>
+                <input type="number" id="quantidadeExtra">
+            </div>
+            <menu>
+                <button type="button" id="modalExtraCancelar" class="botao-secundario">Cancelar</button>
+                <button type="button" id="modalExtraConfirmar" class="botao-principal">Adicionar</button>
             </menu>
         </dialog>
     </body>

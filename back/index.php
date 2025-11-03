@@ -25,6 +25,7 @@ use App\Repositorio\RepositorioLaudoBdr;
 use App\Repositorio\RepositorioOsBdr;
 use App\Repositorio\RepositorioOsCustoBdr;
 use App\Repositorio\RepositorioPagamentoBdr;
+use App\Repositorio\RepositorioServicoBdr;
 use App\Repositorio\RepositorioUsuarioBdr;
 use App\Repositorio\RepositorioVeiculoBdr;
 use App\Dto\UsuarioDto;
@@ -325,11 +326,12 @@ $app->get( '/veiculos-por-cliente/:idCliente', function($req, $res) {
         $repositorioItem = new RepositorioItemBdr($pdo);
         $repositorioOs = new RepositorioOsBdr($pdo);
         $repositorioOsCusto = new RepositorioOsCustoBdr($pdo);
+        $repositorioServico = new RepositorioServicoBdr($pdo);
         $repositorioUsuario = new RepositorioUsuarioBdr($pdo);
         $repositorioVeiculo = new RepositorioVeiculoBdr($pdo);
         $servico = new ServicoCadastroOs(
             $transacao, $repositorioCliente, $repositorioItem, $repositorioOs, 
-            $repositorioOsCusto, $repositorioUsuario, $repositorioVeiculo
+            $repositorioOsCusto, $repositorioServico, $repositorioUsuario, $repositorioVeiculo
         );
         $veiculos = $servico->buscarVeiculosPorCliente($idCliente, $logado['cargo_usuario']);
         $res->status(200)->json($veiculos);
@@ -353,14 +355,47 @@ $app->get( '/responsaveis', function($req, $res) {
         $repositorioItem = new RepositorioItemBdr($pdo);
         $repositorioOs = new RepositorioOsBdr($pdo);
         $repositorioOsCusto = new RepositorioOsCustoBdr($pdo);
+        $repositorioServico = new RepositorioServicoBdr($pdo);
         $repositorioUsuario = new RepositorioUsuarioBdr($pdo);
         $repositorioVeiculo = new RepositorioVeiculoBdr($pdo);
         $servico = new ServicoCadastroOs(
             $transacao, $repositorioCliente, $repositorioItem, $repositorioOs, 
-            $repositorioOsCusto, $repositorioUsuario, $repositorioVeiculo
+            $repositorioOsCusto, $repositorioServico, $repositorioUsuario, $repositorioVeiculo
         );
         $responsaveis = $servico->listarResponsaveis($logado['cargo_usuario']);
         $res->status(200)->json($responsaveis);
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->get( '/servicos/:busca', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $logado = $sessao->dadosUsuarioLogado();
+        $termo = ( $req->param('busca') );
+        $pdo = Conexao::conectar();
+        $transacao = new TransacaoPdo($pdo);
+        $repositorioCliente = new RepositorioClienteBdr($pdo);
+        $repositorioItem = new RepositorioItemBdr($pdo);
+        $repositorioOs = new RepositorioOsBdr($pdo);
+        $repositorioOsCusto = new RepositorioOsCustoBdr($pdo);
+        $repositorioServico = new RepositorioServicoBdr($pdo);
+        $repositorioUsuario = new RepositorioUsuarioBdr($pdo);
+        $repositorioVeiculo = new RepositorioVeiculoBdr($pdo);
+        $servico = new ServicoCadastroOs(
+            $transacao, $repositorioCliente, $repositorioItem, $repositorioOs, 
+            $repositorioOsCusto, $repositorioServico, $repositorioUsuario, $repositorioVeiculo
+        );
+        $servicos = $servico->buscarServicos($termo, $logado['cargo_usuario']);
+        $res->status(200)->json($servicos);
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
     } catch (DominioException $erro) {
@@ -383,11 +418,12 @@ $app->get( '/itens-cod/:busca', function($req, $res) {
         $repositorioItem = new RepositorioItemBdr($pdo);
         $repositorioOs = new RepositorioOsBdr($pdo);
         $repositorioOsCusto = new RepositorioOsCustoBdr($pdo);
+        $repositorioServico = new RepositorioServicoBdr($pdo);
         $repositorioUsuario = new RepositorioUsuarioBdr($pdo);
         $repositorioVeiculo = new RepositorioVeiculoBdr($pdo);
         $servico = new ServicoCadastroOs(
             $transacao, $repositorioCliente, $repositorioItem, $repositorioOs, 
-            $repositorioOsCusto, $repositorioUsuario, $repositorioVeiculo
+            $repositorioOsCusto, $repositorioServico, $repositorioUsuario, $repositorioVeiculo
         );
         $item = $servico->buscarItemPorCodigo($codigo);
         $res->status(200)->json($item);
@@ -414,11 +450,12 @@ $app->post( '/ordens-servico', function($req, $res) {
         $repositorioItem = new RepositorioItemBdr($pdo);
         $repositorioOs = new RepositorioOsBdr($pdo);
         $repositorioOsCusto = new RepositorioOsCustoBdr($pdo);
+        $repositorioServico = new RepositorioServicoBdr($pdo);
         $repositorioUsuario = new RepositorioUsuarioBdr($pdo);
         $repositorioVeiculo = new RepositorioVeiculoBdr($pdo);
         $servico = new ServicoCadastroOs(
             $transacao, $repositorioCliente, $repositorioItem, $repositorioOs, 
-            $repositorioOsCusto, $repositorioUsuario, $repositorioVeiculo
+            $repositorioOsCusto, $repositorioServico, $repositorioUsuario, $repositorioVeiculo
         );
         $osId = $servico->cadastrarOs($dados, $logado['id_usuario'], $logado['cargo_usuario']);
         $res->status(200)->json($osId);
