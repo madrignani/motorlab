@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS motorlab;
+
 CREATE DATABASE IF NOT EXISTS motorlab CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 USE motorlab;
@@ -103,7 +105,7 @@ CREATE TABLE os_custo (
     os_id INT NOT NULL,
     item_id INT DEFAULT NULL,
     os_servico_id INT DEFAULT NULL,
-    os_tarefa_id INT NULL, 
+    os_tarefa_id INT DEFAULT NULL, 
     tipo ENUM('ITEM', 'EXTRA') NOT NULL,
     descricao VARCHAR(70),
     quantidade INT NOT NULL,

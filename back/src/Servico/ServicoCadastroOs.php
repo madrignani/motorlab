@@ -333,6 +333,7 @@ class ServicoCadastroOs {
                 'valor_final' => 0,
                 'observacoes' => $dados['observacoes'] ?? null,
             ] );
+            $mapeamentoTarefas = [];
             foreach ($dados['servicos'] as $servico) {
                 $servico = ( (array)$servico );
                 $servId = ( (int)$servico['id'] );
@@ -341,14 +342,16 @@ class ServicoCadastroOs {
                 foreach ($servico['tarefas'] as $tarefa) {
                     $tarefa = ( (array)$tarefa );
                     $descricao = $tarefa['descricao'];
-                    $tarefaId = $this->repositorioOs->salvarTarefa($osServicoId, $descricao, $ordenacao);
+                    $osTarefaId = $this->repositorioOs->salvarTarefa($osServicoId, $descricao, $ordenacao);
+                    $mapeamentoTarefas[ $tarefa['id'] ] = $osTarefaId;
                     $ordenacao++;
                 }
             }
             foreach ($produtosValidados as $produto) {
+                $osTarefaId = $mapeamentoTarefas[ $produto['tarefaId'] ] ?? null;
                 $this->repositorioOsCusto->salvar( [
                     'os_id' => $osId,
-                    'os_tarefa_id' => $tarefaId,
+                    'os_tarefa_id' => $osTarefaId,
                     'item_id' => $produto['id'],
                     'tipo' => 'ITEM',
                     'descricao' => $produto['titulo'],
@@ -361,6 +364,7 @@ class ServicoCadastroOs {
             foreach ($extrasValidados as $custo) {
                 $this->repositorioOsCusto->salvar( [
                     'os_id' => $osId,
+                    'os_tarefa_id' => null,
                     'item_id' => null,
                     'tipo' => 'EXTRA',
                     'descricao' => $custo['descricao'],

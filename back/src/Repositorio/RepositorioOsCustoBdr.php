@@ -18,12 +18,13 @@ class RepositorioOsCustoBdr implements RepositorioOsCusto {
     public function salvar(array $dados): void {
         try {
             $sql = <<<SQL
-                INSERT INTO os_custo ( os_id, item_id, tipo, descricao, quantidade, subtotal )
-                VALUES ( :os_id, :item_id, :tipo, :descricao, :quantidade, :subtotal )
+                INSERT INTO os_custo ( os_id, os_tarefa_id, item_id, tipo, descricao, quantidade, subtotal )
+                VALUES ( :os_id, :os_tarefa_id, :item_id, :tipo, :descricao, :quantidade, :subtotal )
             SQL;
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute( [
                 'os_id' => $dados['os_id'],
+                'os_tarefa_id' => $dados['os_tarefa_id'],
                 'item_id' => $dados['item_id'],
                 'tipo' => $dados['tipo'],
                 'descricao' => $dados['descricao'],
@@ -31,7 +32,7 @@ class RepositorioOsCustoBdr implements RepositorioOsCusto {
                 'subtotal' => $dados['subtotal']
             ] );
         } catch (PDOException $erro) {
-            throw new RepositorioException($erro->getMessage());
+            throw new RepositorioException( $erro->getMessage() );
         }
     }
 
