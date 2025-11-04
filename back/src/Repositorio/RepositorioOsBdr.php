@@ -18,8 +18,8 @@ class RepositorioOsBdr implements RepositorioOs {
     public function salvar(array $dados): int {
         try {
             $sql = <<<SQL
-                INSERT INTO os ( cliente_id, veiculo_id, usuario_criacao, usuario_responsavel, status, previsao_entrega_sugerida, previsao_entrega, valor_mao_obra_sugerido, valor_mao_obra, valor_estimado, valor_final, observacoes )
-                VALUES ( :cliente_id, :veiculo_id, :usuario_criacao, :usuario_responsavel, :status, :previsao_entrega_sugerida, :previsao_entrega, :valor_mao_obra_sugerido, :valor_mao_obra, :valor_estimado, :valor_final, :observacoes )
+                INSERT INTO os ( cliente_id, veiculo_id, usuario_criacao, usuario_responsavel, status, previsao_entrega_sugerida, previsao_entrega, valor_mao_obra_sugerido, valor_mao_obra, valor_estimado_sugerido, valor_estimado, valor_final, observacoes )
+                VALUES ( :cliente_id, :veiculo_id, :usuario_criacao, :usuario_responsavel, :status, :previsao_entrega_sugerida, :previsao_entrega, :valor_mao_obra_sugerido, :valor_mao_obra, :valor_estimado_sugerido, :valor_estimado, :valor_final, :observacoes )
             SQL;
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute( [
@@ -32,6 +32,7 @@ class RepositorioOsBdr implements RepositorioOs {
                 'previsao_entrega' => $dados['previsao_entrega'],
                 'valor_mao_obra_sugerido' => $dados['valor_mao_obra_sugerido'],
                 'valor_mao_obra' => $dados['valor_mao_obra'],
+                'valor_estimado_sugerido' => $dados['valor_estimado_sugerido'],
                 'valor_estimado' => $dados['valor_estimado'],
                 'valor_final' => $dados['valor_final'],
                 'observacoes' => $dados['observacoes']

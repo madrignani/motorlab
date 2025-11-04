@@ -18,6 +18,7 @@ class Os {
     private DateTime $previsaoEntrega;
     private float $valorMaoObraSugerido;
     private float $valorMaoObra;
+    private float $valorEstimadoSugerido;
     private float $valorEstimado;
     private float $valorFinal;
     private ?string $observacoes;
@@ -34,6 +35,7 @@ class Os {
         DateTime $previsaoEntrega,
         float $valorMaoObraSugerido,
         float $valorMaoObra,
+        float $valorEstimadoSugerido,
         float $valorEstimado,
         float $valorFinal,
         ?string $observacoes
@@ -49,6 +51,7 @@ class Os {
         $this->previsaoEntrega = $previsaoEntrega;
         $this->valorMaoObraSugerido = $valorMaoObraSugerido;
         $this->valorMaoObra = $valorMaoObra;
+        $this->valorEstimadoSugerido = $valorEstimadoSugerido;
         $this->valorEstimado = $valorEstimado;
         $this->valorFinal = $valorFinal;
         $this->observacoes = $observacoes;

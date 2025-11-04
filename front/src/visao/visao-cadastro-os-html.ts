@@ -337,7 +337,7 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
                         const produtoId = target.dataset.produtoId!;
                         const servicoId = target.dataset.servicoId!;
                         const tarefaId = target.dataset.tarefaId!;
-                        this.removerProduto(produtoId, servicoId, tarefaId);
+                        this.removerProdutoLista(produtoId, servicoId, tarefaId);
                     } );
                 }
             }
@@ -406,7 +406,7 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
             const produtoId = target.dataset.produtoId!;
             const servicoId = target.dataset.servicoId!;
             const tarefaId = target.dataset.tarefaId!;
-            this.removerProduto(produtoId, servicoId, tarefaId);
+            this.removerProdutoLista(produtoId, servicoId, tarefaId);
         } );
         this.fecharModalProduto();
     }
@@ -419,7 +419,7 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         this.produtoAtual = null;
     }
 
-    removerProduto(produtoId: string, servicoId: string, tarefaId: string): void {
+    removerProdutoLista(produtoId: string, servicoId: string, tarefaId: string): void {
         const selector = `.produto-item[data-produto-id="${produtoId}"][data-servico-id="${servicoId}"][data-tarefa-id="${tarefaId}"]`;
         const produtoDiv = document.querySelector(selector) as HTMLDivElement;
         produtoDiv.remove();
@@ -487,6 +487,16 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         });
         document.getElementById('botaoEditarPrevisaoEntrega')!.addEventListener( 'click', () => {
             const modal = document.getElementById('modalEdicaoDataEntrega') as HTMLDialogElement;
+            const inputData = document.getElementById('novaDataEntrega') as HTMLInputElement;
+            const dataAtualSpan = document.getElementById('dataEntrega') as HTMLSpanElement;
+            const dataISO = dataAtualSpan.dataset.iso;
+            if (dataISO) {
+                const dataBrasil = new Date( new Date(dataISO).getTime() - 10800000 );
+                inputData.value = dataBrasil.toISOString().slice(0, 16);
+            } else {
+                const dataBrasil = new Date( (new Date()).getTime() - 10800000 );
+                inputData.value = dataBrasil.toISOString().slice(0, 16);
+            }
             modal.showModal();
         } );
         document.getElementById('modalDataConfirmar')!.addEventListener( 'click', () => {
@@ -577,21 +587,21 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
     }
 
     atualizarDataEntrega(dataISO: string): void {
-        const elemento = document.getElementById('dataEntregaCalculada') as HTMLSpanElement;
+        const elemento = document.getElementById('dataEntrega') as HTMLSpanElement;
         elemento.dataset.iso = dataISO;
         const data = new Date(dataISO);
-        const dataFormatada = data.toLocaleString('pt-BR', {
+        const dataFormatada = data.toLocaleString( 'pt-BR', {
             day: '2-digit',
             month: '2-digit', 
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit'
-        });
+        } );
         elemento.textContent = dataFormatada;
     }
 
     obterDataEntregaAtual(): string {
-        const elemento = document.getElementById('dataEntregaCalculada') as HTMLSpanElement;
+        const elemento = document.getElementById('dataEntrega') as HTMLSpanElement;
         return elemento.dataset.iso!;
     }
 

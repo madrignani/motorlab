@@ -163,7 +163,8 @@ class ServicoCadastroOs {
         $extrasValidados = $valores['extrasValidados'];
         $valorMaoObraSugerido = $valores['valorMaoObraSugerido'];
         $minutosTotais = $valores['minutosTotais'];
-        $valorEstimado = $valores['valorTotalEstimado'];
+        $valorProdutosExtras = $valores['valorProdutosExtras'];
+        $valorEstimadoSugerido = $valores['valorTotalEstimado'];
         $clienteObj = $this->mapearCliente($cliente['cpf'], $cliente['nome'], $cliente['telefone'], $cliente['email']);
         $usuCriacaoObj = $this->mapearUsuario($usuCriacao['cpf'], $usuCriacao['nome'], $usuCriacao['email'], $usuCriacao['cargo'], $usuCriacao['ativo']);
         $usuResponsavelObj = $this->mapearUsuario($usuResp['cpf'], $usuResp['nome'], $usuResp['email'], $usuResp['cargo'], $usuResp['ativo']);
@@ -184,7 +185,8 @@ class ServicoCadastroOs {
             $previsaoEntrega,
             $valorMaoObraSugerido,
             $dados['valorMaoObra'],
-            $valorEstimado,
+            $valorEstimadoSugerido,
+            ( floatval($dados['valorMaoObra'] + $valorProdutosExtras) ),
             0.0,
             $dados['observacoes'] ?? null
         );
@@ -192,7 +194,7 @@ class ServicoCadastroOs {
         if (!empty($problemas)) {
             throw DominioException::comProblemas( $problemas );
         }
-        return $this->persistirOsComDetalhes($dados, $idUsuarioLogado, $produtosValidados, $extrasValidados, $valorEstimado, $valorMaoObraSugerido, $previsaoSugerida, $previsaoEntrega, $minutosTotais);
+        return $this->persistirOsComDetalhes($dados, $idUsuarioLogado, $produtosValidados, $extrasValidados, $valorProdutosExtras, $valorMaoObraSugerido, $valorEstimadoSugerido, $previsaoSugerida, $previsaoEntrega);
     }
 
     private function validarEntidades(array $dados, int $idUsuarioLogado) {
@@ -236,6 +238,7 @@ class ServicoCadastroOs {
         $extrasValidados = [];
         $valorMaoObraSugerido = 0.0;
         $minutosTotais = 0;
+        $valorProdutosExtras = 0.0;
         $valorTotalEstimado = 0.0;
         foreach ($dados['servicos'] as $servico) {
             $servico = ( (array)$servico );
@@ -260,6 +263,7 @@ class ServicoCadastroOs {
                 throw new DominioException( ["Quantidade solicitada para {$itemExistente['codigo']} excede o estoque disponível."] );
             }
             $subtotal = ( $itemExistente['preco_venda'] * $produto['quantidade'] );
+            $valorProdutosExtras += $subtotal;
             $valorTotalEstimado += $subtotal;
             $produtosValidados[] = [
                 'id' => $itemExistente['id'],
@@ -279,6 +283,7 @@ class ServicoCadastroOs {
                 throw new DominioException( ["Custo extra inválido."] );
             }
             $subtotal = ( $extra['valor'] * $extra['quantidade'] );
+            $valorProdutosExtras += $subtotal;
             $valorTotalEstimado += $subtotal;
             $extrasValidados[] = [
                 'descricao' => $extra['descricao'],
@@ -293,6 +298,7 @@ class ServicoCadastroOs {
             'extrasValidados' => $extrasValidados,
             'valorMaoObraSugerido' => $valorMaoObraSugerido,
             'minutosTotais' => $minutosTotais,
+            'valorProdutosExtras' => $valorProdutosExtras,
             'valorTotalEstimado' => $valorTotalEstimado
         ];
     }
@@ -309,7 +315,7 @@ class ServicoCadastroOs {
         return new Usuario(0, $cpf, $nome, $email, $cargo, $ativo);
     }
 
-    private function persistirOsComDetalhes(array $dados, int $idUsuarioLogado, array $produtosValidados, array $extrasValidados, float $valorEstimado, float $valorMaoObraSugerido, DateTime $previsaoSugerida, DateTime $previsaoEntrega, int $minutosTotais) {
+    private function persistirOsComDetalhes(array $dados, int $idUsuarioLogado, array $produtosValidados, array $extrasValidados, float $valorProdutosExtras, float $valorMaoObraSugerido, float $valorEstimadoSugerido, DateTime $previsaoSugerida, DateTime $previsaoEntrega) {
         $this->transacao->iniciar();
         try {
             $osId = $this->repositorioOs->salvar( [
@@ -322,7 +328,8 @@ class ServicoCadastroOs {
                 'previsao_entrega' => $previsaoEntrega->format('Y-m-d H:i:s'),
                 'valor_mao_obra_sugerido' => $valorMaoObraSugerido,
                 'valor_mao_obra' => $dados['valorMaoObra'],
-                'valor_estimado' => $valorEstimado,
+                'valor_estimado_sugerido' => $valorEstimadoSugerido,
+                'valor_estimado' => ( floatval($dados['valorMaoObra'] + $valorProdutosExtras) ),
                 'valor_final' => 0,
                 'observacoes' => $dados['observacoes'] ?? null,
             ] );

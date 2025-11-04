@@ -157,9 +157,9 @@ export class ControladoraCadastroOs {
             if (tarefa.produtos) {
                 for (const produto of tarefa.produtos) {
                     this.produtosSelecionados = this.produtosSelecionados.filter( (prod) => {
-                        const mesmoId = ( prod.id === produto.id );
-                        const mesmoServico = ( prod.servicoId === servicoId );
-                        const mesmaTarefa = ( prod.tarefaId === tarefa.id );
+                        const mesmoId = ( String(prod.id) === String(produto.id) );
+                        const mesmoServico = ( String(prod.servicoId) === String(servicoId) );
+                        const mesmaTarefa = ( String(prod.tarefaId) === String(tarefa.id) );
                         const remocao = ( mesmoId && mesmoServico && mesmaTarefa );
                         return !remocao;
                     } );
@@ -205,9 +205,9 @@ export class ControladoraCadastroOs {
             if (tarefa && tarefa.produtos) {
                 for (const produto of tarefa.produtos) {
                     this.produtosSelecionados = this.produtosSelecionados.filter( (prod) => {
-                        const mesmoId = ( prod.id === produto.id );
-                        const mesmoServico = ( prod.servicoId === servicoId );
-                        const mesmaTarefa = ( prod.tarefaId === tarefa.id );
+                        const mesmoId = ( String(prod.id) === String(produto.id) );
+                        const mesmoServico = ( String(prod.servicoId) === String(servicoId) );
+                        const mesmaTarefa = ( String(prod.tarefaId) === String(tarefa.id) );
                         const remocao = ( mesmoId && mesmoServico && mesmaTarefa );
                         return !remocao;
                     } );
@@ -315,30 +315,22 @@ export class ControladoraCadastroOs {
     }
 
     removerProduto(produtoId: string, servicoId: string, tarefaId: string): void {
-        const servico = this.servicosSelecionados.find( (servico) => servico.id === servicoId );
-        const tarefa = servico.tarefas.find( (tarefa: any) => tarefa.id === tarefaId);
-        const produtoRemovido = (tarefa.produtos || []).find( (prod: any) => 
-            prod.id === produtoId &&
-            prod.servicoId === servicoId &&
-            prod.tarefaId === tarefaId
-        );
-        tarefa.produtos = tarefa.produtos || [];
-        tarefa.produtos = tarefa.produtos.filter( (prod: any) => {
-            const mesmoId = (prod.id === produtoId);
-            const mesmoServico = (prod.servicoId === servicoId);
-            const mesmaTarefa = (prod.tarefaId === tarefaId);
+        const servico = this.servicosSelecionados.find( (servico: any) => String(servico.id) === String(servicoId) );
+        const tarefa = (servico.tarefas || []).find( (tarefa: any) => String(tarefa.id) === String(tarefaId) );
+        tarefa.produtos = (tarefa.produtos || []).filter( (prod: any) => {
+            const mesmoId = (String(prod.id) === String(produtoId));
+            const mesmoServico = (String(prod.servicoId) === String(servicoId));
+            const mesmaTarefa = (String(prod.tarefaId) === String(tarefaId));
             const remocao = (mesmoId && mesmoServico && mesmaTarefa);
             return !remocao;
         } );
-        if (produtoRemovido) {
-            this.produtosSelecionados = this.produtosSelecionados.filter( (prod) => {
-                const mesmoId = ( prod.id === produtoId );
-                const mesmoServico = ( prod.servicoId === servicoId );
-                const mesmaTarefa = ( prod.tarefaId === tarefa.id );
-                const remocao = ( mesmoId && mesmoServico && mesmaTarefa );
-                return !remocao;
-            } );
-        }
+        this.produtosSelecionados = this.produtosSelecionados.filter( (prod: any) => {
+            const mesmoId = (String(prod.id) === String(produtoId));
+            const mesmoServico = (String(prod.servicoId) === String(servicoId));
+            const mesmaTarefa = (String(prod.tarefaId) === String(tarefaId));
+            const remocao = (mesmoId && mesmoServico && mesmaTarefa);
+            return !remocao;
+        } );
         this.visao.atualizarTarefasServico(servico);
         this.atualizarCalculos();
     }
@@ -375,7 +367,9 @@ export class ControladoraCadastroOs {
     }
 
     removerExtra(extraId: string): void {
-        this.extrasSelecionados = this.extrasSelecionados.filter( (extra) => extra.id !== extraId );
+        this.extrasSelecionados = this.extrasSelecionados.filter( 
+            (extra) => extra.id !== Number(extraId) 
+        );
         this.visao.exibirExtras(this.extrasSelecionados);
         this.atualizarCalculos();
     }
@@ -432,7 +426,7 @@ export class ControladoraCadastroOs {
     confirmarDataEntrega(novaData: string): void {
         if (novaData) {
             const data = new Date(novaData);
-            if (data< ( new Date(Date.now()) )){
+            if ( data<(new Date()) ){
                 this.visao.exibirMensagem( ['Previsão de entrega não pode ser no passado.'] );
                 return;
             }
@@ -473,6 +467,14 @@ export class ControladoraCadastroOs {
 
     async enviarOs(): Promise<void> {
         const dadosForm = this.visao.obterDadosFormulario();
+        const dataEntrega = new Date(this.visao.obterDataEntregaAtual());
+        const dataEntregaString = dataEntrega.toLocaleString( 'sv', {
+            timeZone: 'America/Sao_Paulo',
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false
+        } );
+        const dataEntregaBrasilIso = dataEntregaString.replace(' ', 'T') + '-03:00';
         if (!this.clienteSelecionado) {
             this.visao.exibirMensagem( ['Selecione um cliente.'] );
             return;
@@ -503,7 +505,7 @@ export class ControladoraCadastroOs {
                 extras: this.extrasSelecionados,
                 observacoes: dadosForm.observacoes,
                 valorMaoObra,
-                dataEntrega: this.visao.obterDataEntregaAtual()
+                dataEntrega: dataEntregaBrasilIso
             };
             const osId = await this.gestor.cadastrarOs(osData);
             this.visao.exibirMensagemComAcao( ['Ordem de Serviço cadastrada com sucesso.'], osId );

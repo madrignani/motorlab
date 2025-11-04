@@ -22,7 +22,7 @@ export interface VisaoCadastroOs {
     adicionarProdutoLista(produto: any, quantidade: number, servicoId: string, tarefaId: string): void;
     obterProdutoAtual(): any;
     limparProdutoAtual(): void;
-    removerProduto(produtoId: string, servicoId: string, tarefaId: string): void;
+    removerProdutoLista(produtoId: string, servicoId: string, tarefaId: string): void;
     adicionarExtraLista(extra: any): void;
     exibirExtras(extras: any[]): void;
     removerExtraNaLista(extraId: string): void;

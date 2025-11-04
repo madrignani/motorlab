@@ -72,6 +72,7 @@ CREATE TABLE os (
     previsao_entrega DATETIME NOT NULL,
     valor_mao_obra_sugerido DECIMAL(10,2) DEFAULT 0.00,
     valor_mao_obra DECIMAL(10,2) DEFAULT 0.00,
+    valor_estimado_sugerido DECIMAL(10,2) DEFAULT 0.00,
     valor_estimado DECIMAL(10,2) DEFAULT 0.00,
     valor_final DECIMAL(10,2) DEFAULT 0.00,
     observacoes TEXT,
