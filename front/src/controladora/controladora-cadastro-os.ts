@@ -435,6 +435,17 @@ export class ControladoraCadastroOs {
         }
     }
 
+    atualizarDataEntregaAutomatica(): void {
+        let minutosTotais = 0;
+        for (const servico of this.servicosSelecionados) {
+            minutosTotais += servico.execucaoMinutos;
+        }
+        const dataAtual = new Date();
+        const dataPrevisao = new Date(dataAtual.getTime() + minutosTotais * 60000);
+        const dataISO = dataPrevisao.toISOString();
+        this.visao.atualizarDataEntrega(dataISO);
+    }
+
     atualizarCalculos(): void {
         this.calcularMaoObra();
         this.calcularDataEntrega();

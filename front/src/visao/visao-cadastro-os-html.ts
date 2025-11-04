@@ -8,6 +8,8 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
     private permissao = false;
     private servicosAdicionados: string[] = [];
     private produtoAtual: any = null;
+    private dataEditadaManual = false;
+    private intervaloAtualizacao: number | null = null;
 
     constructor() {
         this.controladora = new ControladoraCadastroOs(this);
@@ -16,6 +18,7 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
     iniciar(): void {
         this.controladora.iniciarSessao();
         this.iniciarLogout();
+        this.iniciarAtualizacaoData();
     }
 
     private iniciarLogout(): void {
@@ -51,7 +54,11 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         const p = document.getElementById("modalMensagemTexto") as HTMLParagraphElement;
         const botaoOk = document.getElementById("modalMensagemOk") as HTMLButtonElement;
         p.textContent = texto;
-        botaoOk.addEventListener( "click", () => dialog.close(), { once: true } );
+        botaoOk.addEventListener( "click", () => 
+            dialog.close(), { 
+                once: true 
+            } 
+        );
         dialog.showModal();
     }
 
@@ -504,6 +511,10 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
             if (novaData) {
                 const modal = document.getElementById('modalEdicaoDataEntrega') as HTMLDialogElement;
                 modal.close();
+                this.dataEditadaManual = true;
+                if (this.intervaloAtualizacao) {
+                    clearInterval(this.intervaloAtualizacao);
+                }
             }
             this.controladora.confirmarDataEntrega(novaData) 
         } );
@@ -605,6 +616,14 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         return elemento.dataset.iso!;
     }
 
+    private iniciarAtualizacaoData(): void {
+        this.intervaloAtualizacao = setInterval( () => {
+            if (!this.dataEditadaManual) {
+                this.controladora.atualizarDataEntregaAutomatica();
+            }
+        }, 10000 );
+    }
+
     atualizarValorTotal(total: number): void {
         const elemento = document.getElementById('valorTotal') as HTMLSpanElement;
         elemento.textContent = `${( Number(total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) )}`;
@@ -622,8 +641,8 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
     }
 
     enviarFormulario(): void {
-        const formulario = document.querySelector('form') as HTMLFormElement;
-        formulario.addEventListener( 'submit', (evento) => {
+        const botaoEnviar = document.getElementById('botaoEnviar') as HTMLButtonElement;
+        botaoEnviar.addEventListener( 'click', (evento) => {
             evento.preventDefault();
             this.controladora.enviarOs();
         } );
