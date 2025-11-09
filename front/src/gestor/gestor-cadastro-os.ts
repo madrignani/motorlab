@@ -58,7 +58,7 @@ export class GestorCadastroOs {
     }
 
     async obterServicosPorTermo(busca: string): Promise<any[]> {
-        const response = await fetch( `${API_URL}/servicos/${busca}`, {
+        const response = await fetch( `${API_URL}/servicos-cadastro/${busca}`, {
             method: 'GET',
             credentials: 'include'
         } );
@@ -92,8 +92,7 @@ export class GestorCadastroOs {
             const dadosResposta = await response.json();
             throw ErroGestor.comProblemas(dadosResposta.mensagens);
         }
-        const resultado = await response.json();
-        return resultado.id;
+        return await response.json();
     }
 
 }

@@ -186,9 +186,9 @@ export class ControladoraCadastroOs {
     reordenarTarefa(origemServicoId: string, origemTarefaId: string, destinoServicoId: string, destinoTarefaId: string): void {
         const origemServico = this.servicosSelecionados.find( (servico) => servico.id === origemServicoId );
         const destinoServico = this.servicosSelecionados.find( (servico) => servico.id === destinoServicoId );
-        const tarefaIndex = origemServico.tarefas.findIndex( (tarefa: any) => tarefa.id === origemTarefaId );
+        const tarefaIndex = origemServico.tarefas.findIndex( (tarefa: any) => String(tarefa.id) === String(origemTarefaId) );
         const [tarefa] = origemServico.tarefas.splice(tarefaIndex, 1);
-        const destinoIndex = destinoServico.tarefas.findIndex( (tarefa: any) => tarefa.id === destinoTarefaId ) ;
+        const destinoIndex = destinoServico.tarefas.findIndex( (tarefa: any) => String(tarefa.id) === String(destinoTarefaId) ) ;
         if (destinoIndex !== -1) {
             destinoServico.tarefas.splice(destinoIndex, 0, tarefa);
         } else {

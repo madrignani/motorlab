@@ -188,6 +188,7 @@ class ServicoCadastroOs {
             $valorEstimadoSugerido,
             ( floatval($dados['valorMaoObra'] + $valorProdutosExtras) ),
             0.0,
+            null,
             $dados['observacoes'] ?? null
         );
         $problemas = $osObj->validar();

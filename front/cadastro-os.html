@@ -32,7 +32,7 @@
         <main>
             <h1>CADASTRAR ORDEM DE SERVIÇO</h1>
             <form>
-                <section>
+                <section id="dadosClienteVeiculo">
                     <h2>Cliente e Veículo</h2>
                     <div class="campo-grupo">
                         <div id="divCliente">
@@ -47,7 +47,7 @@
                         </div>
                     </div>
                 </section>
-                <section>
+                <section id=dadosResponsavel>
                     <h2>Responsável</h2>
                     <div class="campo-grupo">
                         <div id="divResponsavel">
@@ -57,7 +57,7 @@
                         </div>
                     </div>
                 </section>
-                <section>
+                <section id="dadosServicos">
                     <h2>Serviços</h2>
                     <div class="campo-grupo">
                         <label for="buscaServico">Adicionar: </label>
@@ -65,42 +65,44 @@
                         <div id="listaTarefasServico"></div>
                     </div>
                     <div id="listaServicos"></div>
+                </section>
+                <section id="dadosCustosExtras">
+                    <h2>Custos Extras</h2>
                     <div id="listaExtras"></div>
-                    <div id="acoesServicos">
+                    <div id="acoesCustosExtras">
                         <button type="button" id="botaoAdicionarExtra" class="botao-secundario">+ Custo Extra</button>
                     </div>
                 </section>
-                <section>
-                    <h2>Resumo</h2>
-                    <div id="resumo">
-                        <div id="maoObra">
-                            <label>Mão de Obra:</label>
-                            <span id="valorMaoObra">R$ 0,00</span>
-                            <button type="button" id="botaoEditarMaoObra">Editar</button>
-                        </div>
-                        <div id="produtos">
-                            <label>Produtos:</label>
-                            <span id="valorProdutos">R$ 0,00</span>
-                        </div>
-                        <div id="extras">
-                            <label>Extras:</label>
-                            <span id="valorExtras">R$ 0,00</span>
-                        </div>
-                        <div id="previsaoEntrega">
-                            <label>Previsão de Entrega:</label>
-                            <span id="dataEntrega">--/--/---- --:--</span>
-                            <button type="button" id="botaoEditarPrevisaoEntrega">Editar</button>
-                        </div>
-                        <div id="total">
-                            <strong>Valor Total: <span id="valorTotal">R$ 0,00</span></strong>
-                        </div>
+                <section id="dadosValores">
+                    <h2>Valores</h2>
+                    <div id="maoObra">
+                        <label>Mão de obra:</label>
+                        <span id="valorMaoObra">R$ 0,00</span>
+                        <button type="button" id="botaoEditarMaoObra">Editar</button>
+                    </div>
+                    <div id="produtos">
+                        <label>Produtos:</label>
+                        <span id="valorProdutos">R$ 0,00</span>
+                    </div>
+                    <div id="extras">
+                        <label>Extras:</label>
+                        <span id="valorExtras">R$ 0,00</span>
+                    </div>
+                    <div id="total">
+                        <label><strong>Valor total:</strong></label>
+                        <span id="valorTotal">R$ 0,00</span>
                     </div>
                 </section>
-                <section>
-                    <h2>Observações</h2>
-                    <textarea id="observacoes"></textarea>
+                <section id="dadosPrevisaoEntrega">
+                    <h2>Previsão de Entrega</h2>
+                    <span id="dataEntrega">--/--/---- --:--</span>
+                    <button type="button" id="botaoEditarPrevisaoEntrega">Editar</button>
                 </section>
-                <button id="botaoEnviar" type="button">CADASTRAR ORDEM DE SERVIÇO</button>
+                <section id="dadosObservacoes">
+                    <h2>Observações</h2>
+                    <textarea id="textoObservacoes"></textarea>
+                </section>
+                <button id="botaoEnviar" type="button">CADASTRAR</button>
             </form>
         </main>
         <dialog id="modalMensagem">
@@ -111,7 +113,7 @@
         </dialog>
         <dialog id="modalEdicaoMaoObra">
             <h3>Editar Valor da Mão de Obra</h3>
-            <label for="novoValorMaoObra">Novo Valor:</label>
+            <label for="novoValorMaoObra">Novo valor:</label>
             <input type="number" id="novoValorMaoObra" step="0.01">
             <menu>
                 <button type="button" id="modalMaoObraCancelar" class="botao-secundario">Cancelar</button>

@@ -243,9 +243,12 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         tarefaDiv.className = 'tarefa-item';
         tarefaDiv.dataset.tarefaId = tarefa.id;
         tarefaDiv.dataset.servicoId = servicoId;
-        tarefaDiv.draggable = true;
         tarefaDiv.innerHTML = `
             <span class="tarefa-descricao">${tarefa.descricao}</span>
+            <div class="acoes-mover">
+                <button type="button" class="botao-mover-cima" title="Mover para cima">▲</button>
+                <button type="button" class="botao-mover-baixo" title="Mover para baixo">▼</button>
+            </div>
             <div>
                 <button type="button" class="botao-adicionar-produto" 
                     data-servico-id="${servicoId}" data-tarefa-id="${tarefa.id}">+ Produto
@@ -256,30 +259,44 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
             </div>
         `;
         campo.appendChild(tarefaDiv);
-        tarefaDiv.addEventListener( 'dragstart', (evento) => {
-            evento.dataTransfer!.setData( 'text/plain', JSON.stringify({
-                servicoId: servicoId,
-                tarefaId: tarefa.id
-            }) );
-            setTimeout( () => tarefaDiv.classList.add('dragging'), 0 );
+        const botaoCima = tarefaDiv.querySelector('.botao-mover-cima')! as HTMLButtonElement;
+        const botaoBaixo = tarefaDiv.querySelector('.botao-mover-baixo')! as HTMLButtonElement;
+        botaoCima.addEventListener( 'click', () => {
+            const atual = tarefaDiv as HTMLElement;
+            let anterior = atual.previousElementSibling as HTMLElement | null;
+            while (anterior && !anterior.dataset.tarefaId) {
+                anterior = anterior.previousElementSibling as HTMLElement | null;
+            }
+            if (!anterior) {
+                return;
+            }
+            const origemServicoId = servicoId;
+            const origemTarefaId = tarefa.id;
+            const destinoServicoId = servicoId;
+            const destinoTarefaId = anterior.dataset.tarefaId!;
+            this.controladora.reordenarTarefa(origemServicoId, origemTarefaId, destinoServicoId, destinoTarefaId);
         } );
-        tarefaDiv.addEventListener( 'dragend', () => {
-            tarefaDiv.classList.remove('dragging');
-            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-        } );
-        tarefaDiv.addEventListener( 'dragover', (evento) => {
-            evento.preventDefault();
-            tarefaDiv.classList.add('drag-over');
-        } );
-        tarefaDiv.addEventListener( 'dragleave', () => {
-            tarefaDiv.classList.remove('drag-over');
-        } );
-        tarefaDiv.addEventListener( 'drop', (evento) => {
-            evento.preventDefault();
-            tarefaDiv.classList.remove('drag-over');
-            const data = evento.dataTransfer!.getData('text/plain');
-            const { servicoId: origemServicoId, tarefaId: origemTarefaId } = JSON.parse(data);
-            this.controladora.reordenarTarefa(origemServicoId, origemTarefaId, servicoId, tarefa.id);
+        botaoBaixo.addEventListener( 'click', () => {
+            const atual = tarefaDiv as HTMLElement;
+            let proximo = atual.nextElementSibling as HTMLElement | null;
+            while (proximo && !proximo.dataset.tarefaId) {
+                proximo = proximo.nextElementSibling as HTMLElement | null;
+            }
+            let destino = null;
+            if (proximo) {
+                destino = proximo.nextElementSibling as HTMLElement | null;
+            }
+            while (destino && !destino.dataset.tarefaId) {
+                destino = destino.nextElementSibling as HTMLElement | null;
+            }
+            const origemServicoId = servicoId;
+            const origemTarefaId = tarefa.id;
+            const destinoServicoId = servicoId;
+            let destinoTarefaId = '';
+            if (destino) {
+                destinoTarefaId = destino.dataset.tarefaId!;
+            }
+            this.controladora.reordenarTarefa(origemServicoId, origemTarefaId, destinoServicoId, destinoTarefaId);
         } );
         const botaoProduto = tarefaDiv.querySelector('.botao-adicionar-produto') as HTMLButtonElement;
         const botaoRemover = tarefaDiv.querySelector('.botao-remover-tarefa') as HTMLButtonElement;
@@ -632,7 +649,7 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
     obterDadosFormulario(): any {
         const veiculoSelect = document.getElementById('veiculos') as HTMLSelectElement;
         const responsavelSelect = document.getElementById('responsaveis') as HTMLSelectElement;
-        const observacoes = document.getElementById('observacoes') as HTMLTextAreaElement;
+        const observacoes = document.getElementById('textoObservacoes') as HTMLTextAreaElement;
         return {
             veiculoId: veiculoSelect.value,
             responsavelId: responsavelSelect.value,
