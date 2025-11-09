@@ -118,7 +118,7 @@ section {
     margin-bottom: 0.5rem;
 }
 
-#acoesServicos {
+#acoesCustosExtras {
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
@@ -226,21 +226,15 @@ section {
 }
 
 
-/*////////////////////////////     RESUMO      /////////////////////////////////*/
+/*////////////////////////////     VALORES      /////////////////////////////////*/
 
 
-#resumo {
+#dadosValores {
     display: grid;
     gap: 1rem;
 }
 
 #maoObra {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-#previsaoEntrega {
     display: flex;
     align-items: center;
     gap: 1rem;
