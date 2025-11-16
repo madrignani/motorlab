@@ -21,6 +21,7 @@ class Os {
     private float $valorEstimadoSugerido;
     private float $valorEstimado;
     private float $valorFinal;
+    private ?DateTime $dataHoraFinalizacao;
     private ?string $observacoes;
 
     public function __construct(
@@ -38,6 +39,7 @@ class Os {
         float $valorEstimadoSugerido,
         float $valorEstimado,
         float $valorFinal,
+        ?DateTime $dataHoraFinalizacao,
         ?string $observacoes
     ) {
         $this->id = $id;
@@ -54,6 +56,7 @@ class Os {
         $this->valorEstimadoSugerido = $valorEstimadoSugerido;
         $this->valorEstimado = $valorEstimado;
         $this->valorFinal = $valorFinal;
+        $this->dataHoraFinalizacao = $dataHoraFinalizacao;
         $this->observacoes = $observacoes;
     }
 
@@ -70,6 +73,7 @@ class Os {
     public function getValorMaoObra(): float { return $this->valorMaoObra; }
     public function getValorEstimado(): float { return $this->valorEstimado; }
     public function getValorFinal(): float { return $this->valorFinal; }
+    public function getDataHoraFinalizacao(): ?DateTime { return $this->dataHoraFinalizacao; }
     public function getObservacoes(): ?string { return $this->observacoes; }
 
     public function validar(): array {

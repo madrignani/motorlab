@@ -78,6 +78,61 @@ class RepositorioOsBdr implements RepositorioOs {
         }
     }
 
+    public function buscarServicosPorOs(int $osId): array {
+        try {
+            $sql = <<<SQL
+                SELECT os_servico.id as os_servico_id, os_servico.servico_id, servico.* 
+                FROM os_servico 
+                JOIN servico ON os_servico.servico_id = servico.id 
+                WHERE os_servico.os_id = :os_id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['os_id' => $osId] );
+            $dados = $stmt->fetchAll();
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function buscarOsServico(int $osId, int $servicoId): ?array {
+        try {
+            $sql = <<<SQL
+                SELECT * FROM os_servico 
+                WHERE os_id = :os_id AND servico_id = :servico_id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'os_id' => $osId,
+                'servico_id' => $servicoId
+            ] );
+            $dados = $stmt->fetch();
+            if ( empty($dados) ) {
+                return null;
+            }
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function removerServico(int $osId, int $servicoId): void {
+        try {
+            $sql = <<<SQL
+                DELETE FROM os_servico 
+                WHERE os_id = :os_id 
+                AND servico_id = :servico_id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'os_id' => $osId,
+                'servico_id' => $servicoId
+            ] );
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
     public function salvarTarefa(int $osServicoId, string $descricao, int $ordenacao): int {
         try {
             $sql = <<<SQL
@@ -91,6 +146,218 @@ class RepositorioOsBdr implements RepositorioOs {
                 'ordenacao' => $ordenacao
             ] );
             return $this->pdo->lastInsertId();
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function atualizarOrdenacaoTarefa(int $tarefaId, int $ordenacao): void {
+        try {
+            $sql = <<<SQL
+                UPDATE os_tarefa SET ordenacao = :ordenacao 
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'ordenacao' => $ordenacao,
+                'id' => $tarefaId
+            ] );
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function atualizarOsTarefaServicoId(int $tarefaId, int $osServicoId): void {
+        try {
+            $sql = <<<SQL
+                UPDATE os_tarefa SET os_servico_id = :os_servico_id 
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'os_servico_id' => $osServicoId,
+                'id' => $tarefaId
+            ] );
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function buscarTarefasPorServico(int $osServicoId): array {
+        try {
+            $sql = <<<SQL
+                SELECT * FROM os_tarefa 
+                WHERE os_servico_id = :os_servico_id 
+                ORDER BY ordenacao
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['os_servico_id' => $osServicoId] );
+            $dados = $stmt->fetchAll();
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function buscarUltimaOrdenacaoTarefa(int $osServicoId): int {
+        try {
+            $sql = <<<SQL
+                SELECT MAX(ordenacao) as max_ordenacao 
+                FROM os_tarefa 
+                WHERE os_servico_id = :os_servico_id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['os_servico_id' => $osServicoId] );
+            $dados = $stmt->fetch();
+            if ( empty($dados['max_ordenacao']) ) {
+                return 0;
+            }
+            return ( (int)$dados['max_ordenacao'] );
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function removerTarefa(int $osId, int $servicoId, int $tarefaId): void {
+        try {
+            $sql = <<<SQL
+                DELETE os_tarefa 
+                FROM os_tarefa 
+                JOIN os_servico ON os_tarefa.os_servico_id = os_servico.id 
+                WHERE os_servico.os_id = :os_id 
+                AND os_servico.servico_id = :servico_id 
+                AND os_tarefa.id = :tarefa_id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'os_id' => $osId,
+                'servico_id' => $servicoId,
+                'tarefa_id' => $tarefaId
+            ] );
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function atualizarStatus(int $id, string $status): void {
+        try {
+            if ($status === 'CANCELADA') {
+                $sql = <<<SQL
+                    UPDATE os SET status = :status, data_hora_finalizacao = NOW() 
+                    WHERE id = :id
+                SQL;
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute( [
+                    'id' => $id,
+                    'status' => $status
+                ] );
+            } else {
+                $sql = <<<SQL
+                    UPDATE os SET status = :status, data_hora_finalizacao = NULL 
+                    WHERE id = :id
+                SQL;
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute( [
+                    'id' => $id,
+                    'status' => $status
+                ] );
+            }
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function atualizarMaoObra(int $id, float $valor): void {
+        try {
+            $sql = <<<SQL
+                UPDATE os SET valor_mao_obra = :valor 
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'id' => $id,
+                'valor' => $valor
+            ] );
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function atualizarValorMaoObraSugerido(int $id, float $valor): void {
+        try {
+            $sql = <<<SQL
+                UPDATE os SET valor_mao_obra_sugerido = :valor 
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'id' => $id,
+                'valor' => $valor
+            ] );
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function atualizarDataEntrega(int $id, string $data): void {
+        try {
+            $sql = <<<SQL
+                UPDATE os SET previsao_entrega = :data 
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'id' => $id,
+                'data' => $data
+            ] );
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function atualizarPrevisaoSugerida(int $id, string $data): void {
+        try {
+            $sql = <<<SQL
+                UPDATE os SET previsao_entrega_sugerida = :data
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'id' => $id,
+                'data' => $data
+            ] );
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function atualizarObservacoes(int $id, string $observacoes): void {
+        try {
+            $sql = <<<SQL
+                UPDATE os SET observacoes = :observacoes 
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'id' => $id,
+                'observacoes' => $observacoes
+            ] );
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function atualizarValorEstimado(int $id, float $valor): void {
+        try {
+            $sql = <<<SQL
+                UPDATE os SET valor_estimado = :valor 
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'id' => $id,
+                'valor' => $valor
+            ] );
         } catch (PDOException $erro) {
             throw new RepositorioException( $erro->getMessage() );
         }

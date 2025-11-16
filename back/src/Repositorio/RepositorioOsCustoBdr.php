@@ -14,7 +14,7 @@ class RepositorioOsCustoBdr implements RepositorioOsCusto {
     public function __construct(PDO $pdo) {
         $this->pdo = $pdo;
     }
-
+    
     public function salvar(array $dados): void {
         try {
             $sql = <<<SQL
@@ -36,16 +36,70 @@ class RepositorioOsCustoBdr implements RepositorioOsCusto {
         }
     }
 
-    public function buscarPorOsId(int $osId): array {
+    public function buscarPorOs(int $osId): array {
         try {
             $sql = <<<SQL
-                SELECT * FROM os_custo
+                SELECT * FROM os_custo 
                 WHERE os_id = :os_id
             SQL;
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute( ['os_id' => $osId] );
             $dados = $stmt->fetchAll();
             return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function buscarProduto(int $produtoId, int $tarefaId): ?array {
+        try {
+            $sql = <<<SQL
+                SELECT * FROM os_custo 
+                WHERE item_id = :produto_id 
+                AND os_tarefa_id = :tarefa_id 
+                AND tipo = 'ITEM'
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'produto_id' => $produtoId,
+                'tarefa_id' => $tarefaId
+            ] );
+            $dados = $stmt->fetch();
+            if ( $dados === false ) {
+                return null;
+            }
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function buscarProdutosPorTarefa(int $tarefaId): array {
+        try {
+            $sql = <<<SQL
+                SELECT os_custo.*, item.titulo, item.preco_venda 
+                FROM os_custo 
+                JOIN item ON os_custo.item_id = item.id 
+                WHERE os_custo.os_tarefa_id = :tarefa_id 
+                AND os_custo.tipo = 'ITEM'
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['tarefa_id' => $tarefaId] );
+            $dados = $stmt->fetchAll();
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function remover(int $id): void {
+        try {
+            $sql = <<<SQL
+                DELETE FROM os_custo 
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['id' => $id] );
         } catch (PDOException $erro) {
             throw new RepositorioException( $erro->getMessage() );
         }

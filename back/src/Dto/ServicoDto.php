@@ -26,11 +26,7 @@ class ServicoDto {
             'descricao' => $this->descricao,
             'valorMaoObra' => $this->valor_mao_obra,
             'execucaoMinutos' => $this->execucao_minutos,
-            'tarefas' => array_map( 
-                function($tarefa) { 
-                    return $tarefa->arrayDados(); 
-                }, $this->tarefas
-            )
+            'tarefas' => $this->tarefas
         ];
     }
 

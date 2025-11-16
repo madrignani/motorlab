@@ -6,8 +6,9 @@ namespace App\Repositorio;
 
 interface RepositorioLaudo {
 
-    public function buscarPorOsId(int $osId): ?array;
-
+    public function salvar(array $dados): int;
+    public function buscarPorOs(int $osId): ?array;
+    
 }
 
 

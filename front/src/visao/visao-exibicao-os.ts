@@ -6,6 +6,16 @@ export interface VisaoExibicaoOs {
     retornarNavegacao(): void;
     exibirMensagem( mensagens: string[] ): void;
     exibirPagina(): void;
-    preencherCampos(dados: any): void;
-    
+    exibirOs(dados: any): void;
+    atualizarValoresApresentacao(totais: any): void;
+    mostrarAlertaPrazo(): void;
+    ocultarAlertaPrazo(): void;
+    exibirServicosModal(servicos: any[]): void;
+    abrirModalProduto(servicoId: string, tarefaId: string): void;
+    exibirProdutoEncontradoModal(produto: any): void;
+    exibirLaudo(laudo: any): void;
+    exibirValoresSugeridos(dados: any): void;
+    obterProdutoAtual(): any;
+    obterDadosOs(): any;
+
 }

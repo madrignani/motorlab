@@ -70,6 +70,7 @@ CREATE TABLE os (
     usuario_responsavel INT NOT NULL,
     status ENUM('PROVISORIA', 'ANDAMENTO', 'ALERTA', 'CONCLUIDA', 'FINALIZADA', 'CANCELADA') NOT NULL,
     data_hora_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_hora_finalizacao DATETIME DEFAULT NULL,
     previsao_entrega_sugerida DATETIME NOT NULL,
     previsao_entrega DATETIME NOT NULL,
     valor_mao_obra_sugerido DECIMAL(10,2) DEFAULT 0.00,
@@ -118,8 +119,8 @@ CREATE TABLE os_custo (
 CREATE TABLE laudo (
     id INT PRIMARY KEY AUTO_INCREMENT,
     os_id INT NOT NULL,
-    resumo TEXT,
-    recomendacoes TEXT,
+    resumo TEXT NOT NULL,
+    recomendacoes TEXT NOT NULL,
     FOREIGN KEY (os_id) REFERENCES os(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

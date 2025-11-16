@@ -105,11 +105,12 @@ class ServicoCadastroOs {
         foreach ($servicos as $servico) {
             $tarefasDto = [];
             foreach ($servico['tarefas'] as $tarefa) {
-                $tarefasDto[] = new TarefaDto(
+                $tarefaDto = new TarefaDto(
                     $tarefa['id'], 
                     $tarefa['descricao'], 
                     ( (int)$tarefa['ordenacao'] )
                 );
+                $tarefasDto[] = $tarefaDto->arrayDados();
             }
             $dto = new ServicoDto(
                 ( (int)$servico['id'] ), 

@@ -30,83 +30,215 @@
             </nav>
             <button id="botaoLogout" type="button">LOGOUT</button>
         </header>
-        <h1>ORDEM DE SERVIÇO #<span id="idOs"></span></h1>
-        <div id="informacoesOsNaoEditaveis">
-            <p>Criação: <span id="dataHoraCriacaoOs"></span></p>
-            <p>Cliente: <span id="nomeCliente"></span></p>
-            <p>Veículo: <span id="fabricanteVeiculo"></span> <span id="modeloVeiculo"></span> <span id="anoVeiculo"></span> (<span id="placaVeiculo"></span>)</p>
-            <p>Responsável: <span id="nomeResponsavel"></span></p>
-        </div>
-        <div id="botoesGerenciamentoOs">
-            <button id="botaoAlertaOs">COLOCAR EM ALERTA</button>
-            <button id="botaoEditarOs">EDITAR</button>
-        </div>
-        <div id="informacoesOsEditaveis">
-            <label for="statusOs">Status: </label>
-            <select id="statusOs" disabled></select>
-            <label for="previsaoEntrega">Previsão para a entrega do veículo: </label>
-            <input type="datetime-local" id="previsaoEntrega" disabled>
-            <h3>ITENS</h3>
-            <div id="camposAdicaoItens" hidden>
-                <label for="pesquisaItem">Pesquisa: </label>
-                <input type="search" id="pesquisaItem" placeholder="Digite o código" disabled>
-                <label for="quantidadeItem">Quantidade: </label>
-                <input type="number" id="quantidadeItem" disabled>
-                <button type="button" id="botaoBuscaItem" disabled>BUSCAR E ADICIONAR</button>
-            </div>
-            <table id="tabelaItens">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Título</th>
-                        <th>Fabricante</th>
-                        <th>Preço</th>
-                        <th>Quantidade</th>
-                        <th>Subtotal</th>
-                        <th hidden>Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="corpoTabelaItens"></tbody>
-            </table>
-            <h3>CUSTOS</h3>
-            <div id="camposAdicaoCustos" hidden>
-                <label for="tipoCusto">Tipo: </label>
-                <select id="tipoCusto"></select>
-                <label for="descricaoCusto">Descrição: </label>
-                <input type="text" id="descricaoCusto" disabled>
-                <label for="valorCusto">Valor: </label>
-                <input type="number" id="valorCusto" disabled>
-                <label for="quantidadeCusto">Quantidade: </label>
-                <input type="number" id="quantidadeCusto" disabled>
-                <button type="button" id="botaoAdicionarCusto" disabled>ADICIONAR</button>
-            </div>
-            <table id="tabelaCustos">
-                <thead>
-                    <tr>
-                        <th>Tipo</th>
-                        <th>Descrição</th>
-                        <th>Preço</th>
-                        <th>Quantidade</th>
-                        <th>Subtotal</th>
-                        <th hidden>Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="corpoTabelaCustos"></tbody>
-            </table>
-            <label for="observacoes">Observações: </label>
-            <textarea id="observacoes" disabled></textarea>
-        </div>
-        <div id="informacoesOsProcessadas">
-            <p>Valor total: <span id="valorTotalOs"></span></p>
-        </div>
-        <div id ="acoesPosEdicao">
-            <button id="botaoSalvarEdicaoOs" hidden>SALVAR</button>
-            <button id="botaoCancelarEdicaoOs" hidden>CANCELAR</button>
-        </div>
+        <main>
+            <h1>ORDEM DE SERVIÇO #<span id="idOs"></span></h1>
+                <section id="dadosBasicos">
+                    <h2>Dados Básicos</h2>
+                    <div class="campo-grupo">
+                        <div>
+                            <label>Status:</label>
+                            <span id="statusOs"></span>
+                        </div>
+                        <div>
+                            <label>Criada em:</label>
+                            <span id="dataHoraCriacao"></span>
+                        </div>
+                        <div>
+                            <label id="labelDataHoraFinalizacao">Data/Hora Finalização:</label>
+                            <span id="dataHoraFinalizacao"></span>
+                        </div>
+                    </div>
+                </section>
+                <div id="alertas"></div>
+                <section id="dadosClienteVeiculo">
+                    <h2>Cliente e Veículo</h2>
+                    <div class="campo-grupo">
+                        <div id="dadosCliente"></div>
+                        <div id="dadosVeiculo"></div>
+                    </div>
+                </section>
+                <section id="dadosResponsaveis">
+                    <h2>Responsáveis</h2>
+                    <div class="campo-grupo">
+                        <div id="dadosUsuarioCriacao"></div>
+                        <div id="dadosUsuarioResponsavel"></div>
+                    </div>
+                </section>
+                <section id="dadosServicosTarefas">
+                    <h2>Serviços</h2>
+                    <div id="campoServicos"></div>
+                    <div id="acoesServicos"> 
+                        <button type="button" id="botaoAdicionarServico" class="botao-secundario">+ Serviço</button>
+                    </div>
+                </section>
+                <section id="dadosCustosExtras">
+                    <h2>Custos Extras</h2>
+                    <div id="listaExtras"></div>
+                    <div id="acoesExtras">
+                        <button type="button" id="botaoAdicionarExtra" class="botao-secundario">+ Custo Extra</button>
+                    </div>
+                </section>
+                <section id="dadosValores">
+                    <h2>Valores</h2>
+                    <div id="resumoValores">
+                        <div>
+                            <label>Mão de obra:</label>
+                            <span id="valorMaoObra">R$ 0,00</span>
+                            <button type="button" id="botaoEditarMaoObra" class="botao-secundario">Editar</button>
+                        </div>
+                        <div>
+                            <label>Produtos:</label>
+                            <span id="valorProdutos">R$ 0,00</span>
+                        </div>
+                        <div>
+                            <label>Extras:</label>
+                            <span id="valorExtras">R$ 0,00</span>
+                        </div>
+                        <div>
+                            <label><strong>Valor total:</strong></label>
+                            <span id="valorTotal">R$ 0,00</span>
+                        </div>
+                    </div>
+                </section>
+                <section id="dadosPrevisaoEntrega">
+                    <h2>Previsão de Entrega</h2>
+                    <div>
+                        <span id="dataPrevisaoEntrega"></span>
+                        <button type="button" id="botaoEditarPrevisao" class="botao-secundario">Editar</button>
+                    </div>
+                </section>
+                <section id="dadosObservacoes">
+                    <h2>Observações</h2>
+                    <div id="campoObservacoes"></div>
+                </section>
+                <section id="dadosPagamento">
+                    <h2>Pagamento</h2>
+                    <div id="campoPagamento"></div>
+                </section>
+                <div id="botoesAcao">
+                    <button type="button" id="botaoValoresSugeridos" class="botao-secundario">VER VALORES SUGERIDOS</button>
+                    <button type="button" id="botaoEfetivar">EFETIVAR</button>
+                    <button type="button" id="botaoCancelar">CANCELAR</button>
+                    <button type="button" id="botaoAlerta">COLOCAR EM ALERTA</button>
+                    <button type="button" id="botaoConcluir">CONCLUIR</button>
+                    <button type="button" id="botaoRemoverAlerta">REMOVER ALERTA</button>
+                    <button type="button" id="botaoVerLaudo">VER LAUDO</button>
+                    <button type="button" id="botaoPagamento">IR PARA PAGAMENTO</button>
+                </div>
+        </main>
         <dialog id="modalMensagem">
             <p id="modalMensagemTexto"></p>
             <menu>
                 <button id="modalMensagemOk">OK</button>
+            </menu>
+        </dialog>
+        <dialog id="modalValoresSugeridos">
+            <div class="campo-modal">
+                <label>Previsão de entrega sugerida:</label>
+                <span id="modalPrevisaoSugerida"></span>
+            </div>
+            <div class="campo-modal">
+                <label>Valor da mão de obra sugerido:</label>
+                <span id="modalMaoObraSugerida"></span>
+            </div>
+            <menu>
+                <button id="modalValoresSugeridosFechar">Fechar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalAdicionarServico">
+            <h3>Adicionar Serviço</h3>
+            <div class="campo-modal">
+                <label for="buscaServicoModal">Busca:</label>
+                <input type="text" id="buscaServicoModal" placeholder="Digite o nome">
+                <div id="listaServicosModal"></div>
+            </div>
+            <menu>
+                <button type="button" id="modalServicoCancelar" class="botao-secundario">Cancelar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalAdicionarProduto">
+            <h3>Adicionar Produto</h3>
+            <div class="campo-modal">
+                <label for="codigoProduto">Código:</label>
+                <input type="text" id="codigoProduto">
+                <button type="button" id="botaoBuscarProduto" class="botao-secundario">Buscar</button>
+            </div>
+            <div class="campo-modal">
+                <label for="quantidadeProduto">Quantidade:</label>
+                <input type="number" id="quantidadeProduto">
+            </div>
+            <div id="detalhesProduto"></div>
+            <menu>
+                <button type="button" id="modalProdutoCancelar" class="botao-secundario">Cancelar</button>
+                <button type="button" id="modalProdutoConfirmar" class="botao-principal">Adicionar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalAdicionarExtra">
+            <h3>Adicionar Custo Extra</h3>
+            <div class="campo-modal">
+                <label for="descricaoExtra">Descrição:</label>
+                <input type="text" id="descricaoExtra">
+            </div>
+            <div class="campo-modal">
+                <label for="valorExtra">Valor unitário:</label>
+                <input type="number" id="valorExtra" step="0.01">
+            </div>
+            <div class="campo-modal">
+                <label for="quantidadeExtra">Quantidade:</label>
+                <input type="number" id="quantidadeExtra">
+            </div>
+            <menu>
+                <button type="button" id="modalExtraCancelar" class="botao-secundario">Cancelar</button>
+                <button type="button" id="modalExtraConfirmar" class="botao-principal">Adicionar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalEdicaoMaoObra">
+            <h3>Editar Valor da Mão de Obra</h3>
+            <label for="novoValorMaoObra">Novo valor:</label>
+            <input type="number" id="novoValorMaoObra" step="0.01">
+            <menu>
+                <button type="button" id="modalMaoObraCancelar" class="botao-secundario">Cancelar</button>
+                <button type="button" id="modalMaoObraConfirmar" class="botao-principal">Confirmar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalEdicaoDataEntrega">
+            <h3>Editar Previsão de Entrega</h3>
+            <input type="datetime-local" id="novaDataEntrega">
+            <menu>
+                <button type="button" id="modalDataCancelar" class="botao-secundario">Cancelar</button>
+                <button type="button" id="modalDataConfirmar" class="botao-principal">Confirmar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalEdicaoObservacoes">
+            <h3>Editar Observações</h3>
+            <div class="campo-modal">
+                <textarea id="novaObservacoes"></textarea>
+            </div>
+            <menu>
+                <button type="button" id="modalObservacoesCancelar" class="botao-secundario">Cancelar</button>
+                <button type="button" id="modalObservacoesConfirmar" class="botao-principal">Confirmar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalEdicaoLaudo">
+            <h3>Preencha o laudo técnico para a conclusão da OS</h3>
+            <div class="campo-modal">
+                <label for="resumoLaudo">Resumo:</label>
+                <textarea id="resumoLaudo"></textarea>
+            </div>
+            <div class="campo-modal">
+                <label for="recomendacoesLaudo">Recomendações:</label>
+                <textarea id="recomendacoesLaudo"></textarea>
+            </div>
+            <menu>
+                <button type="button" id="modalEdicaoLaudoCancelar" class="botao-secundario">Cancelar</button>
+                <button type="button" id="modalEdicaoLaudoConfirmar" class="botao-principal">Confirmar</button>
+            </menu>
+        </dialog>
+        <dialog id="modalVisualizarLaudo">
+            <h3>Laudo da OS</h3>
+            <div id="conteudoLaudo"></div>
+            <menu>
+                <button id="modalVisualizarLaudoFechar">Fechar</button>
             </menu>
         </dialog>
     </body>

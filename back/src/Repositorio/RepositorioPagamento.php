@@ -6,7 +6,7 @@ namespace App\Repositorio;
 
 interface RepositorioPagamento {
 
-    public function buscarPorOsId(int $osId): ?array;
+    public function buscarPorOs(int $osId): ?array;
 
 }
 

@@ -51,22 +51,6 @@ nav {
     display: block;
 }
 
-.alertaEstoqueBaixo {
-    display: none;
-}
-
-#camposEditaveis {
-    display: none;
-}
-
-#modalConfirmarEdicao {
-    display: none;
-}
-
-#modalCancelarEdicao {
-    display: none;
-}
-
 #inicioLogo {
     display: inline-block;
     text-decoration: none;
@@ -77,17 +61,320 @@ nav {
     height: auto;
 }
 
-input:disabled,
-textarea:disabled,
-button:disabled {
-    opacity: 0.8;
-    color: #4b4b4b;
-    background-color: #f9f9f9;
+section {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
 }
 
-select:disabled {
-    opacity: 1;
-    background-color: #f9f9f9; 
-    color: #4b4b4b;
-    appearance: none;
+.campo-grupo {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: end;
+    position: relative;
+}
+
+.campo-grupo > div {
+    flex: 1;
+    min-width: 250px;
+}
+
+.botao-principal {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.botao-secundario {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: default;
+    filter: grayscale(10%);
+}
+
+
+/*////////////////////////////     DADOS BÁSICOS      /////////////////////////////////*/
+
+
+.status-provisoria { 
+    color: #6c757d; font-weight: bold; 
+}
+
+.status-andamento { 
+    color: #007bff; font-weight: bold; 
+}
+
+.status-alerta { 
+    color: #ffc107; font-weight: bold; 
+}
+
+.status-concluida { color: #28a745; font-weight: bold; 
+}
+
+.status-finalizada { 
+    color: #17a2b8; font-weight: bold; 
+}
+
+.status-cancelada { 
+    color: #dc3545; font-weight: bold; 
+}
+
+.alerta {
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    font-weight: bold;
+}
+
+.alerta.atencao {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+}
+
+
+/*////////////////////////////     CLIENTE E VEÍCULO      /////////////////////////////////*/
+
+
+#dadosCliente, #dadosVeiculo {
+    background: white;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+}
+
+
+/*////////////////////////////     RESPONSÁVEIS      /////////////////////////////////*/
+
+
+#dadosUsuarioCriacao, #dadosUsuarioResponsavel {
+    background: white;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+}
+
+
+/*////////////////////////////     SERVIÇOS, TAREFAS E PRODUTOS      /////////////////////////////////*/
+
+
+.servico-item {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: white;
+}
+
+.servico-cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.servico-info {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    color: #666;
+}
+
+.tarefas-lista {
+    margin-top: 1rem;
+}
+
+.tarefa-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+}
+
+.tarefa-item[draggable="true"] {
+    cursor: move;
+}
+
+.tarefa-item.dragging {
+    opacity: 0.5;
+    background: #e0e0e0;
+}
+
+.tarefa-item.drag-over {
+    background: #e0e0e0;
+}
+
+.acoes-mover {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-right: 0.5rem;
+}
+
+.acoes-mover .botao-mover-cima,
+.acoes-mover .botao-mover-baixo {
+    background: transparent;
+    border: 1px solid #ccc;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.acoes-mover .botao-mover-cima:hover,
+.acoes-mover .botao-mover-baixo:hover {
+    background: #f0f0f0;
+}
+
+.tarefa-item .tarefa-descricao {
+    flex: 1 1 auto;
+    margin-right: 0.5rem;
+}
+
+.produtos-tarefa {
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+.produto-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    margin: 0.25rem 0;
+    background: #e8f5e8;
+    border-radius: 4px;
+    border-left: 4px solid #28a745;
+}
+
+
+/*////////////////////////////     EXTRAS      /////////////////////////////////*/
+
+
+.extra-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    background: #fff3cd;
+    border-radius: 4px;
+    border-left: 4px solid #ffc107;
+}
+
+
+/*////////////////////////////     VALORES      /////////////////////////////////*/
+
+
+#resumoValores {
+    display: grid;
+    gap: 1rem;
+}
+
+#resumoValores > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 4px;
+}
+
+#valorTotal {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007bff;
+}
+
+
+/*////////////////////////////     AÇÕES      /////////////////////////////////*/
+
+
+#acoesServicos, #acoesExtras, #botaoEditarMaoObra,
+#botaoEditarPrevisao, #laudo, #dadosPagamento, 
+#botaoValoresSugeridos, #botaoEfetivar,
+#botaoCancelar, #botaoAlerta, #botaoConcluir,
+#botaoRemoverAlerta, #botaoVerLaudo, #botaoPagamento {
+    display: none;
+}
+
+#botoesAcao {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+
+/*////////////////////////////     MODAIS      /////////////////////////////////*/
+
+
+.campo-modal {
+    margin-bottom: 1rem;
+}
+
+.campo-modal label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.campo-modal input,
+.campo-modal textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+dialog {
+    border: none;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+dialog::backdrop {
+    background: rgba(0,0,0,0.5);
+}
+
+dialog menu {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.servico-modal-item {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.servico-modal-item:hover {
+    background: #f0f0f0;
 }

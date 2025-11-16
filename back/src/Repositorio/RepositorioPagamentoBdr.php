@@ -15,7 +15,7 @@ class RepositorioPagamentoBdr implements RepositorioPagamento {
         $this->pdo = $pdo;
     }
 
-    public function buscarPorOsId(int $osId): ?array {
+    public function buscarPorOs(int $osId): ?array {
         try {
             $sql = <<<SQL
                 SELECT * FROM pagamento

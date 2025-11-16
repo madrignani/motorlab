@@ -89,6 +89,23 @@ class RepositorioServicoBdr implements RepositorioServico {
         }
     }
 
+    public function buscarTarefasPorServico(int $servicoId): array {
+        try {
+            $sql = <<<SQL
+                SELECT id, descricao, ordenacao 
+                FROM tarefa 
+                WHERE servico_id = :servico_id 
+                ORDER BY ordenacao ASC
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['servico_id' => $servicoId]);
+            $dados = $stmt->fetchAll();
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException($erro->getMessage());
+        }
+    }
+
 }
 
 
