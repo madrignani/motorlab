@@ -389,22 +389,16 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
     }
 
     atualizarValoresApresentacao(totais: any): void {
-        this.atualizarValorMaoObra(totais.valorMaoObra);
+        this.atualizarValorMaoObra();
         this.atualizarValorProdutos(totais.totalProdutos);
         this.atualizarValorExtras(totais.totalExtras);
         this.atualizarValorTotal();
     }
 
-    private atualizarValorMaoObra(valor: number): void {
+    private atualizarValorMaoObra(): void {
         const elemento = document.getElementById('valorMaoObra') as HTMLSpanElement;
-        const valorAtualNum = ( Number(valor) );
-        const textoBase = ( Number(valorAtualNum).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) );
-        let somaSugerida = 0;  
-        for (const servico of this.dadosOs.servicos) {
-            const valor = ( Number(servico.valorMaoObra) );
-            somaSugerida += valor;
-        }
-        if (valorAtualNum !== somaSugerida) {
+        const textoBase = ( Number(this.dadosOs.valorMaoObra).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) );
+        if (this.dadosOs.valorMaoObra !== this.dadosOs.valorMaoObraSugerido) {
             elemento.textContent = `${textoBase} (alterado)`;
         } else {
             elemento.textContent = textoBase;
@@ -540,7 +534,11 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         const botaoRemoverAlerta = document.getElementById('botaoRemoverAlerta')! as HTMLButtonElement;
         botaoValores.addEventListener( 'click', () => { this.exibirValoresSugeridos() } );
         botaoEfetivar.addEventListener( 'click', () => { this.controladora.efetivarOs() } );
-        botaoCancelar.addEventListener( 'click', () => { this.controladora.cancelarOs() } );
+        botaoCancelar.addEventListener( 'click', () => {
+            if (confirm('Tem certeza que deseja cancelar esta OS?')) {
+                this.controladora.cancelarOs();
+            }
+        } );
         botaoAlerta.addEventListener( 'click', () => { this.controladora.colocarOsEmAlerta() } );
         botaoConcluir.addEventListener( 'click', () => { this.abrirModalLaudo() } );
         botaoVerLaudo.addEventListener( 'click', () => { this.controladora.exibirLaudo() } );
@@ -594,10 +592,10 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         const usuario = this.controladora.obterDadosUsuario();
         if (usuario.cargo === 'ATENDENTE' || usuario.cargo === 'GERENTE') {
             document.getElementById('botaoEfetivar')!.style.display = 'block';
-            this.ativarModoEdicao();
-        }
-        if (usuario.cargo === 'GERENTE') {
             document.getElementById('botaoCancelar')!.style.display = 'block';
+            document.getElementById('botaoEditarMaoObra')!.style.display = 'block';
+            document.getElementById('botaoEditarPrevisao')!.style.display = 'block';
+            this.ativarModoEdicao();
         }
     }
 
@@ -609,6 +607,8 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
             this.ativarModoEdicao();
         }
         if (usuario.cargo === 'GERENTE') {
+            document.getElementById('botaoEditarMaoObra')!.style.display = 'block';
+            document.getElementById('botaoEditarPrevisao')!.style.display = 'block';
             document.getElementById('botaoCancelar')!.style.display = 'block';
         }
     }
@@ -619,8 +619,9 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
             this.ativarModoEdicao();
         }
         if (usuario.cargo === 'GERENTE') {
-            const botaoRemocaoAlerta = document.getElementById('botaoRemoverAlerta')! as HTMLButtonElement;
-            botaoRemocaoAlerta.style.display = 'block';
+            document.getElementById('botaoEditarMaoObra')!.style.display = 'block';
+            document.getElementById('botaoEditarPrevisao')!.style.display = 'block';
+            document.getElementById('botaoRemoverAlerta')!.style.display = 'block';
         }
     }
 
@@ -647,8 +648,6 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
     private ativarModoEdicao(): void {
         document.getElementById('acoesServicos')!.style.display = 'block';
         document.getElementById('acoesExtras')!.style.display = 'block';
-        document.getElementById('botaoEditarMaoObra')!.style.display = 'inline-block';
-        document.getElementById('botaoEditarPrevisao')!.style.display = 'inline-block';
         const botaoObservacoes = ( document.getElementById('botaoEditarObservacoes') || document.getElementById('botaoAdicionarObservacoes') )!;
         botaoObservacoes.style.display = 'block';
         for ( const elemento of (document.querySelectorAll('.acoes-servico')) ) {

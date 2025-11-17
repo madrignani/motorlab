@@ -272,9 +272,22 @@ class ServicoExibicaoEdicaoOs {
             foreach ($tarefas as $tarefa) {
                 $this->repositorioOs->salvarTarefa($osServicoId, $tarefa['descricao'], $tarefa['ordenacao']);
             }
-            $novoValorMaoObra = ( (float)$os['valor_mao_obra'] + (float)$servico['valor_mao_obra'] );
-            $this->repositorioOs->atualizarMaoObra($id, $novoValorMaoObra);
-            $this->atualizarValoresAposServico($id);
+            $osAtualizada = $this->repositorioOs->buscarPorId($id);
+            $servicoAposAtualizacao = $this->repositorioOs->buscarServicosPorOs($os['id']);
+            $valorMaoObraSugerido = 0;
+            foreach ($servicoAposAtualizacao as $serv) {
+                $serv = $this->repositorioServico->buscarPorId($serv['servico_id']);
+                $valorMaoObraSugerido += $serv['valor_mao_obra'];
+            }
+            $this->repositorioOs->atualizarMaoObraSugerido($id, $valorMaoObraSugerido);
+            $this->repositorioOs->atualizarMaoObra($id, $valorMaoObraSugerido);
+            $previsaoSugerida = new DateTime($osAtualizada['previsao_entrega_sugerida']);
+            $previsaoEntrega = new DateTime($osAtualizada['previsao_entrega']);
+            $previsaoSugerida->modify("+{$servico['execucao_minutos']} minutes");
+            $previsaoEntrega->modify("+{$servico['execucao_minutos']} minutes");
+            $this->repositorioOs->atualizarPrevisaoSugerida($id, $previsaoSugerida->format('Y-m-d H:i:s'));
+            $this->repositorioOs->atualizarPrevisaoEntrega($id, $previsaoEntrega->format('Y-m-d H:i:s'));
+            $this->atualizarValorEstimado($id);
             $this->transacao->finalizar();
         } catch (Throwable $erro) {
             $this->transacao->desfazer();
@@ -288,10 +301,11 @@ class ServicoExibicaoEdicaoOs {
         if ( empty($os) ) {
             throw DominioException::comProblemas( ['OS não encontrada.'] );
         }
-        $servicosAtuais = $this->repositorioOs->buscarServicosPorOs($id);
-        if (count($servicosAtuais) <= 1) {
+        $servicosExistentes = $this->repositorioOs->buscarServicosPorOs($id);
+        if ( count($servicosExistentes) <= 1 ) {
             throw DominioException::comProblemas( ['A OS deve haver pelo menos um serviço.'] );
         }
+        $servico = $this->repositorioServico->buscarPorId($servicoId);
         $this->transacao->iniciar();
         try {
             $osServico = $this->repositorioOs->buscarOsServico($id, $servicoId);
@@ -310,33 +324,27 @@ class ServicoExibicaoEdicaoOs {
                 }
             }
             $this->repositorioOs->removerServico($id, $servicoId);
-            $this->atualizarValoresAposServico($id);
+            $osAtualizada = $this->repositorioOs->buscarPorId($id);
+            $servicoAposAtualizacao = $this->repositorioOs->buscarServicosPorOs($id);
+            $valorMaoObraSugerido = 0;
+            foreach ($servicoAposAtualizacao as $serv) {
+                $serv = $this->repositorioServico->buscarPorId($serv['servico_id']);
+                $valorMaoObraSugerido += $serv['valor_mao_obra'];
+            }
+            $this->repositorioOs->atualizarMaoObraSugerido($id, $valorMaoObraSugerido);
+            $this->repositorioOs->atualizarMaoObra($id, $valorMaoObraSugerido);
+            $previsaoSugerida = new DateTime($osAtualizada['previsao_entrega_sugerida']);
+            $previsaoEntrega = new DateTime($osAtualizada['previsao_entrega']);
+            $previsaoSugerida->modify("-{$servico['execucao_minutos']} minutes");
+            $previsaoEntrega->modify("-{$servico['execucao_minutos']} minutes");
+            $this->repositorioOs->atualizarPrevisaoSugerida($id, $previsaoSugerida->format('Y-m-d H:i:s'));
+            $this->repositorioOs->atualizarPrevisaoEntrega($id, $previsaoEntrega->format('Y-m-d H:i:s'));
+            $this->atualizarValorEstimado($id);
             $this->transacao->finalizar();
         } catch (Throwable $erro) {
             $this->transacao->desfazer();
             throw $erro;
         }
-    }
-
-    private function atualizarValoresAposServico(int $idOs) {
-        $servicos = $this->repositorioOs->buscarServicosPorOs($idOs);
-        $valorMaoObraSugerido = 0;
-        $minutosTotais = 0;
-        foreach ($servicos as $servico) {
-            $servicoBase = $this->repositorioServico->buscarPorId($servico['servico_id']);
-            $valorMaoObraSugerido += $servicoBase['valor_mao_obra'];
-            $minutosTotais += $servicoBase['execucao_minutos'];
-        }
-        $this->repositorioOs->atualizarValorMaoObraSugerido($idOs, $valorMaoObraSugerido);
-        $this->repositorioOs->atualizarMaoObra($idOs, $valorMaoObraSugerido);
-        $dataCriacao = new DateTime();
-        $previsaoSugerida = new DateTime();
-        $previsaoEntrega = new DateTime();
-        $previsaoSugerida->modify("+{$minutosTotais} minutes");
-        $previsaoEntrega = clone $previsaoSugerida;
-        $this->repositorioOs->atualizarPrevisaoSugerida($idOs, $previsaoSugerida->format('Y-m-d H:i:s'));
-        $this->repositorioOs->atualizarDataEntrega($idOs, $previsaoEntrega->format('Y-m-d H:i:s'));
-        $this->atualizarValorEstimado($idOs);
     }
 
     public function adicionarTarefa(int $id, int $servicoId, string $descricao, int $idUsuarioLogado, string $cargoUsuarioLogado) {
@@ -611,6 +619,16 @@ class ServicoExibicaoEdicaoOs {
                 throw new AutenticacaoException('Permissão negada.');
             }
         }
+        if ($statusAtual === 'PROVISORIA' && $novoStatus === 'CANCELADA') {
+            if ($cargoUsuarioLogado !== 'ATENDENTE' && $cargoUsuarioLogado !== 'GERENTE') {
+                throw new AutenticacaoException('Permissão negada.');
+            }
+        }
+        if ($statusAtual === 'ANDAMENTO' && $novoStatus === 'CANCELADA') {
+            if ($cargoUsuarioLogado !== 'GERENTE') {
+                throw new AutenticacaoException('Permissão negada.');
+            }
+        }
         if ($statusAtual === 'ALERTA' && $novoStatus === 'ANDAMENTO') {
             if ($cargoUsuarioLogado !== 'GERENTE') {
                 throw new AutenticacaoException('Permissão negada.');
@@ -619,6 +637,9 @@ class ServicoExibicaoEdicaoOs {
     }
 
     public function atualizarMaoObra(int $id, float $valor, int $idUsuarioLogado, string $cargoUsuarioLogado) {
+        if( $cargoUsuarioLogado !== 'GERENTE' && $cargoUsuarioLogado !== 'ATENDENTE' ) {
+            throw new AutenticacaoException('Permissão negada.');
+        }
         $this->validarPermissaoEdicao($id, $idUsuarioLogado, $cargoUsuarioLogado);        
         if ($valor < 0) {
             throw DominioException::comProblemas( ['Valor da mão de obra não pode ser negativo.'] );
@@ -639,6 +660,9 @@ class ServicoExibicaoEdicaoOs {
     }
 
     public function atualizarDataEntrega(int $id, string $data, int $idUsuarioLogado, string $cargoUsuarioLogado) {
+        if( $cargoUsuarioLogado !== 'GERENTE' && $cargoUsuarioLogado !== 'ATENDENTE' ) {
+            throw new AutenticacaoException('Permissão negada.');
+        }
         $this->validarPermissaoEdicao($id, $idUsuarioLogado, $cargoUsuarioLogado);
         try {
             $dataObj = new DateTime($data);
@@ -658,7 +682,7 @@ class ServicoExibicaoEdicaoOs {
         }
         $this->transacao->iniciar();
         try {
-            $this->repositorioOs->atualizarDataEntrega($id, $dataObj->format('Y-m-d H:i:s'));
+            $this->repositorioOs->atualizarPrevisaoEntrega($id, $dataObj->format('Y-m-d H:i:s'));
             $this->transacao->finalizar();
         } catch (Throwable $erro) {
             $this->transacao->desfazer();

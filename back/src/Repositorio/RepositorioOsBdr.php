@@ -283,7 +283,7 @@ class RepositorioOsBdr implements RepositorioOs {
         }
     }
 
-    public function atualizarValorMaoObraSugerido(int $id, float $valor): void {
+    public function atualizarMaoObraSugerido(int $id, float $valor): void {
         try {
             $sql = <<<SQL
                 UPDATE os SET valor_mao_obra_sugerido = :valor 
@@ -299,7 +299,7 @@ class RepositorioOsBdr implements RepositorioOs {
         }
     }
 
-    public function atualizarDataEntrega(int $id, string $data): void {
+    public function atualizarPrevisaoEntrega(int $id, string $data): void {
         try {
             $sql = <<<SQL
                 UPDATE os SET previsao_entrega = :data 

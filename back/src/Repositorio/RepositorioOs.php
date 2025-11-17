@@ -20,8 +20,8 @@ interface RepositorioOs {
     public function removerTarefa(int $osId, int $servicoId, int $tarefaId): void;
     public function atualizarStatus(int $id, string $status): void;
     public function atualizarMaoObra(int $id, float $valor): void;
-    public function atualizarValorMaoObraSugerido(int $id, float $valor): void;
-    public function atualizarDataEntrega(int $id, string $data): void;
+    public function atualizarMaoObraSugerido(int $id, float $valor): void;
+    public function atualizarPrevisaoEntrega(int $id, string $data): void;
     public function atualizarPrevisaoSugerida(int $id, string $data): void;
     public function atualizarObservacoes(int $id, string $observacoes): void;
     public function atualizarValorEstimado(int $id, float $valor): void;

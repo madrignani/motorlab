@@ -86,9 +86,18 @@ export class ControladoraExibicaoOs {
             const osData = this.visao.obterDadosOs();
             await this.gestor.adicionarServico(osData.id, servico);
             await this.carregarOs(osData.id);
-            if ( Number(osData.valorMaoObra) != Number(osData.valorMaoObraSugerido) || (new Date(osData.previsaoEntrega).getTime() !== new Date(osData.previsaoEntregaSugerida).getTime()) ) {
+            if ( Number(osData.valorMaoObra) != Number(osData.valorMaoObraSugerido) ) {
                 setTimeout( () => {
-                    this.visao.exibirMensagem( ['Serviço adicionado: valor da mão de obra e previsão de entrega restaurados ao padrão.'] );
+                    this.visao.exibirMensagem( ['Serviço adicionado: valor da mão de obra restaurado ao padrão.'] );
+                }, 700 );
+            }
+            const previsaoEntregaFormat = new Date(osData.previsaoEntrega);
+            const previsaoSugeridaFormat = new Date(osData.previsaoEntregaSugerida);
+            previsaoEntregaFormat.setSeconds(0,0);
+            previsaoSugeridaFormat.setSeconds(0,0);
+            if (previsaoEntregaFormat.getTime() !== previsaoSugeridaFormat.getTime()) {
+                setTimeout( () => {
+                    this.visao.exibirMensagem( ['Serviço adicionado: tempo de execução aplicado à previsão de entrega.'] );
                 }, 700 );
             }
         } catch (erro: any) {
@@ -105,10 +114,19 @@ export class ControladoraExibicaoOs {
             const osData = this.visao.obterDadosOs();
             await this.gestor.removerServico(osData.id, servicoId);
             await this.carregarOs(osData.id);
-            if ( Number(osData.valorMaoObra) != Number(osData.valorMaoObraSugerido) || (new Date(osData.previsaoEntrega).getTime() !== new Date(osData.previsaoEntregaSugerida).getTime()) ) {
+            if ( Number(osData.valorMaoObra) != Number(osData.valorMaoObraSugerido) ) {
                 setTimeout( () => {
-                    this.visao.exibirMensagem( ['Serviço removido: valor da mão de obra e previsão de entrega restaurados ao padrão.'] );
+                    this.visao.exibirMensagem( ['Serviço removido: valor da mão de obra restaurado ao padrão.'] );
                 }, 400 );
+            }
+            const previsaoEntregaFormat = new Date(osData.previsaoEntrega);
+            const previsaoSugeridaFormat = new Date(osData.previsaoEntregaSugerida);
+            previsaoEntregaFormat.setSeconds(0,0);
+            previsaoSugeridaFormat.setSeconds(0,0);
+            if (previsaoEntregaFormat.getTime() !== previsaoSugeridaFormat.getTime()) {
+                setTimeout( () => {
+                    this.visao.exibirMensagem( ['Serviço removido: tempo de execução subtraído da previsão de entrega.'] );
+                }, 700 );
             }
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
@@ -266,10 +284,6 @@ export class ControladoraExibicaoOs {
     async colocarOsEmAlerta(): Promise<void> {
         try {
             const osData = this.visao.obterDadosOs();
-            if (this.dadosUsuario.cargo !== 'GERENTE' && this.dadosUsuario.cargo !== 'MECANICO') {
-                this.visao.exibirMensagem( ['Permissão negada.'] );
-                return;
-            }
             await this.gestor.atualizarStatus(osData.id, 'ALERTA');
             this.visao.exibirMensagem( ['OS colocada em alerta.'] );
             await this.carregarOs(osData.id);
@@ -285,10 +299,6 @@ export class ControladoraExibicaoOs {
     async removerAlertaOs(): Promise<void> {
         try {
             const osData = this.visao.obterDadosOs();
-            if (this.dadosUsuario.cargo !== 'GERENTE') {
-                this.visao.exibirMensagem( ['Permissão negada.'] );
-                return;
-            }
             await this.gestor.atualizarStatus(osData.id, 'ANDAMENTO');
             this.visao.exibirMensagem( ['Alerta removido da OS.'] );
             await this.carregarOs(osData.id);
@@ -304,10 +314,6 @@ export class ControladoraExibicaoOs {
     async cancelarOs(): Promise<void> {
         try {
             const osData = this.visao.obterDadosOs();
-            if (this.dadosUsuario.cargo !== 'GERENTE') {
-                this.visao.exibirMensagem( ['Permissão negada.'] );
-                return;
-            }
             await this.gestor.atualizarStatus(osData.id, 'CANCELADA');
             this.visao.exibirMensagem( ['OS cancelada com sucesso.'] );
             await this.carregarOs(osData.id);
@@ -323,10 +329,6 @@ export class ControladoraExibicaoOs {
     async efetivarOs(): Promise<void> {
         try {
             const osData = this.visao.obterDadosOs();
-            if (this.dadosUsuario.cargo !== 'GERENTE' && this.dadosUsuario.cargo !== 'ATENDENTE') {
-                this.visao.exibirMensagem( ['Permissão negada.'] );
-                return;
-            }
             await this.gestor.atualizarStatus(osData.id, 'ANDAMENTO');
             this.visao.exibirMensagem( ['OS efetivada com sucesso.'] );
             await this.carregarOs(osData.id);
@@ -342,10 +344,6 @@ export class ControladoraExibicaoOs {
     async concluirOsComLaudo(resumo: string, recomendacoes: string): Promise<void> {
         try {
             const osData = this.visao.obterDadosOs();
-            if (this.dadosUsuario.cargo !== 'GERENTE' && this.dadosUsuario.cargo !== 'MECANICO') {
-                this.visao.exibirMensagem( ['Permissão negada.'] );
-                return;
-            }
             await this.gestor.concluirOsComLaudo(osData.id, resumo, recomendacoes);
             this.visao.exibirMensagem( ['OS concluída com sucesso.'] );
             await this.carregarOs(osData.id);
