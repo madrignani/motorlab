@@ -174,8 +174,8 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
             <div class="servico-cabecalho">
                 <h4>${servico.descricao}</h4>
                 <div>
-                    <button type="button" class="botao-adicionar-tarefa-local" data-servico-id="${servico.id}">+ TAREFA</button>
-                    <button type="button" class="botao-remover-servico" data-servico-id="${servico.id}">REMOVER</button>
+                    <button type="button" class="botao-adicionar-tarefa-local" data-servico-id="${servico.id}">+ Tarefa</button>
+                    <button type="button" class="botao-remover-servico" data-servico-id="${servico.id}">Remover</button>
                 </div>
             </div>
             <div class="servico-info">
@@ -542,6 +542,8 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         document.getElementById('botaoBuscarProduto')!.addEventListener( 'click', () => {
             const codigoProduto = ( document.getElementById('codigoProduto') as HTMLInputElement ).value.trim();
             this.controladora.buscarProduto(codigoProduto);
+            const botaoConfirmar = document.getElementById('modalProdutoConfirmar')! as HTMLButtonElement;
+            botaoConfirmar.disabled = false;
         } );
         document.getElementById('modalProdutoCancelar')!.addEventListener( 'click', () => this.fecharModalProduto() );
         document.getElementById('modalProdutoConfirmar')!.addEventListener( 'click', () => {
@@ -562,6 +564,8 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
     abrirModalProduto(servicoId: string, tarefaId: string): void {
         const modal = document.getElementById('modalAdicionarProduto') as HTMLDialogElement;
         modal.showModal();
+        const botaoConfirmar = document.getElementById('modalProdutoConfirmar')! as HTMLButtonElement;
+        botaoConfirmar.disabled = true;
         ( document.getElementById('codigoProduto') as HTMLInputElement ).value = '';
         ( document.getElementById('quantidadeProduto') as HTMLInputElement ).value = '1';
         document.getElementById('detalhesProduto')!.innerHTML = '';

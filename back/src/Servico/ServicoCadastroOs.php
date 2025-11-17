@@ -242,6 +242,7 @@ class ServicoCadastroOs {
         $minutosTotais = 0;
         $valorProdutosExtras = 0.0;
         $valorTotalEstimado = 0.0;
+        $quantidadesPorItem = [];
         foreach ($dados['servicos'] as $servico) {
             $servico = ( (array)$servico );
             $servicoExistente = $this->repositorioServico->buscarPorId( (int)$servico['id'] );
@@ -256,13 +257,18 @@ class ServicoCadastroOs {
             $produto = ( (array)$produto );
             $itemExistente = $this->repositorioItem->buscarPorId( (int)$produto['id'] );
             if (!$itemExistente) {
-                throw new DominioException( ["Item ID {$produto['id']} não encontrado."] );
+                throw DominioException::comProblemas( ["Produto ID {$produto['id']} não encontrado."] );
             }
             if ($produto['quantidade'] <= 0) {
-                throw new DominioException( ["Quantidade inválida para item {$itemExistente['codigo']}."] );
+                throw DominioException::comProblemas( ["Quantidade inválida para o produto {$itemExistente['codigo']}."] );
             }
-            if ($produto['quantidade'] > $itemExistente['estoque']) {
-                throw new DominioException( ["Quantidade solicitada para {$itemExistente['codigo']} excede o estoque disponível."] );
+            $itemId = ( (int)$itemExistente['id'] );
+            if (!isset($quantidadesPorItem[$itemId])) {
+                $quantidadesPorItem[$itemId] = 0;
+            }
+            $quantidadesPorItem[$itemId] += $produto['quantidade'];
+            if ($quantidadesPorItem[$itemId] > (int)$itemExistente['estoque']) {
+                throw DominioException::comProblemas( ["Quantidade solicitada para o produto {$itemExistente['codigo']} excede o estoque disponível."] );
             }
             $subtotal = ( $itemExistente['preco_venda'] * $produto['quantidade'] );
             $valorProdutosExtras += $subtotal;
@@ -282,7 +288,7 @@ class ServicoCadastroOs {
         foreach ($dados['extras'] as $extra) {
             $extra = ( (array)$extra );
             if ($extra['quantidade'] <= 0 || $extra['valor'] < 0) {
-                throw new DominioException( ["Custo extra inválido."] );
+                throw DominioException::comProblemas( ["Custo extra inválido."] );
             }
             $subtotal = ( $extra['valor'] * $extra['quantidade'] );
             $valorProdutosExtras += $subtotal;

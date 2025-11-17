@@ -249,7 +249,13 @@ export class ControladoraCadastroOs {
             this.visao.exibirMensagem( ['Informe uma quantidade válida.'] );
             return;
         }
-        if (quantidadeFormat > produto.estoque) {
+        let totalExistente = 0;
+        for (const produtoSelecionado of this.produtosSelecionados) {
+            if (String(produtoSelecionado.id) === String(produto.id)) {
+                totalExistente += Number(produtoSelecionado.quantidade);
+            }
+        }
+        if ( (totalExistente + quantidadeFormat) > Number(produto.estoque) ) {
             this.visao.exibirMensagem( ['Quantidade solicitada indisponível em estoque.'] );
             return;
         }
