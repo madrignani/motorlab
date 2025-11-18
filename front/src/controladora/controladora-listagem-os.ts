@@ -7,6 +7,7 @@ export class ControladoraListagemOs {
 
     private gestor = new GestorListagemOs();
     private visao: VisaoListagemOs;
+    private listaOs: any[] = [];
 
     constructor(visao: VisaoListagemOs) {
         this.visao = visao;
@@ -33,6 +34,7 @@ export class ControladoraListagemOs {
             return;
         }
         await this.carregarDadosUsuario();
+        await this.carregarListaOs();
         this.visao.exibirPagina();
     }
 
@@ -45,6 +47,19 @@ export class ControladoraListagemOs {
                 this.visao.exibirMensagem( erro.getProblemas() );
             } else {
                 this.visao.exibirMensagem( [`Não foi possível carregar os dados do usuário: ${erro.message}`] ); 
+            }
+        }
+    }
+
+    async carregarListaOs(): Promise<void> {
+        try {
+            this.listaOs = await this.gestor.obterListaOs();
+            this.visao.exibirListaOs(this.listaOs);
+        } catch (erro: any) {
+            if (erro instanceof ErroGestor) {
+                this.visao.exibirMensagem( erro.getProblemas() );
+            } else {
+                this.visao.exibirMensagem( [`Não foi possível carregar a lista de OS: ${erro.message}`] ); 
             }
         }
     }

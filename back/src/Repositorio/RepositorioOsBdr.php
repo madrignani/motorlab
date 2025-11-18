@@ -14,6 +14,21 @@ class RepositorioOsBdr implements RepositorioOs {
     public function __construct(PDO $pdo) {
         $this->pdo = $pdo;
     }
+    
+    public function listarTodas(): array {
+        try {
+            $sql = <<<SQL
+                SELECT * FROM os
+                ORDER BY previsao_entrega ASC
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            $dados = $stmt->fetchAll();
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
 
     public function salvar(array $dados): int {
         try {

@@ -19,6 +19,7 @@ use App\Servico\ServicoCadastroOs;
 use App\Servico\ServicoCadastroVeiculo;
 use App\Servico\ServicoExibicaoEdicaoOs;
 use App\Servico\ServicoListagemItem;
+use App\Servico\ServicoListagemOs;
 use App\Repositorio\RepositorioClienteBdr;
 use App\Repositorio\RepositorioItemBdr;
 use App\Repositorio\RepositorioLaudoBdr;
@@ -427,6 +428,32 @@ $app->get( '/itens-cod/:busca', function($req, $res) {
         );
         $item = $servico->buscarItemPorCodigo($codigo);
         $res->status(200)->json($item);
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
+$app->get( '/ordens-servico', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $pdo = Conexao::conectar();
+        $transacao = new TransacaoPdo($pdo);
+        $repositorioCliente = new RepositorioClienteBdr($pdo);
+        $repositorioOs = new RepositorioOsBdr($pdo);
+        $repositorioUsuario = new RepositorioUsuarioBdr($pdo);
+        $repositorioVeiculo = new RepositorioVeiculoBdr($pdo);
+        $servico = new ServicoListagemOs(
+            $repositorioOs, $repositorioCliente, $repositorioVeiculo, $repositorioUsuario
+        );
+        $lista = $servico->listar();
+        $res->status(200)->json($lista);
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
     } catch (DominioException $erro) {

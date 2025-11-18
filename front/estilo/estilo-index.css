@@ -60,3 +60,77 @@ nav {
     width: 30px;
     height: auto;
 }
+
+
+/*////////////////////////////     FILTRAGEM      /////////////////////////////////*/
+
+
+#ferramentas {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+#filtros {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+#busca input {
+    padding: 0.5rem;
+    width: 320px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+
+/*////////////////////////////     LISTAGEM      /////////////////////////////////*/
+
+
+#campoListagem {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.area-status {
+    border: 1px solid #e6e6e6;
+    padding: 0.5rem;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+.area-status h2 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.lista-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.os-cartao {
+    padding: 0.6rem;
+    border-radius: 6px;
+    color: #111;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.os-cartao .linha {
+    display: flex;
+    justify-content: space-between;
+}
+
+.status-provisoria { background: #bfbfbf; }
+.status-andamento { background: #9ec5ff; }
+.status-alerta { background: #ffb86b; }
+.status-concluida { background: #b8f2c2; }
+.status-finalizada { background: #2e8b57; color: #fff; }
+.status-cancelada { background: #ff6b6b; color: #fff; }

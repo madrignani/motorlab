@@ -1,3 +1,5 @@
+import { API_URL } from './rota-api.ts';
+import { ErroGestor } from '../infra/erro-gestor.ts';
 import { GestorAutenticacao } from './gestor-autenticacao.ts';
 import { GestorSessao } from '../gestor/gestor-sessao.ts';
 
@@ -17,6 +19,18 @@ export class GestorListagemOs {
 
     async obterDadosUsuario(): Promise<any> {
         return await this.gestorSessao.obterDadosUsuario();
+    }
+
+    async obterListaOs(): Promise<any[]> {
+        const response = await fetch( `${API_URL}/ordens-servico`, {
+            method: 'GET',
+            credentials: 'include'
+        } );
+        if (!response.ok) {
+            const dadosResposta = await response.json();
+            throw ErroGestor.comProblemas(dadosResposta.mensagens);
+        }
+        return await response.json();
     }
 
 }

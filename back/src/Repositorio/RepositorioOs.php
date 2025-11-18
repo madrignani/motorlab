@@ -6,6 +6,7 @@ namespace App\Repositorio;
 
 interface RepositorioOs {
 
+    public function listarTodas(): array;
     public function salvar(array $dados): int;
     public function buscarPorId(int $id): ?array;
     public function salvarServico(int $osId, int $servicoId): int;
@@ -27,7 +28,7 @@ interface RepositorioOs {
     public function atualizarValorEstimado(int $id, float $valor): void;
     public function existeAtivaPeriodo(int $veiculoId, string $previsaoEntrega): bool;
     public function existeAtivaPorResponsavel(int $usuarioResponsavelId): bool;
-
+    
 }
 
 

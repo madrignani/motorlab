@@ -31,6 +31,43 @@
             <button id="botaoLogout" type="button">LOGOUT</button>
         </header>
         <h1>ORDENS DE SERVIÇO</h1>
+        <div id="ferramentas">
+            <div id="filtros">
+                <label><input type="radio" class="filtro-radio" value="ativas" checked> Ativas</label>
+                <label><input type="radio" class="filtro-radio" value="finalizadas"> Finalizadas</label>
+                <label><input type="radio" class="filtro-radio" value="canceladas"> Canceladas</label>
+            </div>
+            <div id="busca">
+                <label for="buscaOs">Buscar:</label>
+                <input type="search" id="buscaOs" placeholder="ID, cliente, mecânico ou veículo">
+            </div>
+        </div>
+        <main id="campoListagem">
+            <section class="area-status">
+                <h2>PROVISÓRIA</h2>
+                <div class="lista-status" id="area-PROVISORIA"></div>
+            </section>
+            <section class="area-status">
+                <h2>ANDAMENTO</h2>
+                <div class="lista-status" id="area-ANDAMENTO"></div>
+            </section>
+            <section class="area-status">
+                <h2>ALERTA</h2>
+                <div class="lista-status" id="area-ALERTA"></div>
+            </section>
+            <section class="area-status">
+                <h2>CONCLUÍDA</h2>
+                <div class="lista-status" id="area-CONCLUIDA"></div>
+            </section>
+            <section class="area-status">
+                <h2>FINALIZADA</h2>
+                <div class="lista-status" id="area-FINALIZADA"></div>
+            </section>
+            <section class="area-status">
+                <h2>CANCELADA</h2>
+                <div class="lista-status" id="area-CANCELADA"></div>
+            </section>
+        </main>
         <dialog id="modalMensagem">
             <p id="modalMensagemTexto"></p>
             <menu>
