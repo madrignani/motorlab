@@ -1056,6 +1056,41 @@ $app->post( '/ordens-servico/:id/concluir', function($req, $res) {
     }
 } );
 
+$app->post( '/ordens-servico/:id/pagamento', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $logado = $sessao->dadosUsuarioLogado();
+        $id = $req->param('id');
+        $dados = ( (array)$req->body() );
+        $pdo = Conexao::conectar();
+        $transacao = new TransacaoPdo($pdo);
+        $repositorioCliente = new RepositorioClienteBdr($pdo);
+        $repositorioItem = new RepositorioItemBdr($pdo);
+        $repositorioLaudo = new RepositorioLaudoBdr($pdo);
+        $repositorioOs = new RepositorioOsBdr($pdo);
+        $repositorioOsCusto = new RepositorioOsCustoBdr($pdo);
+        $repositorioPagamento = new RepositorioPagamentoBdr($pdo);
+        $repositorioServico = new RepositorioServicoBdr($pdo);
+        $repositorioUsuario = new RepositorioUsuarioBdr($pdo);
+        $repositorioVeiculo = new RepositorioVeiculoBdr($pdo);
+        $servico = new ServicoExibicaoEdicaoOs(
+            $transacao, $repositorioCliente, $repositorioItem, $repositorioLaudo, $repositorioOs, $repositorioOsCusto, 
+            $repositorioPagamento, $repositorioServico, $repositorioUsuario, $repositorioVeiculo
+        );
+        $servico->adicionarPagamento($id, $dados, $logado['id_usuario'], $logado['cargo_usuario']);
+        $res->status(200)->end();
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
 $app->get( '/ordens-servico/:id/laudo', function($req, $res) {
     try {
         $sessao = new Sessao();

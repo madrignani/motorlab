@@ -15,6 +15,25 @@ class RepositorioPagamentoBdr implements RepositorioPagamento {
         $this->pdo = $pdo;
     }
 
+    public function salvar(int $osId, int $usuarioResponsavel, float $valor, string $metodo): int {
+        try {
+            $sql = <<<SQL
+                INSERT INTO pagamento (os_id, usuario_responsavel, valor, metodo)
+                VALUES (:os_id, :usuario_responsavel, :valor, :metodo)
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'os_id' => $osId,
+                'usuario_responsavel' => $usuarioResponsavel,
+                'valor' => $valor,
+                'metodo' => $metodo
+            ] );
+            return $this->pdo->lastInsertId();
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
     public function buscarPorOs(int $osId): ?array {
         try {
             $sql = <<<SQL

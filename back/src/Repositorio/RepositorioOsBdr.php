@@ -282,6 +282,22 @@ class RepositorioOsBdr implements RepositorioOs {
         }
     }
 
+    public function finalizarOs(int $id, float $valorFinal): void {
+        try {
+            $sql = <<<SQL
+                UPDATE os SET status = 'FINALIZADA', valor_final = :valor_final, data_hora_finalizacao = NOW()
+                WHERE id = :id
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( [
+                'id' => $id,
+                'valor_final' => $valorFinal
+            ] );
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
     public function atualizarMaoObra(int $id, float $valor): void {
         try {
             $sql = <<<SQL

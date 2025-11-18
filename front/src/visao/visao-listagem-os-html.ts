@@ -186,11 +186,27 @@ export class VisaoListagemOsHTML implements VisaoListagemOs {
         const modelo = os.veiculo.modelo;
         const ano = os.veiculo.ano;
         const clienteNome = os.cliente.nome;
-        cartao.innerHTML = `
-            <div class="linha"><strong>OS #${os.id}</strong></div>
-            <div class="linha"><span>${clienteNome}</span><span>Criação: ${dataCriacao}</span></div>
-            <div class="linha"><span>${fabricante} ${modelo} ${ano}</span><span>Entrega: ${previsao}</span></div>
-        `;
+        if (os.status === 'CANCELADA') {
+            cartao.innerHTML = `
+                <div class="linha"><strong>OS #${os.id}</strong></div>
+                <div class="linha"><span>${clienteNome}</span><span>Criação: ${dataCriacao}</span></div>
+                <div class="linha"><span>${fabricante} ${modelo} ${ano}</span><span>Cancelamento: ${this.formatarData(os.dataHoraFinalizacao)}</span></div>
+            `;
+        }
+        else if (os.status === 'FINALIZADA') {
+            cartao.innerHTML = `
+                <div class="linha"><strong>OS #${os.id}</strong></div>
+                <div class="linha"><span>${clienteNome}</span><span>Criação: ${dataCriacao}</span></div>
+                <div class="linha"><span>${fabricante} ${modelo} ${ano}</span><span>Finalização: ${this.formatarData(os.dataHoraFinalizacao)}</span></div>
+            `;
+        }
+        else {
+            cartao.innerHTML = `
+                <div class="linha"><strong>OS #${os.id}</strong></div>
+                <div class="linha"><span>${clienteNome}</span><span>Criação: ${dataCriacao}</span></div>
+                <div class="linha"><span>${fabricante} ${modelo} ${ano}</span><span>Entrega: ${previsao}</span></div>
+            `;
+        }
         cartao.addEventListener( 'click', () => {
             const id = cartao.dataset.osId!;
             window.location.href = `./exibicao-os.html?id=${id}`;

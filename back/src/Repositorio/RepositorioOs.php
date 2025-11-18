@@ -20,6 +20,7 @@ interface RepositorioOs {
     public function buscarUltimaOrdenacaoTarefa(int $osServicoId): int;
     public function removerTarefa(int $osId, int $servicoId, int $tarefaId): void;
     public function atualizarStatus(int $id, string $status): void;
+    public function finalizarOs(int $id, float $valorFinal): void;
     public function atualizarMaoObra(int $id, float $valor): void;
     public function atualizarMaoObraSugerido(int $id, float $valor): void;
     public function atualizarPrevisaoEntrega(int $id, string $data): void;

@@ -368,6 +368,21 @@ export class ControladoraExibicaoOs {
         }
     }
 
+    async cadastrarPagamento(metodo: string, descontoPorcentagem: number): Promise<void> {
+        try {
+            const osData = this.visao.obterDadosOs();
+            await this.gestor.cadastrarPagamento(osData.id, { metodo, descontoPorcentagem });
+            this.visao.exibirMensagem( ['Pagamento registrado. OS finalizada.'] );
+            await this.carregarOs(osData.id);
+        } catch (erro: any) {
+            if (erro instanceof ErroGestor) {
+                this.visao.exibirMensagem( erro.getProblemas() );
+            } else {
+                this.visao.exibirMensagem( [`Erro ao registrar pagamento: ${erro.message}`] );
+            }
+        }
+    }
+
     async atualizarMaoObra(valor: number): Promise<void> {
         try {
             const osData = this.visao.obterDadosOs();

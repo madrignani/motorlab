@@ -233,6 +233,19 @@ export class GestorExibicaoOs {
         }
     }
 
+    async cadastrarPagamento(idOs: string, dados: any): Promise<void> {
+        const response = await fetch( `${API_URL}/ordens-servico/${idOs}/pagamento`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        } );
+        if (!response.ok) {
+            const dadosResposta = await response.json();
+            throw ErroGestor.comProblemas(dadosResposta.mensagens);
+        }
+    }
+
     async obterLaudo(idOs: string): Promise<any> {
         const response = await fetch( `${API_URL}/ordens-servico/${idOs}/laudo`, {
             method: 'GET',

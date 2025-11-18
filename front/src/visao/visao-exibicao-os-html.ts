@@ -11,6 +11,7 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
     private botoesAcaoConfigurados = false;
     private servicosEventosConfigurados = false;
     private extrasModalConfigurado = false;
+    private pagamentoModalConfigurado = false;
     private maoObraModalConfigurado = false;
     private dataEntregaModalConfigurado = false;
     private observacoesModalConfigurado = false;
@@ -541,7 +542,7 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         botaoConcluir.addEventListener( 'click', () => { this.abrirModalLaudo() } );
         botaoVerLaudo.addEventListener( 'click', () => { this.controladora.exibirLaudo() } );
         botaoPagamento.addEventListener( 'click', () => { 
-            window.location.href = `./pagamento.html?id=${this.dadosOs.id}`;
+            this.abrirModalPagamento();
          } );
         botaoRemoverAlerta.addEventListener( 'click', () => { this.controladora.removerAlertaOs() } );
     }
@@ -725,6 +726,7 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         this.iniciarModalMaoObra();
         this.iniciarModalDataEntrega();
         this.iniciarModalLaudo();
+        this.iniciarModalPagamento();
         this.iniciarModalObservacoes();
         this.iniciarModalProduto();
         this.iniciarModalCancelarOs();
@@ -1011,6 +1013,106 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         modal.showModal();
     }
 
+    exibirLaudo(laudo: any): void {
+        const modal = document.getElementById('modalVisualizarLaudo')! as HTMLDialogElement;
+        const conteudo = document.getElementById('conteudoLaudo')! as HTMLDivElement;
+        conteudo.innerHTML = `
+            <div><strong>Resumo:</strong></div>
+            <p>${laudo.resumo}</p>
+            <div><strong>Recomendações:</strong></div>
+            <p>${laudo.recomendacoes}</p>
+        `;
+        modal.showModal();
+    }
+
+    private iniciarModalPagamento(): void {
+        if (this.pagamentoModalConfigurado) {
+            return;
+        }
+        this.pagamentoModalConfigurado = true;
+        const modal = document.getElementById('modalPagamento') as HTMLDialogElement;
+        const spanValorSugerido = document.getElementById('pagamentoValorSugerido') as HTMLSpanElement;
+        const selectMetodo = document.getElementById('pagamentoMetodo') as HTMLSelectElement;
+        const selectDesconto = document.getElementById('pagamentoDesconto') as HTMLSelectElement;
+        const spanValorFinal = document.getElementById('pagamentoValorFinal') as HTMLSpanElement;
+        const botaoCancelar = document.getElementById('modalPagamentoCancelar') as HTMLButtonElement;
+        const botaoConfirmar = document.getElementById('modalPagamentoConfirmar') as HTMLButtonElement;
+        botaoCancelar.addEventListener( 'click', () => { 
+            modal.close(); 
+        } );
+        const atualizarValores = () => {
+            const valorTotal = ( Number(this.dadosOs.valorEstimado) );
+            spanValorSugerido.textContent = ( valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) );
+            const desconto = ( Number(selectDesconto.value) );
+            let valor = valorTotal;
+            if (desconto > 0) {
+                valor = ( Number((valorTotal * (1 - (desconto / 100))).toFixed(2)) );
+            }
+            spanValorFinal.textContent = ( valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) );
+        };
+        selectMetodo.addEventListener( 'change', () => {
+            const usuario = this.controladora.obterDadosUsuario();
+            const metodo = selectMetodo.value;
+            if (usuario.cargo === 'ATENDENTE') {
+                if (metodo === 'PIX' || metodo === 'DINHEIRO') {
+                    for (const option of selectDesconto.options) {
+                        if (option.value === '0' || option.value === '5') {
+                            option.hidden = false;
+                        }
+                    }
+                    selectDesconto.value = '0';
+                } else {
+                    for (const option of selectDesconto.options) {
+                        if(option.value !== '0') {
+                            option.hidden = true;
+                        }
+                    }
+                    selectDesconto.value = '0';
+                }
+            } else {
+                for (const option of selectDesconto.options) {
+                    option.hidden = false;
+                }
+            }
+            atualizarValores();
+        } );
+        selectDesconto.addEventListener( 'change', () => { 
+            atualizarValores(); 
+        } );
+        botaoConfirmar.addEventListener( 'click', () => {
+            const metodo = selectMetodo.value;
+            const desconto = ( Number(selectDesconto.value) );
+            this.controladora.cadastrarPagamento(metodo, desconto);
+            modal.close();
+        } );
+    }
+
+    private abrirModalPagamento(): void {
+        const modal = document.getElementById('modalPagamento') as HTMLDialogElement;
+        const spanValorSugerido = document.getElementById('pagamentoValorSugerido') as HTMLSpanElement;
+        const selectMetodo = document.getElementById('pagamentoMetodo') as HTMLSelectElement;
+        const selectDesconto = document.getElementById('pagamentoDesconto') as HTMLSelectElement;
+        const spanValorFinal = document.getElementById('pagamentoValorFinal') as HTMLSpanElement;
+        selectMetodo.value = 'DEBITO';
+        selectDesconto.value = '0';
+        const usuario = this.controladora.obterDadosUsuario();
+        if (usuario && usuario.cargo === 'ATENDENTE') {
+            for (const option of selectDesconto.options) {
+                if (option.value !== '0') {
+                    option.hidden = true;
+                }
+            }
+            selectDesconto.value = '0';
+        } else {
+            for (const option of selectDesconto.options) {
+                option.hidden = false;
+            }
+        }
+        spanValorSugerido.textContent = ( Number(this.dadosOs.valorEstimado).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) );
+        spanValorFinal.textContent = ( Number(this.dadosOs.valorEstimado).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) );
+        modal.showModal();
+    }
+
     exibirValoresSugeridos(): void {
         const modal = document.getElementById('modalValoresSugeridos')! as HTMLDialogElement;
         document.getElementById('modalPrevisaoSugerida')!.textContent = ( new Date(this.dadosOs.previsaoEntregaSugerida).toLocaleString('pt-BR', {
@@ -1021,18 +1123,6 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
             minute: '2-digit'
         }) );
         document.getElementById('modalMaoObraSugerida')!.textContent = ( Number(this.dadosOs.valorMaoObraSugerido).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) );
-        modal.showModal();
-    }
-
-    exibirLaudo(laudo: any): void {
-        const modal = document.getElementById('modalVisualizarLaudo')! as HTMLDialogElement;
-        const conteudo = document.getElementById('conteudoLaudo')! as HTMLDivElement;
-        conteudo.innerHTML = `
-            <div><strong>Resumo:</strong></div>
-            <p>${laudo.resumo}</p>
-            <div><strong>Recomendações:</strong></div>
-            <p>${laudo.recomendacoes}</p>
-        `;
         modal.showModal();
     }
 

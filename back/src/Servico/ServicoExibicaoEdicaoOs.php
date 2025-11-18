@@ -739,6 +739,59 @@ class ServicoExibicaoEdicaoOs {
         }
     }
 
+    public function adicionarPagamento(int $id, array $dados, int $idUsuarioLogado, string $cargoUsuarioLogado) {
+        if ($cargoUsuarioLogado === 'MECANICO') {
+            throw new AutenticacaoException('Permissão negada.');
+        }
+        if (empty($dados['metodo'])) {
+            throw DominioException::comProblemas( ['Método de pagamento obrigatório.'] );
+        }
+        $metodo = $dados['metodo'];
+        if( !in_array($metodo, ['DINHEIRO', 'CREDITO', 'DEBITO', 'PIX']) ) {
+            throw DominioException::comProblemas( ['Método de pagamento inválido.'] );
+        }
+        $os = $this->repositorioOs->buscarPorId($id);
+        if ( empty($os) ) {
+            throw DominioException::comProblemas( ['OS não encontrada.'] );
+        }
+        if ($os['status'] !== 'CONCLUIDA') {
+            throw DominioException::comProblemas( ['Somente OS com status CONCLUIDA podem ser pagas.'] );
+        }
+        $valorEstimado = ( (float)$os['valor_estimado'] );
+        $desconto = 0.0;
+        if (isset($dados['descontoPorcentagem'])) {
+            $desconto = ( (float)$dados['descontoPorcentagem'] );
+        }
+        $valorFinal = $valorEstimado;
+        if ($cargoUsuarioLogado === 'ATENDENTE') {
+            if ($desconto !== 0.0 && $desconto !== 5.0) {
+                throw DominioException::comProblemas( ['Atendente só pode aplicar 5% de desconto.'] );
+            }
+            if ($desconto === 5.0) {
+                if ($metodo !== 'PIX' && $metodo !== 'DINHEIRO') {
+                    throw DominioException::comProblemas( ['Desconto de 5% só permitido para PIX ou Dinheiro.'] );
+                }
+                $valorFinal = ( $valorEstimado * (1 - ($desconto / 100)) );
+            }
+        } else if ($cargoUsuarioLogado === 'GERENTE') {
+            if ($desconto !== 0.0) {
+                if ( !in_array($desconto, [5.0, 10.0, 20.0]) ) {
+                    throw DominioException::comProblemas( ['Gerente só pode aplicar 5%, 10% ou 20% de desconto.'] );
+                }
+                $valorFinal = ( $valorEstimado * (1 - ($desconto / 100)) );
+            }
+        }
+        $this->transacao->iniciar();
+        try {
+            $this->repositorioPagamento->salvar($id, $idUsuarioLogado, $valorFinal, $metodo);
+            $this->repositorioOs->finalizarOs($id, $valorFinal);
+            $this->transacao->finalizar();
+        } catch (Throwable $erro) {
+            $this->transacao->desfazer();
+            throw $erro;
+        }
+    }
+
     public function obterLaudo(int $id) {
         $laudo = $this->repositorioLaudo->buscarPorOs($id);
         if ( empty($laudo) ) {

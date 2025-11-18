@@ -240,6 +240,39 @@
                 <button id="modalVisualizarLaudoFechar">Fechar</button>
             </menu>
         </dialog>
+        <dialog id="modalPagamento">
+            <h3>Registrar Pagamento</h3>
+            <div class="campo-modal">
+                <label>Valor total:</label>
+                <span id="pagamentoValorSugerido"></span>
+            </div>
+            <div class="campo-modal">
+                <label for="pagamentoMetodo">Método de pagamento:</label>
+                <select id="pagamentoMetodo">
+                    <option value="CREDITO">Crédito</option>
+                    <option value="DEBITO">Débito</option>
+                    <option value="PIX">PIX</option>
+                    <option value="DINHEIRO">Dinheiro</option>
+                </select>
+            </div>
+            <div class="campo-modal">
+                <label for="pagamentoDesconto">Desconto:</label>
+                <select id="pagamentoDesconto">
+                    <option value="0">0%</option>
+                    <option value="5">5%</option>
+                    <option value="10">10%</option>
+                    <option value="20">20%</option>
+                </select>
+            </div>
+            <div class="campo-modal">
+                <label>Valor a pagar:</label>
+                <span id="pagamentoValorFinal"></span>
+            </div>
+            <menu>
+                <button type="button" id="modalPagamentoCancelar" class="botao-secundario">Cancelar</button>
+                <button type="button" id="modalPagamentoConfirmar" class="botao-principal">Confirmar pagamento</button>
+            </menu>
+        </dialog>
         <dialog id="modalCancelarOs">
             <div class="campo-modal">
                 <h3>Tem certeza que deseja cancelar esta OS?</h3>

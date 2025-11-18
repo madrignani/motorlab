@@ -13,9 +13,9 @@ export interface VisaoExibicaoOs {
     exibirServicosModal(servicos: any[]): void;
     abrirModalProduto(servicoId: string, tarefaId: string): void;
     exibirProdutoEncontradoModal(produto: any): void;
-    exibirLaudo(laudo: any): void;
     exibirValoresSugeridos(dados: any): void;
     obterProdutoAtual(): any;
+    exibirLaudo(laudo: any): void;
     obterDadosOs(): any;
 
 }
