@@ -534,10 +534,8 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         const botaoRemoverAlerta = document.getElementById('botaoRemoverAlerta')! as HTMLButtonElement;
         botaoValores.addEventListener( 'click', () => { this.exibirValoresSugeridos() } );
         botaoEfetivar.addEventListener( 'click', () => { this.controladora.efetivarOs() } );
-        botaoCancelar.addEventListener( 'click', () => {
-            if (confirm('Tem certeza que deseja cancelar esta OS?')) {
-                this.controladora.cancelarOs();
-            }
+        botaoCancelar.addEventListener( 'click', () => { 
+            this.abrirModalCancelarOs() 
         } );
         botaoAlerta.addEventListener( 'click', () => { this.controladora.colocarOsEmAlerta() } );
         botaoConcluir.addEventListener( 'click', () => { this.abrirModalLaudo() } );
@@ -729,6 +727,7 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         this.iniciarModalLaudo();
         this.iniciarModalObservacoes();
         this.iniciarModalProduto();
+        this.iniciarModalCancelarOs();
     }
 
     private iniciarModalServicos(): void {
@@ -1039,6 +1038,24 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
 
     obterDadosOs(): any {
         return this.dadosOs;
+    }
+
+    private abrirModalCancelarOs(): void {
+        const modal = document.getElementById('modalCancelarOs') as HTMLDialogElement;
+        modal.showModal();
+    }
+
+    private iniciarModalCancelarOs(): void {
+        const modal = document.getElementById('modalCancelarOs') as HTMLDialogElement;
+        const botaoConfirmar = document.getElementById('modalCancelarOsConfirmar') as HTMLButtonElement;
+        const botaoCancelar = document.getElementById('modalCancelarOsCancelar') as HTMLButtonElement;
+        botaoConfirmar.addEventListener( 'click', () => {
+            this.controladora.cancelarOs();
+            modal.close();
+        } );
+        botaoCancelar.addEventListener( 'click', () => {
+            modal.close();
+        } );
     }
 
 }

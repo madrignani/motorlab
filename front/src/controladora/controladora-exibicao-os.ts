@@ -86,18 +86,24 @@ export class ControladoraExibicaoOs {
             const osData = this.visao.obterDadosOs();
             await this.gestor.adicionarServico(osData.id, servico);
             await this.carregarOs(osData.id);
+            let mensagem = '';
             if ( Number(osData.valorMaoObra) != Number(osData.valorMaoObraSugerido) ) {
-                setTimeout( () => {
-                    this.visao.exibirMensagem( ['Serviço adicionado: valor da mão de obra restaurado ao padrão.'] );
-                }, 700 );
+                mensagem += 'Serviço adicionado: valor da mão de obra restaurado ao padrão';
             }
             const previsaoEntregaFormat = new Date(osData.previsaoEntrega);
             const previsaoSugeridaFormat = new Date(osData.previsaoEntregaSugerida);
             previsaoEntregaFormat.setSeconds(0,0);
             previsaoSugeridaFormat.setSeconds(0,0);
             if (previsaoEntregaFormat.getTime() !== previsaoSugeridaFormat.getTime()) {
+                if(mensagem.length > 0) {
+                    mensagem += ' e o tempo de execução do serviço aplicado à previsão de entrega.';
+                } else {
+                    mensagem += 'Serviço adicionado: o tempo de execução do serviço foi aplicado à previsão de entrega.';
+                }
+            }
+            if (mensagem.length > 0) {
                 setTimeout( () => {
-                    this.visao.exibirMensagem( ['Serviço adicionado: tempo de execução aplicado à previsão de entrega.'] );
+                    this.visao.exibirMensagem( [mensagem] );
                 }, 700 );
             }
         } catch (erro: any) {
@@ -114,19 +120,25 @@ export class ControladoraExibicaoOs {
             const osData = this.visao.obterDadosOs();
             await this.gestor.removerServico(osData.id, servicoId);
             await this.carregarOs(osData.id);
+            let mensagem = '';
             if ( Number(osData.valorMaoObra) != Number(osData.valorMaoObraSugerido) ) {
-                setTimeout( () => {
-                    this.visao.exibirMensagem( ['Serviço removido: valor da mão de obra restaurado ao padrão.'] );
-                }, 400 );
+                mensagem += 'Serviço adicionado: valor da mão de obra restaurado ao padrão';
             }
             const previsaoEntregaFormat = new Date(osData.previsaoEntrega);
             const previsaoSugeridaFormat = new Date(osData.previsaoEntregaSugerida);
             previsaoEntregaFormat.setSeconds(0,0);
             previsaoSugeridaFormat.setSeconds(0,0);
             if (previsaoEntregaFormat.getTime() !== previsaoSugeridaFormat.getTime()) {
+                if(mensagem.length > 0) {
+                    mensagem += ' e o tempo de execução do serviço aplicado à previsão de entrega.';
+                } else {
+                    mensagem += 'Serviço adicionado: o tempo de execução do serviço foi aplicado à previsão de entrega.';
+                }
+            }
+            if (mensagem.length > 0) {
                 setTimeout( () => {
-                    this.visao.exibirMensagem( ['Serviço removido: tempo de execução subtraído da previsão de entrega.'] );
-                }, 700 );
+                    this.visao.exibirMensagem( [mensagem] );
+                }, 400 );
             }
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
@@ -315,7 +327,7 @@ export class ControladoraExibicaoOs {
         try {
             const osData = this.visao.obterDadosOs();
             await this.gestor.atualizarStatus(osData.id, 'CANCELADA');
-            this.visao.exibirMensagem( ['OS cancelada com sucesso.'] );
+            this.visao.exibirMensagem( ['OS cancelada.'] );
             await this.carregarOs(osData.id);
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
@@ -330,7 +342,7 @@ export class ControladoraExibicaoOs {
         try {
             const osData = this.visao.obterDadosOs();
             await this.gestor.atualizarStatus(osData.id, 'ANDAMENTO');
-            this.visao.exibirMensagem( ['OS efetivada com sucesso.'] );
+            this.visao.exibirMensagem( ['OS efetivada.'] );
             await this.carregarOs(osData.id);
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
@@ -345,7 +357,7 @@ export class ControladoraExibicaoOs {
         try {
             const osData = this.visao.obterDadosOs();
             await this.gestor.concluirOsComLaudo(osData.id, resumo, recomendacoes);
-            this.visao.exibirMensagem( ['OS concluída com sucesso.'] );
+            this.visao.exibirMensagem( ['OS concluída.'] );
             await this.carregarOs(osData.id);
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
