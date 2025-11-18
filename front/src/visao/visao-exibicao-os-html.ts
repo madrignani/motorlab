@@ -497,10 +497,10 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
 
     private exibirDadosPagamento(): void {
         if (this.dadosOs.pagamento) {
-            const container = document.getElementById('pagamento') as HTMLElement;
-            container.style.display = 'block';
-            const dadosDiv = document.getElementById('dadosPagamento') as HTMLDivElement;
-            dadosDiv.innerHTML = `
+            const section = document.getElementById('dadosPagamento') as HTMLDivElement;
+            section.style.display = 'block';
+            const campo = document.getElementById('campoPagamento') as HTMLDivElement;
+            campo.innerHTML = `
                 <p><strong>Data/Hora:</strong> ${( new Date(this.dadosOs.pagamento.dataHora).toLocaleString('pt-BR') )}</p>
                 <p><strong>Valor:</strong> ${( Number(this.dadosOs.pagamento.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) )}</p>
                 <p><strong>Método:</strong> ${this.dadosOs.pagamento.metodo}</p>
