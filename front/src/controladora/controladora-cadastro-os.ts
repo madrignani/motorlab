@@ -201,6 +201,10 @@ export class ControladoraCadastroOs {
 
     removerTarefa(servicoId: string, tarefaId: string): void {
         const servico = this.servicosSelecionados.find( (servico) => servico.id === servicoId );
+        if (servico.tarefas.length <= 1) {
+            this.visao.exibirMensagem( ['O serviço deve haver pelo menos uma tarefa.'] );
+            return;
+        }
         const tarefa = servico.tarefas.find( (tarefa: any) => tarefa.id === tarefaId );
             if (tarefa && tarefa.produtos) {
                 for (const produto of tarefa.produtos) {
@@ -367,6 +371,11 @@ export class ControladoraCadastroOs {
     }
 
     adicionarExtra(extra: any): void {
+        const existe = this.extrasSelecionados.some( extra => extra.descricao === extra.descricao );
+        if (existe) {
+            this.visao.exibirMensagem( ['Já existe um custo extra com essa descrição.'] );
+            return;
+        }
         this.extrasSelecionados.push(extra);
         this.visao.exibirExtras(this.extrasSelecionados);
         this.atualizarCalculos();

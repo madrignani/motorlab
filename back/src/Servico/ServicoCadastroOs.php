@@ -249,6 +249,9 @@ class ServicoCadastroOs {
             if (!$servicoExistente) {
                 throw DominioException::comProblemas( ["Serviço ID {$servico['id']} não encontrado."] );
             }
+            if (empty($servico['tarefas'])) {
+                throw DominioException::comProblemas( ["Não é permitido haver serviço sem tarefas."] );
+            }
             $valorMaoObraSugerido += $servicoExistente['valor_mao_obra'];
             $minutosTotais += $servicoExistente['execucao_minutos'];
             $valorTotalEstimado += $servicoExistente['valor_mao_obra'];
@@ -285,11 +288,16 @@ class ServicoCadastroOs {
                 'tarefaId' => $produto['tarefaId'] ?? null
             ];
         }
+        $descricoesExtras = [];
         foreach ($dados['extras'] as $extra) {
             $extra = ( (array)$extra );
             if ($extra['quantidade'] <= 0 || $extra['valor'] < 0) {
                 throw DominioException::comProblemas( ["Custo extra inválido."] );
             }
+            if (in_array($extra['descricao'], $descricoesExtras)) {
+                throw DominioException::comProblemas( ["Não é permitido haver custos extras com a mesma descrição."] );
+            }
+            $descricoesExtras[] = $extra['descricao'];
             $subtotal = ( $extra['valor'] * $extra['quantidade'] );
             $valorProdutosExtras += $subtotal;
             $valorTotalEstimado += $subtotal;
