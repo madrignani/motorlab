@@ -1,5 +1,6 @@
 import type { VisaoExibicaoOs } from './visao-exibicao-os.ts';
 import { ControladoraExibicaoOs } from '../controladora/controladora-exibicao-os.ts';
+import html2pdf from 'html2pdf.js';
 
 
 export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
@@ -636,6 +637,7 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
     }
 
     private configurarBotoesFinalizada(): void {
+        document.getElementById('botaoVerLaudo')!.style.display = 'block';
         this.exibirDadosPagamento();
         this.desativarModoEdicao();
     }
@@ -988,6 +990,7 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         const botaoCancelarEdicaoLaudo = document.getElementById('modalEdicaoLaudoCancelar')! as HTMLButtonElement;
         const botaoConfirmarEdicaoLaudo = document.getElementById('modalEdicaoLaudoConfirmar')! as HTMLButtonElement;
         const botaoFecharVisualizacaoLaudo = document.getElementById('modalVisualizarLaudoFechar')! as HTMLButtonElement;
+        const botaoExportarVisualizacaoLaudo = document.getElementById('modalVisualizarLaudoExportarPDF') as HTMLButtonElement | null;
         if (botaoCancelarEdicaoLaudo) {
             botaoCancelarEdicaoLaudo.addEventListener( 'click', () => {
                 modalEdicaoLaudo.close();
@@ -1004,6 +1007,11 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         botaoFecharVisualizacaoLaudo.addEventListener( 'click', () => {
             modalVisualizacaoLaudo.close();
         } );
+        if (botaoExportarVisualizacaoLaudo) {
+            botaoExportarVisualizacaoLaudo.addEventListener( 'click', () => {
+                this.exportarLaudoPdf();
+            } );
+        }
     }
 
     private abrirModalLaudo(): void {
@@ -1023,6 +1031,26 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
             <p>${laudo.recomendacoes}</p>
         `;
         modal.showModal();
+    }
+
+    private exportarLaudoPdf(): void {
+        const opcoesPdf = {
+            margin: 10,
+            filename: `laudo_os_${this.dadosOs.id}.pdf`,
+            image: { type: 'jpeg' as const, quality: 1.0 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
+        };
+        const html = `
+            <h1>Laudo da OS #${this.dadosOs.id}</h1>
+            <p>Cliente: ${this.dadosOs.cliente.nome}</p>
+            <p>Veículo: ${this.dadosOs.veiculo.fabricante} ${this.dadosOs.veiculo.modelo} (${this.dadosOs.veiculo.ano}) - ${this.dadosOs.veiculo.placa}</p>
+            <p>Data de Conclusão: ${new Date(this.dadosOs.dataHoraFinalizacao).toLocaleString('pt-BR')}</p>
+            <br><br>-------------------------------------------------------------------------------------------------------------------------------<br><br><br>
+            ${`<h2>Resumo</h2><p>${this.dadosOs.laudo.resumo}</p><br>`}
+            ${`<h2>Recomendações</h2><p>${this.dadosOs.laudo.recomendacoes}</p>`}
+        `;
+        html2pdf().from(html).set(opcoesPdf).save();
     }
 
     private iniciarModalPagamento(): void {

@@ -4,7 +4,12 @@
     "version": "0.1.0",
     "type": "module",
     "description": "Sistema implementado para o TCC do curso Sistemas de Informação.",
-    "keywords": ["motorlab", "tcc", "vite", "typescript"],
+    "keywords": [
+        "motorlab",
+        "tcc",
+        "vite",
+        "typescript"
+    ],
     "homepage": "https://github.com/madrignani/motorlab",
     "author": "Giovanni de Oliveira Madrignani",
     "license": "MIT",
@@ -21,9 +26,10 @@
 
     "devDependencies": {
         "@playwright/test": "^1.55.0",
+        "html2pdf.js": "^0.12.1",
         "typescript": "~5.8.3",
         "vite": "^7.1.2",
         "vitest": "^3.2.4"
     }
-
+    
 }

@@ -367,6 +367,30 @@ dialog menu {
     margin-top: 1rem;
 }
 
+#modalEdicaoLaudo, #modalVisualizarLaudo {
+    width: min(900px, 95vw);
+    max-height: 80vh;
+    overflow: auto;
+}
+
+#modalEdicaoLaudo textarea {
+    min-height: 220px;
+    max-height: 60vh;
+    width: 100%;
+    resize: vertical;
+    padding: 0.75rem;
+}
+
+#modalVisualizarLaudo #conteudoLaudo {
+    background: white;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+    min-height: 220px;
+    max-height: 60vh;
+    overflow: auto;
+}
+
 .servico-modal-item {
     padding: 1rem;
     border: 1px solid #ddd;
