@@ -292,6 +292,27 @@ $app->get( '/itens/:busca', function($req, $res) {
     }
 } );
 
+$app->get( '/itens-termo/:termo', function($req, $res) {
+    try {
+        $sessao = new Sessao();
+        $sessao->estaLogado();
+        $termo = $req->param('termo');
+        $pdo = Conexao::conectar();
+        $repositorioItem = new RepositorioItemBdr($pdo);
+        $servico = new ServicoListagemItem($repositorioItem);
+        $produtos = $servico->buscarItensPorTermo($termo);
+        $res->status(200)->json($produtos);
+    } catch (AutenticacaoException $erro) {
+        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
+    } catch (DominioException $erro) {
+        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
+    } catch (RepositorioException $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
+    } catch (Exception $erro) {
+        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
+    }
+} );
+
 $app->patch( '/itens-atualizar/:id', function($req, $res) {
     try {
         $sessao = new Sessao();
@@ -397,37 +418,6 @@ $app->get( '/servicos-cadastro/:busca', function($req, $res) {
         );
         $servicos = $servico->buscarServicos($termo, $logado['cargo_usuario']);
         $res->status(200)->json($servicos);
-    } catch (AutenticacaoException $erro) {
-        $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
-    } catch (DominioException $erro) {
-        $res->status(400)->json( ['mensagens' => $erro->getProblemas()] );
-    } catch (RepositorioException $erro) {
-        $res->status(500)->json( ['mensagens' => ['Erro no repositório -> ' . $erro->getMessage()]] );
-    } catch (Exception $erro) {
-        $res->status(500)->json( ['mensagens' => ['Erro no servidor -> ' . $erro->getMessage()]] );
-    }
-} );
-
-$app->get( '/itens-cod/:busca', function($req, $res) {
-    try {
-        $sessao = new Sessao();
-        $sessao->estaLogado();
-        $codigo = $req->param('busca');
-        $pdo = Conexao::conectar();
-        $transacao = new TransacaoPdo($pdo);
-        $repositorioCliente = new RepositorioClienteBdr($pdo);
-        $repositorioItem = new RepositorioItemBdr($pdo);
-        $repositorioOs = new RepositorioOsBdr($pdo);
-        $repositorioOsCusto = new RepositorioOsCustoBdr($pdo);
-        $repositorioServico = new RepositorioServicoBdr($pdo);
-        $repositorioUsuario = new RepositorioUsuarioBdr($pdo);
-        $repositorioVeiculo = new RepositorioVeiculoBdr($pdo);
-        $servico = new ServicoCadastroOs(
-            $transacao, $repositorioCliente, $repositorioItem, $repositorioOs, 
-            $repositorioOsCusto, $repositorioServico, $repositorioUsuario, $repositorioVeiculo
-        );
-        $item = $servico->buscarItemPorCodigo($codigo);
-        $res->status(200)->json($item);
     } catch (AutenticacaoException $erro) {
         $res->status(401)->json( ['mensagens' => [$erro->getMessage()]] );
     } catch (DominioException $erro) {

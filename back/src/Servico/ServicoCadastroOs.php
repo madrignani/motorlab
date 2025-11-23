@@ -124,25 +124,6 @@ class ServicoCadastroOs {
         return $servicosDto;
     }
 
-    public function buscarItemPorCodigo(string $codigo): array {
-        $dados = $this->repositorioItem->buscarPorCodigo($codigo);
-        if ( empty($dados) ) {
-            return [];
-        }
-        $itemDto = new ItemDto(
-            ( (int)$dados['id'] ),
-            $dados['codigo'],
-            $dados['titulo'],
-            $dados['fabricante'],
-            $dados['descricao'],
-            ( (float)$dados['preco_venda'] ),
-            ( (int)$dados['estoque'] ),
-            ( (int)$dados['estoque_minimo'] ),
-            $dados['localizacao']
-        );
-        return $itemDto->arrayDados();
-    }
-
     public function cadastrarOs(array $dados, int $idUsuarioLogado, string $cargoUsuarioLogado) {
         if ($cargoUsuarioLogado !== 'ATENDENTE' && $cargoUsuarioLogado !== 'GERENTE') {
             throw new AutenticacaoException( 'Permissão negada.' );

@@ -45,10 +45,10 @@ export class GestorListagemItem {
     }
 
     async obterItem(busca: number): Promise<any> {
-        const response = await fetch(`${API_URL}/itens/${busca}`, {
+        const response = await fetch( `${API_URL}/itens/${busca}`, {
             method: 'GET',
             credentials: 'include'
-        });
+        } );
         if (!response.ok) {
             const dadosResposta = await response.json();
             throw ErroGestor.comProblemas(dadosResposta.mensagens);

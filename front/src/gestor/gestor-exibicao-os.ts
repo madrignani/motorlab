@@ -106,8 +106,8 @@ export class GestorExibicaoOs {
         }
     }
 
-    async obterProdutoPorCodigo(busca: string): Promise<any> {
-        const response = await fetch( `${API_URL}/itens-cod/${busca}`, {
+    async buscarProdutos(termo: string): Promise<any[]> {
+        const response = await fetch( `${API_URL}/itens-termo/${termo}`, {
             method: 'GET',
             credentials: 'include'
         } );

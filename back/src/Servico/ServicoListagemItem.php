@@ -67,6 +67,26 @@ class ServicoListagemItem {
         return $itemDto->arrayDados();
     }
 
+    public function buscarItensPorTermo(string $termo): array {
+        $produtos = $this->repositorio->buscarPorTermo($termo);
+        $produtosDto = [];
+        foreach ($produtos as $produto) {
+            $dto = new ItemDto(
+                ( (int)$produto['id'] ),
+                $produto['codigo'],
+                $produto['titulo'],
+                $produto['fabricante'],
+                $produto['descricao'],
+                ( (float)$produto['preco_venda'] ),
+                ( (int)$produto['estoque'] ),
+                ( (int)$produto['estoque_minimo'] ),
+                $produto['localizacao']
+            );
+            $produtosDto[] = $dto->arrayDados();
+        }
+        return $produtosDto;
+    }
+
     public function atualizarItem(int $id, array $dadosAlteracao, string $cargoUsuarioLogado): void {
         if ($cargoUsuarioLogado !== 'ATENDENTE' && $cargoUsuarioLogado !== 'GERENTE') {
             throw new AutenticacaoException('Permissão negada.');

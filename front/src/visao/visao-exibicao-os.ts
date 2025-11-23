@@ -12,7 +12,8 @@ export interface VisaoExibicaoOs {
     ocultarAlertaPrazo(): void;
     exibirServicosModal(servicos: any[]): void;
     abrirModalProduto(servicoId: string, tarefaId: string): void;
-    exibirProdutoEncontradoModal(produto: any): void;
+    exibirProdutosModal(produtos: any[]): void;
+    exibirProdutoSelecionadoModal(produto: any): void;
     exibirValoresSugeridos(dados: any): void;
     obterProdutoAtual(): any;
     exibirLaudo(laudo: any): void;

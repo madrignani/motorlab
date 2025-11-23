@@ -191,25 +191,21 @@ export class ControladoraExibicaoOs {
         }
     }
 
-    async buscarProduto(codigoProduto: string): Promise<void> {
-        if (!codigoProduto) {
-            this.visao.exibirMensagem( ['Informe o código do produto.'] );
-            return;
-        }
+    async buscarProdutos(termo: string): Promise<void> {
         try {
-            const produto = await this.gestor.obterProdutoPorCodigo(codigoProduto);
-            if (!produto.id) {
-                this.visao.exibirMensagem( ['Não há produto correspondente ao código informado.'] );
-                return;
-            }
-            this.visao.exibirProdutoEncontradoModal(produto);
+            const produtos = await this.gestor.buscarProdutos(termo);
+            this.visao.exibirProdutosModal(produtos);
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem( erro.getProblemas() );
             } else {
-                this.visao.exibirMensagem( [`Erro ao buscar o produto: ${erro.message}`] );
+                this.visao.exibirMensagem( [`Erro ao buscar produtos: ${erro.message}`] );
             }
         }
+    }
+
+    async selecionarProduto(produto: any): Promise<void> {
+        this.visao.exibirProdutoSelecionadoModal(produto);
     }
 
     async confirmarProduto(modal: HTMLDialogElement, quantidade: string): Promise<void> {

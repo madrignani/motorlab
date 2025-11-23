@@ -84,6 +84,42 @@ class RepositorioItemBdr implements RepositorioItem {
         }
     }
 
+    public function buscarPorCodigo(string $codigo): ?array {
+        try {
+            $sql = <<<SQL
+                SELECT * FROM item
+                WHERE codigo = :codigo
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute( ['codigo' => $codigo] );
+            $dados = $stmt->fetch();
+            if ( empty($dados) ) {
+                return null;
+            }
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
+    public function buscarPorTermo(string $termo): array {
+        try {
+            $sql = <<<SQL
+                SELECT * FROM item
+                WHERE titulo LIKE :termo OR codigo LIKE :termo
+                ORDER BY titulo ASC, fabricante ASC
+                LIMIT 10
+            SQL;
+            $stmt = $this->pdo->prepare($sql);
+            $termo = '%' . $termo . '%';
+            $stmt->execute( ['termo' => $termo] );
+            $dados = $stmt->fetchAll();
+            return $dados;
+        } catch (PDOException $erro) {
+            throw new RepositorioException( $erro->getMessage() );
+        }
+    }
+
     public function atualizar(int $id, float $precoVenda, int $estoque, int $estoqueMinimo, string $localizacao): void {
         try {
             $sql = <<<SQL
@@ -101,24 +137,6 @@ class RepositorioItemBdr implements RepositorioItem {
             ] );
         } catch (PDOException $erro) {
             throw new RepositorioException($erro->getMessage());
-        }
-    }
-
-    public function buscarPorCodigo(string $codigo): ?array {
-        try {
-            $sql = <<<SQL
-                SELECT * FROM item
-                WHERE codigo = :codigo
-            SQL;
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute( ['codigo' => $codigo] );
-            $dados = $stmt->fetch();
-            if ( empty($dados) ) {
-                return null;
-            }
-            return $dados;
-        } catch (PDOException $erro) {
-            throw new RepositorioException( $erro->getMessage() );
         }
     }
 

@@ -367,6 +367,30 @@ dialog menu {
     margin-top: 1rem;
 }
 
+.servico-modal-item {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.servico-modal-item:hover {
+    background: #f0f0f0;
+}
+
+.item-lista-modal {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.item-lista-modal:hover {
+    background: #f0f0f0;
+}
+
 #modalEdicaoLaudo, #modalVisualizarLaudo {
     width: min(900px, 95vw);
     max-height: 80vh;
@@ -389,16 +413,4 @@ dialog menu {
     min-height: 220px;
     max-height: 60vh;
     overflow: auto;
-}
-
-.servico-modal-item {
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-    cursor: pointer;
-}
-
-.servico-modal-item:hover {
-    background: #f0f0f0;
 }

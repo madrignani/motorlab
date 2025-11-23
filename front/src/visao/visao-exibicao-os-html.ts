@@ -803,10 +803,18 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         }
         this.modalProdutoAberto = true;
         const modal = document.getElementById('modalAdicionarProduto')! as HTMLDialogElement;
-        const botaoBuscar = document.getElementById('botaoBuscarProduto')! as HTMLButtonElement;
+        const inputBusca = document.getElementById('buscaProdutoModal')! as HTMLInputElement;
         const botaoCancelar = document.getElementById('modalProdutoCancelar')! as HTMLButtonElement;
         const botaoConfirmar = document.getElementById('modalProdutoConfirmar')! as HTMLButtonElement;
         botaoConfirmar.disabled = true;
+        inputBusca.addEventListener( 'input', () => {
+            const termo = inputBusca.value.trim();
+            if (termo.length >= 2) {
+                this.controladora.buscarProdutos(termo);
+            } else {
+                document.getElementById('listaProdutosModal')!.innerHTML = '';
+            }
+        } );
         botaoCancelar.addEventListener( 'click', () => {
             modal.close();
         } );
@@ -816,16 +824,17 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
             this.produtoAtual = null;
             modal.close();
         } );
-        botaoBuscar.addEventListener( 'click', () => {
-            const codigoProduto = ( (document.getElementById('codigoProduto') as HTMLInputElement).value.trim() );
-            this.controladora.buscarProduto(codigoProduto);
-        } );
         modal.addEventListener( 'close', () => {
             this.produtoAtual = null;
             const detalhes = document.getElementById('detalhesProduto') as HTMLDivElement;
             if (detalhes) {
                 detalhes.innerHTML = '';
             }
+            const listaProdutos = document.getElementById('listaProdutosModal') as HTMLDivElement;
+            if (listaProdutos) {
+                listaProdutos.innerHTML = '';
+            }
+            inputBusca.value = '';
             botaoConfirmar.disabled = true;
         } );
     }
@@ -833,20 +842,46 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
     abrirModalProduto(servicoId: string, tarefaId: string): void {
         const modal = document.getElementById('modalAdicionarProduto') as HTMLDialogElement;
         modal.showModal();
-        ( document.getElementById('codigoProduto') as HTMLInputElement ).value = '';
+        ( document.getElementById('buscaProdutoModal') as HTMLInputElement ).value = '';
         ( document.getElementById('quantidadeProduto') as HTMLInputElement ).value = '1';
         document.getElementById('detalhesProduto')!.innerHTML = '';
+        document.getElementById('listaProdutosModal')!.innerHTML = '';
         const botaoConfirmar = document.getElementById('modalProdutoConfirmar')! as HTMLButtonElement;
         botaoConfirmar.disabled = true;
         modal.dataset.servicoIdDoProduto = servicoId;
         modal.dataset.tarefaIdDoProduto = tarefaId;
     }
 
-    exibirProdutoEncontradoModal(produto: any): void {
+    exibirProdutosModal(produtos: any[]): void {
+        const listaProdutos = document.getElementById('listaProdutosModal') as HTMLDivElement;
+        listaProdutos.innerHTML = '';
+        if (produtos.length === 0) {
+            listaProdutos.innerHTML = '<p>Nenhum produto encontrado.</p>';
+            return;
+        }
+        produtos.forEach( produto => {
+            const div = document.createElement('div');
+            div.className = 'item-lista-modal';
+            div.innerHTML = `
+                <strong>${produto.titulo}</strong>
+                <div>Código: ${produto.codigo}</div>
+                <div>Fabricante: ${produto.fabricante}</div>
+                <div>Preço: ${( Number(produto.precoVenda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) )}</div>
+                <div>Estoque: ${produto.estoque}</div>
+            `;
+            div.addEventListener( 'click', () => {
+                this.controladora.selecionarProduto(produto);
+            } );
+            listaProdutos.appendChild(div);
+        } );
+    }
+
+    exibirProdutoSelecionadoModal(produto: any): void {
         this.produtoAtual = produto;
         const detalhes = document.getElementById('detalhesProduto') as HTMLDivElement;
         detalhes.innerHTML = `
-            <strong>${produto.titulo}</strong>
+            <div><strong>${produto.titulo}</strong></div>
+            <div>Código: ${produto.codigo}</div>
             <div>Fabricante: ${produto.fabricante}</div>
             <div>Descrição: ${produto.descricao}</div>
             <div>Preço: ${( Number(produto.precoVenda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) )}</div>
@@ -854,6 +889,8 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
         `;
         const botaoConfirmar = document.getElementById('modalProdutoConfirmar')! as HTMLButtonElement;
         botaoConfirmar.disabled = false;
+        const listaProdutos = document.getElementById('listaProdutosModal') as HTMLDivElement;
+        listaProdutos.innerHTML = '';
     }
 
     obterProdutoAtual(): any {
