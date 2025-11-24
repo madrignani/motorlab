@@ -376,3 +376,15 @@ dialog menu {
 .servico-modal-item:hover {
     background: #f0f0f0;
 }
+
+.item-lista-modal {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.item-lista-modal:hover {
+    background: #f0f0f0;
+}
