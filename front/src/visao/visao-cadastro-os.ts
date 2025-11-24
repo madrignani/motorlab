@@ -29,7 +29,8 @@ export interface VisaoCadastroOs {
     iniciarModais(): void;
     abrirModalProduto(servicoId: string, tarefaId: string): void;
     fecharModalProduto(): void;
-    exibirProdutoEncontradoModal(produto: any): void;
+    exibirProdutosModal(produtos: any[]): void;
+    exibirProdutoSelecionadoModal(produto: any): void;
     abrirModalExtra(): void;
     fecharModalExtra(): void;
     atualizarValorMaoObra(valor: number): void;

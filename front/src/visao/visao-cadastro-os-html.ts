@@ -539,18 +539,7 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
             const modal = document.getElementById('modalEdicaoDataEntrega') as HTMLDialogElement;
             modal.close();
         } );
-        document.getElementById('botaoBuscarProduto')!.addEventListener( 'click', () => {
-            const codigoProduto = ( document.getElementById('codigoProduto') as HTMLInputElement ).value.trim();
-            this.controladora.buscarProduto(codigoProduto);
-            const botaoConfirmar = document.getElementById('modalProdutoConfirmar')! as HTMLButtonElement;
-            botaoConfirmar.disabled = false;
-        } );
-        document.getElementById('modalProdutoCancelar')!.addEventListener( 'click', () => this.fecharModalProduto() );
-        document.getElementById('modalProdutoConfirmar')!.addEventListener( 'click', () => {
-            const modal = document.getElementById('modalAdicionarProduto') as HTMLDialogElement;
-            const quantidade = ( document.getElementById('quantidadeProduto') as HTMLInputElement ).value;
-            this.controladora.confirmarProduto(modal, quantidade);
-        } );
+        this.iniciarModalProduto();
         document.getElementById('modalExtraCancelar')!.addEventListener( 'click', () => this.fecharModalExtra() );
         document.getElementById('modalExtraConfirmar')!.addEventListener( 'click', () => {
             const descricao = (document.getElementById('descricaoExtra') as HTMLInputElement).value.trim();
@@ -561,14 +550,51 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         document.getElementById('botaoAdicionarExtra')!.addEventListener( 'click', () => this.abrirModalExtra() );
     }
 
+    private iniciarModalProduto(): void {
+        const modal = document.getElementById('modalAdicionarProduto')! as HTMLDialogElement;
+        const inputBusca = document.getElementById('buscaProdutoModal')! as HTMLInputElement;
+        const botaoCancelar = document.getElementById('modalProdutoCancelar')! as HTMLButtonElement;
+        const botaoConfirmar = document.getElementById('modalProdutoConfirmar')! as HTMLButtonElement;
+        botaoConfirmar.disabled = true;
+        inputBusca.addEventListener( 'input', () => {
+            const termo = inputBusca.value.trim();
+            if (termo.length >= 2) {
+                this.controladora.buscarProdutos(termo);
+            } else {
+                document.getElementById('listaProdutosModal')!.innerHTML = '';
+            }
+        } );
+        botaoCancelar.addEventListener( 'click', () => {
+            modal.close();
+        } );
+        botaoConfirmar.addEventListener( 'click', () => {
+            const quantidade = (document.getElementById('quantidadeProduto') as HTMLInputElement).value;
+            this.controladora.confirmarProduto(modal, quantidade);
+        } );
+        modal.addEventListener( 'close', () => {
+            this.produtoAtual = null;
+            const detalhes = document.getElementById('detalhesProduto') as HTMLDivElement;
+            if (detalhes) {
+                detalhes.innerHTML = '';
+            }
+            const listaProdutos = document.getElementById('listaProdutosModal') as HTMLDivElement;
+            if (listaProdutos) {
+                listaProdutos.innerHTML = '';
+            }
+            inputBusca.value = '';
+            botaoConfirmar.disabled = true;
+        } );
+    }
+
     abrirModalProduto(servicoId: string, tarefaId: string): void {
         const modal = document.getElementById('modalAdicionarProduto') as HTMLDialogElement;
         modal.showModal();
-        const botaoConfirmar = document.getElementById('modalProdutoConfirmar')! as HTMLButtonElement;
-        botaoConfirmar.disabled = true;
-        ( document.getElementById('codigoProduto') as HTMLInputElement ).value = '';
+        ( document.getElementById('buscaProdutoModal') as HTMLInputElement ).value = '';
         ( document.getElementById('quantidadeProduto') as HTMLInputElement ).value = '1';
         document.getElementById('detalhesProduto')!.innerHTML = '';
+        document.getElementById('listaProdutosModal')!.innerHTML = '';
+        const botaoConfirmar = document.getElementById('modalProdutoConfirmar')! as HTMLButtonElement;
+        botaoConfirmar.disabled = true;
         modal.dataset.servicoIdDoProduto = servicoId;
         modal.dataset.tarefaIdDoProduto = tarefaId;
     }
@@ -578,16 +604,45 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         modal.close();
     }
 
-    exibirProdutoEncontradoModal(produto: any): void {
+    exibirProdutosModal(produtos: any[]): void {
+        const listaProdutos = document.getElementById('listaProdutosModal') as HTMLDivElement;
+        listaProdutos.innerHTML = '';
+        if (produtos.length === 0) {
+            listaProdutos.innerHTML = '<p>Nenhum produto encontrado.</p>';
+            return;
+        }
+        produtos.forEach( produto => {
+            const div = document.createElement('div');
+            div.className = 'item-lista-modal';
+            div.innerHTML = `
+                <strong>${produto.titulo}</strong>
+                <div>Código: ${produto.codigo}</div>
+                <div>Fabricante: ${produto.fabricante}</div>
+                <div>Preço: ${( Number(produto.precoVenda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) )}</div>
+                <div>Estoque: ${produto.estoque}</div>
+            `;
+            div.addEventListener( 'click', () => {
+                this.controladora.selecionarProduto(produto);
+            } );
+            listaProdutos.appendChild(div);
+        } );
+    }
+
+    exibirProdutoSelecionadoModal(produto: any): void {
         this.produtoAtual = produto;
         const detalhes = document.getElementById('detalhesProduto') as HTMLDivElement;
         detalhes.innerHTML = `
-            <strong>${produto.titulo}</strong>
+            <div><strong>${produto.titulo}</strong></div>
+            <div>Código: ${produto.codigo}</div>
             <div>Fabricante: ${produto.fabricante}</div>
             <div>Descrição: ${produto.descricao}</div>
             <div>Preço: ${( Number(produto.precoVenda).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) )}</div>
             <div>Estoque: ${produto.estoque}</div>
         `;
+        const botaoConfirmar = document.getElementById('modalProdutoConfirmar')! as HTMLButtonElement;
+        botaoConfirmar.disabled = false;
+        const listaProdutos = document.getElementById('listaProdutosModal') as HTMLDivElement;
+        listaProdutos.innerHTML = '';
     }
 
     abrirModalExtra(): void {

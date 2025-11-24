@@ -223,21 +223,21 @@ export class ControladoraCadastroOs {
         this.atualizarCalculos();
     }
 
-    async buscarProduto(codigoProduto: string): Promise<void> {
-        if (!codigoProduto) {
-            this.visao.exibirMensagem( ['Informe o código do produto.'] );
-            return;
-        }
+    async buscarProdutos(termo: string): Promise<void> {
         try {
-            const produto = await this.gestor.obterItemPorCodigo(codigoProduto);
-            this.visao.exibirProdutoEncontradoModal(produto);
+            const produtos = await this.gestor.obterItensPorTermo(termo);
+            this.visao.exibirProdutosModal(produtos);
         } catch (erro: any) {
             if (erro instanceof ErroGestor) {
                 this.visao.exibirMensagem( erro.getProblemas() );
             } else {
-                this.visao.exibirMensagem( [`Erro ao buscar o produto: ${erro.message}`] );
+                this.visao.exibirMensagem( [`Erro ao buscar produtos: ${erro.message}`] );
             }
         }
+    }
+
+    selecionarProduto(produto: any): void {
+        this.visao.exibirProdutoSelecionadoModal(produto);
     }
 
     confirmarProduto(modal: HTMLDialogElement, quantidade: string): void {
@@ -274,6 +274,8 @@ export class ControladoraCadastroOs {
         }
         this.visao.adicionarProdutoLista(produto, quantidadeFormat, servicoId, tarefaId);
         this.adicionarProduto(produto, quantidadeFormat, servicoId, tarefaId);
+        this.visao.limparProdutoAtual();
+        modal.close();
     }
 
     adicionarProduto(produto: any, quantidade: number, servicoId: string, tarefaId: string): void {

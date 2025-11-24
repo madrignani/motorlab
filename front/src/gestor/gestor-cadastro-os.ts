@@ -69,7 +69,7 @@ export class GestorCadastroOs {
         return await response.json();    
     }
 
-    async obterItemPorTermo(termo: string): Promise<any[]> {
+    async obterItensPorTermo(termo: string): Promise<any[]> {
         const response = await fetch( `${API_URL}/itens-termo/${termo}`, {
             method: 'GET',
             credentials: 'include'
