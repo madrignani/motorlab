@@ -373,7 +373,7 @@ export class ControladoraCadastroOs {
     }
 
     adicionarExtra(extra: any): void {
-        const existe = this.extrasSelecionados.some( extra => extra.descricao === extra.descricao );
+        const existe = this.extrasSelecionados.some( ext => ext.descricao === extra.descricao );
         if (existe) {
             this.visao.exibirMensagem( ['Já existe um custo extra com essa descrição.'] );
             return;

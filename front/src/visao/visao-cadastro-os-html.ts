@@ -101,7 +101,7 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
         divVeiculo.style.visibility = "visible";
         const divDetalhesCliente = document.getElementById("detalhesCliente") as HTMLDivElement;
         divDetalhesCliente.innerHTML = `
-            <p>Nome: ${cliente.nome}</p>
+            <p>${cliente.nome}</p>
             <p>CPF: ${cliente.cpf}</p>
             <p>Telefone: ${cliente.telefone}</p>
             <p>Email: ${cliente.email}</p>

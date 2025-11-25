@@ -483,6 +483,9 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
     }
 
     mostrarAlertaPrazo(): void {
+        if (this.dadosOs.status === 'FINALIZADA' || this.dadosOs.status === 'CANCELADA') {
+            return;
+        }
         const alertasDiv = document.getElementById('alertas') as HTMLDivElement;
         alertasDiv.innerHTML = `
             <div class="alerta atencao">
@@ -611,6 +614,9 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
             document.getElementById('botaoEditarPrevisao')!.style.display = 'block';
             document.getElementById('botaoCancelar')!.style.display = 'block';
         }
+        if (usuario.cargo === 'ATENDENTE') {
+            this.desativarModoEdicao();
+        }
     }
 
     private configurarBotoesAlerta(): void {
@@ -622,6 +628,9 @@ export class VisaoExibicaoOsHTML implements VisaoExibicaoOs {
             document.getElementById('botaoEditarMaoObra')!.style.display = 'block';
             document.getElementById('botaoEditarPrevisao')!.style.display = 'block';
             document.getElementById('botaoRemoverAlerta')!.style.display = 'block';
+        }
+        if (usuario.cargo === 'ATENDENTE') {
+            this.desativarModoEdicao();
         }
     }
 

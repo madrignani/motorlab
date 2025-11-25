@@ -406,7 +406,7 @@ class ServicoExibicaoEdicaoOs {
                 throw DominioException::comProblemas( ['Tarefa origem não encontrada.'] );
             }
             $tarefas = array_values($tarefas);
-            if (!empty($dados['destinoTarefaId'])) {
+            if ( !empty($dados['destinoTarefaId']) ) {
                 $novaPosicao = 0;
                 foreach ($tarefas as $indice => $tarefa) {
                     if ($tarefa['id'] == $dados['destinoTarefaId']) {

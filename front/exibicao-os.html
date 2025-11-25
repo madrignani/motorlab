@@ -4,15 +4,16 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="./src/visao/exibicao-os.ts" type="module" defer></script>
+        <link rel="icon" type="image/x-icon" href="./estilo/img/ico.ico">
         <link rel="stylesheet" href="./estilo/estilo-exibicao-os.css">
         <title>MotorLab - OS</title>
     </head>
     <body>
         <header>
+            <a id="inicioLogo" href="./index.html">
+                <img src="./estilo/img/logo-motorlab.png" class="logo">
+            </a>
             <nav aria-label="Navegação principal">
-                <a id="inicioLogo" href="./index.html">
-                    <img src="./estilo/img/logo-temp.png" class="logo">
-                </a>
                 <div class="dropdown">
                     <button class="dropdown-botao" id="dropdownBotaoUsuario">Usuário</button>
                     <div class="dropdown-conteudo" id="dropdownConteudoUsuario"></div>
@@ -123,7 +124,7 @@
                     <button type="button" id="botaoConcluir">CONCLUIR</button>
                     <button type="button" id="botaoRemoverAlerta">REMOVER ALERTA</button>
                     <button type="button" id="botaoVerLaudo">VER LAUDO</button>
-                    <button type="button" id="botaoPagamento">IR PARA PAGAMENTO</button>
+                    <button type="button" id="botaoPagamento" class="botao-secundario">IR PARA PAGAMENTO</button>
                 </div>
         </main>
         <dialog id="modalMensagem">
@@ -142,7 +143,7 @@
                 <span id="modalMaoObraSugerida"></span>
             </div>
             <menu>
-                <button id="modalValoresSugeridosFechar">Fechar</button>
+                <button id="modalValoresSugeridosFechar" class="botao-secundario">Fechar</button>
             </menu>
         </dialog>
         <dialog id="modalAdicionarServico">
@@ -238,7 +239,7 @@
             <div id="conteudoLaudo"></div>
             <menu>
                 <button id="modalVisualizarLaudoExportarPDF" class="botao-principal">Exportar PDF</button>
-                <button id="modalVisualizarLaudoFechar">Fechar</button>
+                <button id="modalVisualizarLaudoFechar" class="botao-secundario">Fechar</button>
             </menu>
         </dialog>
         <dialog id="modalPagamento">
@@ -283,5 +284,24 @@
                 <button type="button" id="modalCancelarOsCancelar" class="botao-secundario">Voltar</button>
             </menu>
         </dialog>
+        <footer>
+            <div class="campo-footer">
+                <div class="footer-secao">
+                    <h3>MotorLab v1.0</h3>
+                    <p class="footer-ambiente">Ambiente de Teste</p>
+                </div>
+                <div class="footer-secao">
+                    <h4>Desenvolvedor</h4>
+                    <p>Giovanni de Oliveira Madrignani</p>
+                    <p class="footer-copyright">© 2025 - Licença MIT</p>
+                </div>
+                <div class="footer-secao">
+                    <h4>Links Úteis</h4>
+                    <p><strong>Contato:</strong> <a href="mailto:giovanni.madrignani@aluno.cefet-rj.br">giovanni.madrignani@aluno.cefet-rj.br</a></p>
+                    <p><strong>Sobre:</strong> Aplicação desenvolvida para o TCC do curso de Sistemas de Informação do CEFET-RJ campus Nova Friburgo</p>
+                    <p><strong>Instituição:</strong> <a href="https://www.cefet-rj.br/index.php" target="_blank" rel="noopener noreferrer">CEFET-RJ</a></p>
+                </div>
+            </div>
+        </footer>
     </body>
 </html>
