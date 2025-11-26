@@ -51,7 +51,6 @@ No diretório `back`, a API PHP utiliza as seguintes dependências:
 
 ```bash
 git clone https://github.com/madrignani/motorlab.git
-cd motorlab
 ```
 
 ### 2. Configurar o Banco de Dados
@@ -72,7 +71,6 @@ cd motorlab
 No diretório `back`:
 
 ```bash
-cd back
 composer install
 ```
 
@@ -97,7 +95,6 @@ A API estará disponível em [http://localhost:8080](http://localhost:8080)
 No diretório `front`:
 
 ```bash
-cd front
 pnpm install
 ```
 
