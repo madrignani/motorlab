@@ -66,7 +66,7 @@ class ServicoCadastroOs {
         }
         $dto = [];
         foreach ($veiculos as $veiculo) {
-            $i = new VeiculoDTO( $veiculo['id'], $veiculo['cliente_id'], $veiculo['placa'], $veiculo['chassi'], $veiculo['fabricante'], $veiculo['modelo'], $veiculo['ano'], $veiculo['quilometragem'] );
+            $i = new VeiculoDto( $veiculo['id'], $veiculo['cliente_id'], $veiculo['placa'], $veiculo['chassi'], $veiculo['fabricante'], $veiculo['modelo'], $veiculo['ano'], $veiculo['quilometragem'] );
             $dto[] = $i->arrayDados();
         }
         return $dto;

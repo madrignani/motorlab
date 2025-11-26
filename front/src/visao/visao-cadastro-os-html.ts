@@ -9,7 +9,7 @@ export class VisaoCadastroOsHTML implements VisaoCadastroOs {
     private servicosAdicionados: string[] = [];
     private produtoAtual: any = null;
     private dataEditadaManual = false;
-    private intervaloAtualizacao: number | null = null;
+    private intervaloAtualizacao: any = null;
 
     constructor() {
         this.controladora = new ControladoraCadastroOs(this);

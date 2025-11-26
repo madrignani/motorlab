@@ -1301,7 +1301,8 @@ dialog menu {
 }
 
 #modalMensagemOk {
-    background: var(--azul-brilhante);
+    margin: 0 auto;
+    background: var(--sucesso);
     color: white;
     border: none;
     padding: 0.75rem 2.5rem;
@@ -1314,7 +1315,7 @@ dialog menu {
 }
 
 #modalMensagemOk:hover {
-    background: var(--azul-contraste);
+    background: var(--sucesso-hover);
     box-shadow: 0 4px 12px rgba(18, 108, 193, 0.3);
 }
 
