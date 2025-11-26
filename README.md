@@ -16,7 +16,7 @@ Para executar o projeto é necessário ter previamente instalado e configurado n
 - [PNPM](https://pnpm.io/) (versão 10.11.0+)
 - [PHP](https://www.php.net/) (versão 8.4.3+)
 - [Composer](https://getcomposer.org/) (versão 2.8.9+)
-- [MariaDB](https://mariadb.org/) ou MySQL (versão 5.7+)
+- [MariaDB](https://mariadb.org/) ou [MySQL](https://www.mysql.com/) (versão 5.7+)
 
 
 
@@ -55,7 +55,7 @@ git clone https://github.com/madrignani/motorlab.git
 
 ### 2. Configurar o Banco de Dados
 
-**Requisitos:** MariaDB ou MySQL instalado e em execução (recomendado via XAMPP, WAMP, Laragon, etc).
+**Requisitos:** MariaDB ou MySQL instalado e em execução (recomendado via XAMPP ou WAMP).
 
 1. Acesse o phpMyAdmin em [http://localhost/phpmyadmin](http://localhost/phpmyadmin)
 2. Crie um novo banco de dados chamado `motorlab`
@@ -126,6 +126,40 @@ pnpm preview     # Visualizar build de produção
 ```bash
 composer dump    # Regenerar autoload
 composer serve   # Iniciar servidor PHP
+```
+
+
+## Testes
+
+### Testes Unitários (Front-end)
+
+Os testes unitários do front-end são executados com **Vitest**.
+
+```bash
+cd front
+pnpm test
+```
+
+### Testes End-to-End (Front-end)
+
+Os testes E2E são executados com **Playwright** e testam o fluxo completo da aplicação.
+
+**Requisitos:** Certifique-se de que tanto o front-end quanto o back-end estejam em execução antes de rodar os testes E2E.
+
+```bash
+cd front
+pnpm e2e
+```
+
+### Testes Unitários (Back-end)
+
+Os testes unitários do back-end são executados com **Kahlan**.
+
+**Nota:** A aplicação não precisa estar em execução para rodar estes testes.
+
+```bash
+cd back
+composer test
 ```
 
 
