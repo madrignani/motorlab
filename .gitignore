@@ -10,3 +10,10 @@ back/composer.lock
 
 # Arquivos com variáveis de ambiente
 back/.env
+front/.env
+
+# Arquivos com resultados de teste
+front/test-results
+
+#Arquivos com dados de sessão
+front/test/e2e/.auth
