@@ -891,3 +891,19 @@ footer {
 .footer-secao a:hover {
     color: var(--azul-brilhante);
 }
+
+
+/*////////////////////////////     MEDIA QUERIES - ZOOM PARA NOTEBOOKS      /////////////////////////////////*/
+
+
+@media screen and (min-width: 1024px) and (max-width: 1600px) {
+    body {
+        zoom: 0.8;
+    }
+}
+
+@media screen and (min-width: 1601px) and (max-width: 1920px) {
+    body {
+        zoom: 0.9;
+    }
+}
