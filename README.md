@@ -144,7 +144,7 @@ pnpm test
 
 Os testes E2E são executados com **Playwright** e testam o fluxo completo da aplicação.
 
-**Requisitos:** Certifique-se de que tanto o front-end quanto o back-end estejam em execução antes de rodar os testes E2E.
+**Requisitos:** Certifique-se de que tanto o front-end quanto o back-end estejam em execução antes de rodar.
 
 ```bash
 cd front
