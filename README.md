@@ -8,6 +8,129 @@ Desenvolvido por **Giovanni de Oliveira Madrignani**.
 
 
 
+
+
+## Funcionalidades
+
+### Gestão de Clientes e Veículos
+- Cadastro completo de clientes
+- Cadastro de veículos vinculados aos clientes
+- Busca e consulta de clientes e veículos
+
+
+### Ordens de Serviço (OS)
+
+O sistema de Ordens de Serviço aplica os princípios do **Sistema Toyota de Produção (STP)**, oferecendo:
+
+**Cadastro e Criação de OS:**
+- Criação de OS vinculada a cliente e veículo específico
+- Seleção de serviços do catálogo com tarefas pré-configuradas em ordem de execução
+- Cada serviço possui tempo de execução padrão e valor de mão de obra base
+- Sistema de permissões (ATENDENTE, MECÂNICO E GERENTE)
+- Valores sugeridos calculados automaticamente:
+  - **Previsão de entrega:** soma dos tempos padrão de todos os serviços
+  - **Valor de mão de obra sugerido:** soma dos valores de todos os serviços
+
+**Personalização de Serviços:**
+- Adição e remoção de tarefas com base nas condições do veículo
+- Reordenação de tarefas seguindo o conceito de fluxo contínuo do STP
+- Vinculação de produtos do estoque a cada tarefa
+- Adição de custos extras personalizados
+
+**Quadro Kanban de Acompanhamento:**
+- Visualização estilo kanban com 6 colunas de status:
+  - **PROVISÓRIA:** OS em elaboração, aguardando efetivação
+  - **EM ANDAMENTO:** OS efetivada e em execução
+  - **ALERTA:** OS com problemas identificados (princípio Jidoka do STP)
+  - **CONCLUÍDA:** Trabalho finalizado, aguardando laudo e pagamento
+  - **FINALIZADA:** OS paga e encerrada
+  - **CANCELADA:** OS cancelada
+
+**Sistema de Alertas (Jidoka - STP):**
+- Mecânicos podem sinalizar problemas durante a execução
+- Alertas visuais para OS com prazo excedido
+- Gerentes podem remover alertas após resolução
+
+**Cálculo e Gestão de Valores:**
+- Valor de mão de obra
+- Valor total de produtos consumidos
+- Valor de custos extras
+- Valor estimado total atualizado em tempo real
+- Comparação com valores sugeridos inicialmente
+
+**Conclusão e Fechamento:**
+- Geração de laudo técnico obrigatório ao concluir OS
+- Laudo contém resumo dos serviços e recomendações
+- Registro de pagamento com desconto progressivo baseado em método e cargo
+- Exportação de laudo em PDF
+- Histórico completo de datas (criação, previsão, finalização)
+
+
+### Gestão de Estoque
+- Cadastro de produtos 
+- Controle de estoque mínimo
+- Busca de produtos por termo
+- Atualização e remoção de itens
+- Baixa automática no estoque ao adicionar produtos na OS
+
+
+
+
+
+## Arquitetura do Projeto
+
+### Back-end (PHP)
+
+O back-end segue uma arquitetura em camadas com separação de responsabilidades:
+
+```
+back/
+├── src/
+│   ├── Autenticacao/       # sistema de autenticação e sessões
+│   ├── Config/             # configurações (conexão BD)
+│   ├── Dto/                # Data Transfer Objects
+│   ├── Excecao/            # exceções personalizadas
+│   ├── Modelo/             # entidades de domínio
+│   ├── Repositorio/        # camada de acesso a dados
+│   ├── Servico/            # lógica de negócio
+│   ├── Transacao/          # gerenciamento de transações
+│   └── Utils/              # utilitários diversos
+├── bd/                     # scripts SQL
+├── test/                   # testes unitários
+└── index.php               # ponto de entrada da API
+```
+
+**Padrões utilizados:**
+- **DTO (Data Transfer Object)**: Transferência de dados entre camadas
+- **Service Layer**: Encapsulamento da lógica de negócio
+- **Dependency Injection**: Injeção de dependências via construtor
+- **Transaction Script**: Gerenciamento de transações de banco de dados
+
+
+### Front-end (TypeScript)
+
+```
+front/
+├── src/
+│   ├── controladora/       # lógica de controle
+│   ├── gestor/             # conexão com a API
+│   ├── infra/              # infraestrutura de erros
+│   └── visao/              # gerencimento dos componentes de UI
+├── estilo/                 # CSS e assets
+├── test/
+│   ├── e2e/                # testes end-to-end
+│   └── unit/               # testes unitários
+└── *.html                  # páginas HTML
+```
+
+**Padrões utilizados:**
+- **MVC (Model-View-Controller)**: Separação de responsabilidades
+- **Módulos ES6**: Organização modular do código
+
+
+
+
+
 ## Ambiente de desenvolvimento
 
 Para executar o projeto é necessário ter previamente instalado e configurado no ambiente: 
@@ -17,6 +140,8 @@ Para executar o projeto é necessário ter previamente instalado e configurado n
 - [PHP](https://www.php.net/) (versão 8.4.3+)
 - [Composer](https://getcomposer.org/) (versão 2.8.9+)
 - [MariaDB](https://mariadb.org/) ou [MySQL](https://www.mysql.com/) (versão 5.7+)
+
+
 
 
 
@@ -42,6 +167,8 @@ No diretório `back`, a API PHP utiliza as seguintes dependências:
 - `phputil/router`: dev-main - Roteamento de requisições HTTP
 - `phputil/cors`: dev-main - Gerenciamento de CORS
 - `kahlan/kahlan`: ^6.0 - Framework de testes para PHP
+
+
 
 
 
@@ -129,6 +256,8 @@ composer serve   # Iniciar servidor PHP
 ```
 
 
+
+
 ## Testes
 
 ### Testes Unitários (Front-end)
@@ -163,6 +292,19 @@ composer test
 ```
 
 
+
+
+
 ## Licença
 
 Este projeto está licenciado sob os termos da [Licença MIT](./LICENSE).
+
+
+
+
+
+## Agradecimentos
+
+- **CEFET/RJ**
+- **Prof. Rafael Elias de Lima Escalfoni**
+- **Sistema Toyota de Produção**
