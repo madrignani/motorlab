@@ -13,23 +13,27 @@ Desenvolvido por **Giovanni de Oliveira Madrignani**.
 ## Funcionalidades
 
 ### Gestão de Clientes e Veículos
-- Cadastro completo de clientes
+- Cadastro de clientes
 - Cadastro de veículos vinculados aos clientes
-- Busca e consulta de clientes e veículos
+- Consulta e busca de clientes e veículos
+
+
+### Gestão de Estoque
+- Cadastro de produtos 
+- Controle de estoque mínimo com alertas
+- Consulta e busca de produtos
+- Atualização e remoção de itens
+- Baixa automática no estoque ao adicionar produtos na OS
 
 
 ### Ordens de Serviço (OS)
-
-O sistema de Ordens de Serviço aplica os princípios do **Sistema Toyota de Produção (STP)**, oferecendo:
 
 **Cadastro e Criação de OS:**
 - Criação de OS vinculada a cliente e veículo específico
 - Seleção de serviços do catálogo com tarefas pré-configuradas em ordem de execução
 - Cada serviço possui tempo de execução padrão e valor de mão de obra base
 - Sistema de permissões (ATENDENTE, MECÂNICO E GERENTE)
-- Valores sugeridos calculados automaticamente:
-  - **Previsão de entrega:** soma dos tempos padrão de todos os serviços
-  - **Valor de mão de obra sugerido:** soma dos valores de todos os serviços
+- Valores sugeridos calculados automaticamente
 
 **Personalização de Serviços:**
 - Adição e remoção de tarefas com base nas condições do veículo
@@ -64,14 +68,6 @@ O sistema de Ordens de Serviço aplica os princípios do **Sistema Toyota de Pro
 - Registro de pagamento com desconto progressivo baseado em método e cargo
 - Exportação de laudo em PDF
 - Histórico completo de datas (criação, previsão, finalização)
-
-
-### Gestão de Estoque
-- Cadastro de produtos 
-- Controle de estoque mínimo
-- Busca de produtos por termo
-- Atualização e remoção de itens
-- Baixa automática no estoque ao adicionar produtos na OS
 
 
 
