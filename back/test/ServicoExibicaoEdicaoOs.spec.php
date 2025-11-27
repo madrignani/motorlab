@@ -1,7 +1,7 @@
 <?php
 
 
-use App\Utils\RecomposicaoBD;
+use App\Utils\RecomposicaoBd;
 use App\Config\Conexao;
 use App\Excecao\AutenticacaoException;
 use App\Excecao\DominioException;
