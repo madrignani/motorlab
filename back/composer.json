@@ -17,7 +17,7 @@
     },
 
     "scripts": {
-        "test": "kahlan --spec=test",
+        "test": "kahlan --spec=Test",
         "dump": "composer dump-autoload",
         "serve": "php -S localhost:8080"
     },
